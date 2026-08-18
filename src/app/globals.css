@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+:root {
+  --background: #faf8ff;
+  --foreground: #1c1428;
+  --grad: linear-gradient(135deg, #c026d3 0%, #7c3aed 48%, #4338ca 100%);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand: #7c3aed;
+  --color-brand-50: #f3e8ff;
+  --color-brand-100: #e9d5ff;
+  --color-ink: #1c1428;
+  --color-mute: #6b6280;
+  --color-line: #ece6f5;
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background:
+    radial-gradient(1200px 500px at 10% -10%, rgba(192, 38, 211, 0.12), transparent 50%),
+    radial-gradient(900px 400px at 100% 0%, rgba(67, 56, 202, 0.1), transparent 45%),
+    var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display), var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  background: var(--grad);
+  color: white;
+  font-weight: 600;
+  padding: 0.7rem 1.2rem;
+  font-size: 0.9rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+  box-shadow: 0 10px 24px -12px rgba(124, 58, 237, 0.7);
+}
+.btn-primary:hover { filter: brightness(1.05); transform: translateY(-1px); }
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-line);
+  background: white;
+  color: var(--color-ink);
+  font-weight: 600;
+  padding: 0.7rem 1.15rem;
+  font-size: 0.9rem;
+}
+.btn-ghost:hover { background: var(--color-brand-50); }
+
+.card {
+  background: white;
+  border: 1px solid var(--color-line);
+  border-radius: 1.35rem;
+}
+
+.input {
+  width: 100%;
+  border-radius: 0.95rem;
+  border: 1px solid var(--color-line);
+  background: white;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.95rem;
+  outline: none;
+}
+.input:focus { border-color: var(--color-brand); box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12); }
+
+.label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: var(--color-ink);
+}
+
+.pill {
+  border-radius: 999px;
+  border: 1px solid var(--color-line);
+  background: #f6f4fb;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.85rem;
+  font-weight: 550;
+}
+.pill-on {
+  border-color: transparent;
+  background: var(--color-brand);
+  color: white;
+}
+
+.hex-frame {
+  clip-path: polygon(25% 4%, 75% 4%, 100% 50%, 75% 96%, 25% 96%, 0% 50%);
+}
