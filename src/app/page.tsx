@@ -1,69 +1,184 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import Link from "next/link";
+import { OfferCard } from "@/components/OfferCard";
+import { IconArrows, IconCheck, IconChat, IconShield, IconStar } from "@/components/icons";
+import { useStore } from "@/lib/store";
+import { Logo } from "@/components/Logo";
+
+const steps = [
+  {
+    n: "01",
+    title: "Publica lo que tienes",
+    text: "Fotos, municipio y barrio. Sin GPS obligatorio. Pausas, editas o das de baja cuando quieras.",
+  },
+  {
+    n: "02",
+    title: "Alguien toca MeCuadra",
+    text: "Como aplicar a una oferta P2P: propone artículos o escribe lo que puede dar, aunque no esté publicado.",
+  },
+  {
+    n: "03",
+    title: "Chat, encuentro, confirmar",
+    text: "Coordinan el punto. Cada parte marca entregado. Luego se valoran. La reputación es la custodia.",
+  },
+];
+
+export default function HomePage() {
+  const { offers } = useStore();
+  const featured = offers.filter((o) => o.status === "abierta").slice(0, 6);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="-mx-4">
+      <section className="relative overflow-hidden px-4 pb-16 pt-8 md:pt-16">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 md:grid-cols-2">
+          <div>
+            <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1 text-xs font-semibold text-brand">
+              Mercado P2P de bienes · Cuba
+            </p>
+            <h1 className="font-display text-4xl font-semibold leading-[1.1] tracking-tight text-ink md:text-6xl">
+              Si te cuadra,
+              <span className="block bg-[image:var(--grad)] bg-clip-text text-transparent">
+                se cierra el trueque.
+              </span>
+            </h1>
+            <p className="mt-5 max-w-lg text-lg leading-7 text-mute">
+              El trueque que ya se hace en grupos, con fotos, municipio y reputación.
+              Publicas lo que tienes, aplicas a lo que necesitas y cierras el trato
+              en el chat. Sin ventas y sin pedir efectivo en el listado.
+            </p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link href="/explorar" className="btn-primary">
+                Explorar ofertas
+              </Link>
+              <Link href="/publicar" className="btn-ghost">
+                Publicar un trueque
+              </Link>
+            </div>
+            <dl className="mt-10 grid grid-cols-3 gap-4 max-w-md">
+              {[
+                ["Solo trueque", "Cero efectivo en listados"],
+                ["Municipio", "Nunca un GPS que bloquee"],
+                ["Reputación", "La garantía del encuentro"],
+              ].map(([k, v]) => (
+                <div key={k}>
+                  <dt className="font-display text-sm font-semibold">{k}</dt>
+                  <dd className="text-xs text-mute">{v}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+          <div className="relative">
+            <div className="absolute -inset-6 rounded-[2.5rem] bg-[image:var(--grad)] opacity-20 blur-2xl" />
+            <div className="card relative p-5 shadow-xl shadow-brand/10">
+              <div className="mb-4 flex items-center justify-between">
+                <Logo withWord size={32} />
+                <span className="text-xs text-mute">Oferta abierta</span>
+              </div>
+              <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-2xl bg-stone-50 p-4">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase text-mute">Ofrece</p>
+                  <p className="font-medium">Ibuprofeno 200 mg</p>
+                  <p className="text-xs text-mute">Plaza · Vedado</p>
+                </div>
+                <span className="grid h-10 w-10 place-items-center rounded-full bg-[image:var(--grad)] text-white">
+                  <IconArrows className="h-5 w-5" />
+                </span>
+                <div>
+                  <p className="text-[10px] font-semibold uppercase text-mute">Necesita</p>
+                  <p className="font-medium">Alimentos o aseo</p>
+                  <p className="text-xs text-mute">Voy al lugar</p>
+                </div>
+              </div>
+              <button className="btn-primary mt-4 w-full pointer-events-none">MeCuadra</button>
+              <p className="mt-3 text-center text-xs text-mute">
+                Un toque. Propones. Se abre el chat.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-line bg-white px-4 py-14">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="font-display text-3xl">Tres pasos para cerrar el trueque</h2>
+          <p className="mt-2 max-w-2xl text-mute">
+            Publicas. Alguien toca MeCuadra y propone qué da a cambio. Coordinan en el
+            chat, confirman la entrega y se valoran. La reputación queda en el perfil.
           </p>
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            {steps.map((s) => (
+              <article key={s.n} className="card p-5">
+                <p className="font-display text-sm text-brand">{s.n}</p>
+                <h3 className="mt-2 font-display text-xl">{s.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-mute">{s.text}</p>
+              </article>
+            ))}
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      <section className="px-4 py-14">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-6 flex items-end justify-between">
+            <div>
+              <h2 className="font-display text-3xl">Libro de ofertas</h2>
+              <p className="text-mute">Formato #cambio / #necesito / #municipio, con fotos y reputación.</p>
+            </div>
+            <Link href="/explorar" className="text-sm font-semibold text-brand">
+              Ver todas
+            </Link>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {featured.map((o) => (
+              <OfferCard key={o.id} offer={o} />
+            ))}
+          </div>
         </div>
-      </main>
+      </section>
+
+      <section className="px-4 pb-16">
+        <div className="mx-auto grid max-w-6xl gap-4 md:grid-cols-3">
+          {[
+            {
+              icon: IconShield,
+              t: "Confianza, no escrow de dinero",
+              d: "Perfiles verificables, historial de trueques y valoración 1–5. La reputación es lo que custodia el trato.",
+            },
+            {
+              icon: IconChat,
+              t: "Chat del trueque",
+              d: "Puedes aclarar, ofrecer otro artículo no publicado o coordinar el punto. Solo las dos partes ven el hilo.",
+            },
+            {
+              icon: IconStar,
+              t: "Regla de oro",
+              d: "Si pides efectivo, no es MeCuadra. Revolico y Facebook cubren la venta. Aquí el trueque se defiende.",
+            },
+          ].map((b) => (
+            <article key={b.t} className="card p-5">
+              <b.icon className="h-6 w-6 text-brand" />
+              <h3 className="mt-3 font-display text-lg">{b.t}</h3>
+              <p className="mt-2 text-sm leading-6 text-mute">{b.d}</p>
+            </article>
+          ))}
+        </div>
+        <div className="mx-auto mt-8 max-w-6xl card flex flex-col items-start gap-4 bg-[image:var(--grad)] p-8 text-white md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="font-display text-2xl">¿Tienes algo que ya no usas?</p>
+            <p className="mt-1 text-white/80">
+              Alguien en tu municipio lo está buscando hoy.
+            </p>
+          </div>
+          <Link href="/publicar" className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-brand">
+            Publicar oferta
+          </Link>
+        </div>
+        <p className="mx-auto mt-6 flex max-w-6xl items-center gap-2 text-xs text-mute">
+          <IconCheck className="h-4 w-4 text-brand" />
+          Explorar no pide ubicación. El municipio es un filtro, nunca un muro.
+        </p>
+      </section>
     </div>
   );
 }

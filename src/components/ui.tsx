@@ -96,12 +96,13 @@ export function Empty({
 }
 
 export function RequireAuth({ children }: { children: React.ReactNode }) {
-  const { currentUser } = useStore();
+  const { currentUser, ready } = useStore();
+  if (!ready) return <p className="py-12 text-center text-sm text-mute">Cargando…</p>;
   if (!currentUser) {
     return (
       <Empty
         title="Inicia sesión para continuar"
-        hint="En el demo puedes entrar con cualquier correo."
+        hint="Entra con Google o con tu número de teléfono."
         action={
           <a href="/login" className="btn-primary">
             Entrar

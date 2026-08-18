@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MeCuadra
 
-## Getting Started
+Mercado de trueque entre personas en Cuba. Publicas lo que tienes, alguien toca **MeCuadra**, se abre el chat, confirman el encuentro y se valoran.
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Next.js (App Router) en Vercel
+- Supabase: Auth, Postgres, Storage, Realtime
+- Login con **Google** y **teléfono** (E.164, Cuba `+53`)
+- Publicar y aplicar exigen teléfono verificado
+- Chat cifrado en reposo con AES-256-GCM; TLS en tránsito; RLS para que solo las dos partes vean el hilo
+
+## Configuración local
+
+Copia `.env.example` a `.env.local` y rellena las claves (Supabase → Settings → API):
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://wcrgbcxewqqbnjvelwrp.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+MESSAGE_ENCRYPTION_KEY=
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`MESSAGE_ENCRYPTION_KEY` es 32 bytes en hexadecimal (64 caracteres):
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+npm run dev
+```
 
-## Learn More
+## Base de datos
 
-To learn more about Next.js, take a look at the following resources:
+En el SQL Editor de Supabase ejecuta `supabase/schema.sql`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Luego, en Authentication:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Providers → Google (Client ID y Secret de Google Cloud, redirect `https://wcrgbcxewqqbnjvelwrp.supabase.co/auth/v1/callback`)
+2. Providers → Phone (Twilio). En Site URL y Redirect URLs añade `http://localhost:3000/auth/callback` y `https://TU-DOMINIO.vercel.app/auth/callback`
 
-## Deploy on Vercel
+## Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Importa el repo `reykratosxx/mecuadra`, pega las mismas tres variables de entorno y despliega.

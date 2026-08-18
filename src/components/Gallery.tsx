@@ -6,6 +6,7 @@ import { IconChevron, IconX } from "./icons";
 export function Gallery({ photos, alt }: { photos: string[]; alt: string }) {
   const [open, setOpen] = useState(false);
   const [index, setIndex] = useState(0);
+  const [touchX, setTouchX] = useState<number | null>(null);
   const n = photos.length || 1;
   const srcs = photos.length ? photos : ["/logo.png"];
 
@@ -32,6 +33,14 @@ export function Gallery({ photos, alt }: { photos: string[]; alt: string }) {
           type="button"
           onClick={() => setOpen(true)}
           className="block w-full"
+          onTouchStart={(e) => setTouchX(e.changedTouches[0].clientX)}
+          onTouchEnd={(e) => {
+            if (touchX == null) return;
+            const dx = e.changedTouches[0].clientX - touchX;
+            if (dx > 40) go(-1);
+            if (dx < -40) go(1);
+            setTouchX(null);
+          }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={srcs[index]} alt={alt} className="aspect-[4/3] w-full object-cover" />

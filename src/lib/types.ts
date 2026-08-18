@@ -38,6 +38,8 @@ export type User = {
   email: string;
   avatar: string;
   bio: string;
+  phone: string | null;
+  phoneVerified: boolean;
   province: string;
   municipality: string;
   neighborhood: string;

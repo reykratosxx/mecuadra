@@ -15,8 +15,8 @@
   --color-ink: #1c1428;
   --color-mute: #6b6280;
   --color-line: #ece6f5;
-  --font-sans: var(--font-sans);
-  --font-display: var(--font-display);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-head);
 }
 
 * { box-sizing: border-box; }
@@ -33,7 +33,7 @@ body {
 }
 
 .font-display {
-  font-family: var(--font-display), var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-head), var(--font-body), ui-sans-serif, system-ui, sans-serif;
 }
 
 .btn-primary {
