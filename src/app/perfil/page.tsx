@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useStore } from "@/lib/store";
 import { Avatar, Badge, RequireAuth, Stars } from "@/components/ui";
 import { PROVINCES, TRANSPORT_LABEL, municipalitiesOf } from "@/lib/cuba";
 import { IconCamera, IconShield } from "@/components/icons";
 import { OfferCard } from "@/components/OfferCard";
+import { LogoutModal } from "@/components/LogoutModal";
 import { uploadDataUrl } from "@/lib/upload";
 
 export default function PerfilPage() {
@@ -21,6 +23,7 @@ function Me() {
   const u = currentUser!;
   const mine = offers.filter((o) => o.userId === u.id);
   const myItems = items.filter((i) => i.userId === u.id && i.status === "activo");
+  const [logoutOpen, setLogoutOpen] = useState(false);
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -141,9 +144,20 @@ function Me() {
         )}
       </section>
 
-      <button type="button" className="text-sm text-rose-600" onClick={() => void logout()}>
+      <button type="button" className="text-sm text-rose-600" onClick={() => setLogoutOpen(true)}>
         Cerrar sesión
       </button>
+      {logoutOpen ? (
+        <LogoutModal
+          email={u.email}
+          phone={u.phone}
+          onClose={() => setLogoutOpen(false)}
+          onDone={async () => {
+            await logout();
+            window.location.href = "/";
+          }}
+        />
+      ) : null}
     </div>
   );
 }

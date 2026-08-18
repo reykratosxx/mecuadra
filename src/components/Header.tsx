@@ -11,8 +11,7 @@ import { cn } from "@/lib/utils";
 const links = [
   { href: "/explorar", label: "Explorar" },
   { href: "/trueques", label: "Trueques" },
-  { href: "/articulos", label: "Artículos" },
-  { href: "/como-funciona", label: "Cómo funciona" },
+  { href: "/docs", label: "Docs" },
 ];
 
 export function Header() {

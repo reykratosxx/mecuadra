@@ -6,7 +6,8 @@ Mercado de trueque entre personas en Cuba. Publicas lo que tienes, alguien toca 
 
 - Next.js (App Router) en Vercel
 - Supabase: Auth, Postgres, Storage, Realtime
-- Login con **Google** y **teléfono** (E.164, Cuba `+53`)
+- Login con **Google**, **código al correo** o **código SMS** (`+53`)
+- Cerrar sesión pide el mismo código de confirmación (correo o SMS)
 - Publicar y aplicar exigen teléfono verificado
 - Chat cifrado en reposo con AES-256-GCM; TLS en tránsito; RLS para que solo las dos partes vean el hilo
 
@@ -37,8 +38,10 @@ En el SQL Editor de Supabase ejecuta `supabase/schema.sql`.
 
 Luego, en Authentication:
 
-1. Providers → Google (Client ID y Secret de Google Cloud, redirect `https://wcrgbcxewqqbnjvelwrp.supabase.co/auth/v1/callback`)
-2. Providers → Phone (Twilio). En Site URL y Redirect URLs añade `http://localhost:3000/auth/callback` y `https://TU-DOMINIO.vercel.app/auth/callback`
+1. Providers → Email: activo, confirmación por OTP. En la plantilla usa `{{ .Token }}` (código de 6 dígitos), no solo el magic link.
+2. Providers → Phone (Twilio / SMS) para códigos a `+53`.
+3. Providers → Google (Client ID y Secret). Redirect: `https://wcrgbcxewqqbnjvelwrp.supabase.co/auth/v1/callback`
+4. Redirect URLs: `http://localhost:3000/auth/callback` y `https://TU-DOMINIO.vercel.app/auth/callback`
 
 ## Vercel
 

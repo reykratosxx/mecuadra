@@ -11,6 +11,7 @@ import { categoryLabel } from "@/lib/categories";
 import { useStore } from "@/lib/store";
 import { timeAgo } from "@/lib/utils";
 import { IconArrows, IconPin, IconShield, IconTruck } from "@/components/icons";
+import { ShareOffer } from "@/components/ShareOffer";
 
 export default function OfertaPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -121,6 +122,7 @@ export default function OfertaPage({ params }: { params: Promise<{ id: string }>
             <p className="mt-5 text-sm text-mute">Esta oferta ya no está abierta.</p>
           )}
         </div>
+        <ShareOffer offer={offer} offeredTitles={offered.map((i) => i.title)} />
       </aside>
       {open ? <ApplyModal offerId={offer.id} onClose={() => setOpen(false)} /> : null}
     </div>

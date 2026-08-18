@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { BottomNav } from "./BottomNav";
@@ -13,8 +14,9 @@ export function AppShell({
   children: React.ReactNode;
   bare?: boolean;
 }) {
+  const path = usePathname();
   const { needsPhone, currentUser } = useStore();
-  if (bare) return <>{children}</>;
+  if (bare || path.startsWith("/docs")) return <>{children}</>;
   return (
     <>
       <Header />

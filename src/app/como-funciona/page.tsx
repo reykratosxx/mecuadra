@@ -77,9 +77,14 @@ export default function ComoFuncionaPage() {
         </ul>
       </section>
 
-      <Link href="/explorar" className="btn-primary mt-8">
-        Ir al mercado
-      </Link>
+      <div className="mt-8 flex flex-wrap gap-3">
+        <Link href="/explorar" className="btn-primary">
+          Ir al mercado
+        </Link>
+        <Link href="/docs" className="btn-ghost">
+          Abrir las docs
+        </Link>
+      </div>
     </div>
   );
 }

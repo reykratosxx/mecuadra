@@ -8,6 +8,7 @@ import { useStore } from "@/lib/store";
 import { timeAgo } from "@/lib/utils";
 import { Avatar, Badge, Stars } from "./ui";
 import { IconArrows, IconPin, IconShield, IconTruck } from "./icons";
+import { buildOfferShare } from "@/lib/share";
 
 export function OfferCard({ offer }: { offer: Offer }) {
   const { users, items } = useStore();
@@ -16,10 +17,8 @@ export function OfferCard({ offer }: { offer: Offer }) {
   const cover = offered[0]?.photos[0] ?? "/logo.png";
 
   return (
-    <Link
-      href={`/oferta/${offer.id}`}
-      className="card group overflow-hidden transition hover:-translate-y-0.5 hover:border-brand/25 hover:shadow-lg hover:shadow-brand/5"
-    >
+    <article className="card group overflow-hidden transition hover:-translate-y-0.5 hover:border-brand/25 hover:shadow-lg hover:shadow-brand/5">
+      <Link href={`/oferta/${offer.id}`} className="block">
       <div className="relative aspect-[4/3] overflow-hidden bg-stone-100">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -82,6 +81,38 @@ export function OfferCard({ offer }: { offer: Offer }) {
           </span>
         </div>
       </div>
-    </Link>
+      </Link>
+      <ShareStrip offer={offer} titles={offered.map((i) => i.title)} />
+    </article>
+  );
+}
+
+function ShareStrip({ offer, titles }: { offer: Offer; titles: string[] }) {
+  function go(kind: "telegram" | "whatsapp" | "facebook") {
+    const origin = window.location.origin;
+    const place = [offer.neighborhood, offer.municipality].filter(Boolean).join(", ");
+    const pack = buildOfferShare({
+      origin,
+      offerId: offer.id,
+      offered: titles,
+      wants: offer.wants.map((w) => w.title),
+      place,
+      transport: TRANSPORT_LABEL[offer.transport],
+    });
+    const href = pack[kind];
+    window.open(href, "_blank", "noopener,noreferrer,width=640,height=720");
+  }
+  return (
+    <div className="flex border-t border-line">
+      <button type="button" className="flex-1 py-2 text-center text-[11px] font-semibold text-mute hover:bg-brand-50" onClick={() => go("telegram")}>
+        Telegram
+      </button>
+      <button type="button" className="flex-1 border-x border-line py-2 text-center text-[11px] font-semibold text-mute hover:bg-brand-50" onClick={() => go("whatsapp")}>
+        WhatsApp
+      </button>
+      <button type="button" className="flex-1 py-2 text-center text-[11px] font-semibold text-mute hover:bg-brand-50" onClick={() => go("facebook")}>
+        Facebook
+      </button>
+    </div>
   );
 }
