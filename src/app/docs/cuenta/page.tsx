@@ -1,4 +1,4 @@
-import { Callout, DocHero, Steps } from "@/components/docs/widgets";
+import { Callout, CodeBlock, DocHero, Steps } from "@/components/docs/widgets";
 
 export const metadata = { title: "Cuenta y códigos" };
 
@@ -33,6 +33,19 @@ export default function Page() {
           { title: "Abres el bot", text: "Tocas Verificar con Telegram." },
           { title: "Compartes el Cubacel", text: "Un botón. Sin SMS. Sin cobro." },
         ]}
+      />
+      <h2>Cerrar sesión</h2>
+      <p>Un “sí, salir”. El código es para entrar, no para irte: si no, el límite de correo te deja atrapado.</p>
+      <h2>Plantilla del correo</h2>
+      <p>
+        Si el mail dice “toca este link”, la plantilla Magic Link de Supabase no tiene el token.
+        Authentication → Email Templates → Magic Link:
+      </p>
+      <CodeBlock
+        label="html"
+        code={`<h2>Tu código MeCuadra</h2>
+<p>Escríbelo en la app. Caduca en minutos. No lo compartas.</p>
+<p style="font-size:28px;letter-spacing:6px;font-weight:700">{{ .Token }}</p>`}
       />
       <Callout title="Por qué no hay SMS gratis" tone="warn">
         Cubacel no termina mensajes internacionales de a gratis. Twilio cortó +53 en 2025.

@@ -31,6 +31,9 @@ export function friendlyAuthError(message: string) {
   if (m.includes("password should be")) {
     return "La contraseña debe tener al menos 6 caracteres.";
   }
+  if (m.includes("rate limit") || m.includes("over_email_send_rate_limit")) {
+    return "Supabase cortó el correo un rato (demasiados envíos). Espera unos minutos; no pidas otro código.";
+  }
   if (m.includes("signups not allowed")) {
     return "El alta no está activa. En Auth → Providers deja Email encendido.";
   }

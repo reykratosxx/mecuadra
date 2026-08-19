@@ -16,8 +16,7 @@ export default function Page() {
           <strong>Tránsito</strong> — HTTPS en Vercel y en Supabase.
         </li>
         <li>
-          <strong>Identidad</strong> — Google, correo con contraseña, o SMS al +53
-          por BudgetSMS (Cubacel).
+          <strong>Identidad</strong> — Google, código al correo, o Cubacel por Telegram.
         </li>
         <li>
           <strong>Autorización</strong> — Row Level Security en todas las tablas.
@@ -31,7 +30,7 @@ export default function Page() {
         </li>
       </ul>
       <Callout title="Cerrar sesión" tone="ok">
-        Pedimos de nuevo un código al correo o un SMS. Confirma que quien sale eres tú.
+        Cerrar sesión es un sí/no. El código es solo para entrar.
       </Callout>
     </article>
   );

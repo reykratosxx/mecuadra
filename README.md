@@ -6,11 +6,11 @@ Mercado de trueque entre personas en Cuba. Publicas lo que tienes, alguien toca 
 
 - Next.js (App Router) en Vercel
 - Supabase: Auth, Postgres, Storage, Realtime
-- Login: **Google** (sin clave), **correo y contraseña**, o **Cubacel por Telegram (gratis)**
+- Login: **Google** (sin clave), **código al correo**, o **Cubacel por Telegram (gratis)**
 - No hay SMS gratis a Cubacel (ETECSA cobra). Telegram es el canal libre en la isla
 - SMS de pago opcional vía BudgetSMS; Twilio cortó +53 en 2025
 - Publicar y aplicar exigen celular cubano
-- Cerrar sesión pide un código al correo o un SMS
+- Cerrar sesión es confirmar sí/no (sin otro correo)
 - Chat cifrado en reposo con AES-256-GCM; TLS en tránsito; RLS para que solo las dos partes vean el hilo
 
 ## Configuración local

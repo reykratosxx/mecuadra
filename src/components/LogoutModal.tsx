@@ -1,15 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
-import { friendlyAuthError } from "@/lib/phone";
 import { IconX } from "./icons";
 
-type Channel = "email" | "sms";
-
 export function LogoutModal({
-  email,
-  phone,
   onClose,
   onDone,
 }: {
@@ -18,44 +12,10 @@ export function LogoutModal({
   onClose: () => void;
   onDone: () => Promise<void>;
 }) {
-  const canEmail = Boolean(email);
-  const canSms = Boolean(phone);
-  const [channel, setChannel] = useState<Channel>(canEmail ? "email" : "sms");
-  const [sent, setSent] = useState(false);
-  const [otp, setOtp] = useState("");
-  const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  async function send() {
+  async function salir() {
     setBusy(true);
-    setError("");
-    const supabase = createClient();
-    const { error: err } =
-      channel === "sms"
-        ? await supabase.auth.signInWithOtp({ phone: phone! })
-        : await supabase.auth.signInWithOtp({ email: email! });
-    setBusy(false);
-    if (err) {
-      setError(friendlyAuthError(err.message));
-      return;
-    }
-    setSent(true);
-  }
-
-  async function confirm() {
-    setBusy(true);
-    setError("");
-    const token = otp.trim();
-    const supabase = createClient();
-    const { error: err } =
-      channel === "sms"
-        ? await supabase.auth.verifyOtp({ phone: phone!, token, type: "sms" })
-        : await supabase.auth.verifyOtp({ email: email!, token, type: "email" });
-    if (err) {
-      setBusy(false);
-      setError(friendlyAuthError(err.message));
-      return;
-    }
     await onDone();
     setBusy(false);
   }
@@ -67,73 +27,19 @@ export function LogoutModal({
           <div>
             <h2 className="font-display text-xl">Cerrar sesión</h2>
             <p className="text-sm text-mute">
-              Confirma con un código al correo o un SMS al celular.
+              Sales de esta cuenta en este teléfono. No hace falta otro código.
             </p>
           </div>
           <button type="button" onClick={onClose} aria-label="Cerrar">
             <IconX className="h-5 w-5" />
           </button>
         </div>
-
-        {!sent ? (
-          <>
-            <div className="mb-3 grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                disabled={!canEmail}
-                onClick={() => setChannel("email")}
-                className={`pill ${channel === "email" ? "pill-on" : ""} ${!canEmail ? "opacity-40" : ""}`}
-              >
-                Correo
-              </button>
-              <button
-                type="button"
-                disabled={!canSms}
-                onClick={() => setChannel("sms")}
-                className={`pill ${channel === "sms" ? "pill-on" : ""} ${!canSms ? "opacity-40" : ""}`}
-              >
-                SMS
-              </button>
-            </div>
-            <p className="mb-4 text-sm text-mute">
-              {channel === "sms" ? `Código al ${phone}` : `Código a ${email}`}
-            </p>
-            <button
-              type="button"
-              className="btn-primary w-full"
-              disabled={busy || (!canEmail && !canSms)}
-              onClick={() => void send()}
-            >
-              Enviar código
-            </button>
-          </>
-        ) : (
-          <form
-            className="space-y-3"
-            onSubmit={(e) => {
-              e.preventDefault();
-              void confirm();
-            }}
-          >
-            <label className="label">Código de confirmación</label>
-            <input
-              className="input tracking-[0.35em]"
-              inputMode="numeric"
-              maxLength={8}
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              autoFocus
-              required
-            />
-            <button type="submit" className="btn-primary w-full" disabled={busy || otp.trim().length < 6}>
-              Confirmar y salir
-            </button>
-            <button type="button" className="btn-ghost w-full" onClick={() => setSent(false)}>
-              Reenviar / cambiar canal
-            </button>
-          </form>
-        )}
-        {error ? <p className="mt-3 text-sm text-rose-600">{error}</p> : null}
+        <button type="button" className="btn-primary w-full" disabled={busy} onClick={() => void salir()}>
+          Sí, salir
+        </button>
+        <button type="button" className="btn-ghost mt-2 w-full" disabled={busy} onClick={onClose}>
+          Cancelar
+        </button>
       </div>
     </div>
   );
