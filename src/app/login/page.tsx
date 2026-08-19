@@ -30,10 +30,9 @@ function AuthCard() {
   const stepPhone = params.get("paso") === "telefono" || needsPhone;
   const [tab, setTab] = useState<Tab>("email");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [register, setRegister] = useState(false);
   const [phone, setPhone] = useState("+53");
   const [otp, setOtp] = useState("");
+  const [emailSent, setEmailSent] = useState(false);
   const [sent, setSent] = useState(false);
   const [info, setInfo] = useState("");
   const [error, setError] = useState(params.get("error") ? "No se pudo completar el acceso." : "");
@@ -93,45 +92,59 @@ function AuthCard() {
     setBusy(true);
     setError("");
     const origin = window.location.origin;
-    const { error: err } = await createClient().auth.signInWithOAuth({
+    const { data, error: err } = await createClient().auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${origin}/auth/callback` },
+      options: {
+        redirectTo: `${origin}/auth/callback`,
+        skipBrowserRedirect: true,
+      },
     });
-    if (err) {
-      setError(friendlyAuthError(err.message));
+    if (err || !data.url) {
+      setError(friendlyAuthError(err?.message || "No se pudo armar el acceso con Google."));
       setBusy(false);
+      return;
     }
+    const probe = await fetch("/api/auth/google", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: data.url }),
+    });
+    if (!probe.ok) {
+      const body = (await probe.json()) as { error?: string };
+      setError(friendlyAuthError(body.error || "Google no está activo en Supabase."));
+      setBusy(false);
+      return;
+    }
+    window.location.assign(data.url);
   }
 
-  async function emailPassword(e: React.FormEvent) {
+  async function sendEmailOtp(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     setError("");
     setInfo("");
-    const supabase = createClient();
-    if (register) {
-      const origin = window.location.origin;
-      const { data, error: err } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
-        options: { emailRedirectTo: `${origin}/auth/callback` },
-      });
-      setBusy(false);
-      if (err) {
-        setError(friendlyAuthError(err.message));
-        return;
-      }
-      if (!data.session) {
-        setInfo("Revisa el correo y confirma la cuenta. Después entra con tu contraseña.");
-        setRegister(false);
-        return;
-      }
-      await afterAuth();
+    const { error: err } = await createClient().auth.signInWithOtp({
+      email: email.trim(),
+      options: { shouldCreateUser: true },
+    });
+    setBusy(false);
+    if (err) {
+      setError(friendlyAuthError(err.message));
       return;
     }
-    const { error: err } = await supabase.auth.signInWithPassword({
+    setOtp("");
+    setEmailSent(true);
+    setInfo("Te enviamos un código de 6 dígitos al correo.");
+  }
+
+  async function verifyEmailOtp(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setError("");
+    const { error: err } = await createClient().auth.verifyOtp({
       email: email.trim(),
-      password,
+      token: otp.trim(),
+      type: "email",
     });
     setBusy(false);
     if (err) {
@@ -214,7 +227,7 @@ function AuthCard() {
       <p className="mt-1 text-sm text-mute">
         {stepPhone
           ? "En Cuba no hay SMS gratis a Cubacel. Verifica el celular con Telegram (gratis, por WiFi o Nauta)."
-          : "Google sin contraseña, correo con clave, o celular. El SMS de pago es opcional."}
+          : "Google (si está activo), código al correo, o celular por Telegram."}
       </p>
 
       {!stepPhone ? (
@@ -231,10 +244,11 @@ function AuthCard() {
             onClick={() => {
               setTab("email");
               setSent(false);
+              setEmailSent(false);
               setError("");
             }}
           >
-            Correo y clave
+            Correo
           </button>
           <button
             type="button"
@@ -252,8 +266,8 @@ function AuthCard() {
         <div className="h-4" />
       )}
 
-      {!stepPhone && tab === "email" ? (
-        <form className="space-y-3" onSubmit={(e) => void emailPassword(e)}>
+      {!stepPhone && tab === "email" && !emailSent ? (
+        <form className="space-y-3" onSubmit={(e) => void sendEmailOtp(e)}>
           <div>
             <label className="label">Correo</label>
             <input
@@ -265,30 +279,37 @@ function AuthCard() {
               required
             />
           </div>
-          <div>
-            <label className="label">Contraseña</label>
-            <input
-              className="input"
-              type="password"
-              minLength={6}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
           <button type="submit" className="btn-primary w-full" disabled={busy}>
-            {register ? "Crear cuenta" : "Entrar"}
+            Enviar código
+          </button>
+        </form>
+      ) : null}
+
+      {!stepPhone && tab === "email" && emailSent ? (
+        <form className="space-y-3" onSubmit={(e) => void verifyEmailOtp(e)}>
+          <label className="label">Código del correo</label>
+          <input
+            className="input tracking-[0.4em]"
+            inputMode="numeric"
+            maxLength={8}
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+            autoFocus
+            required
+          />
+          <button type="submit" className="btn-primary w-full" disabled={busy || otp.trim().length < 6}>
+            Verificar código
           </button>
           <button
             type="button"
             className="btn-ghost w-full"
             onClick={() => {
-              setRegister((v) => !v);
-              setError("");
+              setEmailSent(false);
+              setOtp("");
               setInfo("");
             }}
           >
-            {register ? "Ya tengo cuenta" : "Crear cuenta con correo"}
+            Cambiar correo
           </button>
         </form>
       ) : null}
@@ -313,7 +334,7 @@ function AuthCard() {
             </>
           ) : (
             <p className="text-sm text-mute">
-              Entra con Google o correo. El celular Cubacel se verifica después con Telegram,
+              Entra con el código al correo. El celular Cubacel se verifica después con Telegram,
               sin pagar SMS.
             </p>
           )}
@@ -377,7 +398,7 @@ function AuthCard() {
       {info ? <p className="mt-3 text-sm text-brand">{info}</p> : null}
 
       <p className="mt-4 text-center text-xs text-mute">
-        Si Google no abre desde Cuba, usa correo. El Cubacel se verifica con Telegram, gratis.
+        El código caduca en minutos. En Auth → Email usa la plantilla con {"{{ .Token }}"}.
       </p>
       {stepPhone ? (
         <p className="mt-2 text-center text-sm">

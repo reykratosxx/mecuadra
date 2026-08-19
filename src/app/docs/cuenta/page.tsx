@@ -16,7 +16,7 @@ export default function Page() {
           <strong>Google</strong> — sin contraseña. Si la isla lo bloquea, usa correo.
         </li>
         <li>
-          <strong>Correo y contraseña</strong> — Nauta, Outlook, Proton.
+          <strong>Correo</strong> — un código de 6 dígitos. Sin contraseña.
         </li>
         <li>
           <strong>Cubacel por Telegram</strong> — gratis. El bot pide tu contacto; Telegram
@@ -29,7 +29,7 @@ export default function Page() {
       </ul>
       <Steps
         items={[
-          { title: "Entras", text: "Google o correo y clave." },
+          { title: "Entras", text: "Google (si está activo) o código al correo." },
           { title: "Abres el bot", text: "Tocas Verificar con Telegram." },
           { title: "Compartes el Cubacel", text: "Un botón. Sin SMS. Sin cobro." },
         ]}

@@ -49,8 +49,8 @@ En el SQL Editor de Supabase ejecuta `supabase/schema.sql`.
 
 Luego, en Authentication:
 
-1. Providers → Email: activo (correo y contraseña).
-2. Providers → Google. Redirect: `https://wcrgbcxewqqbnjvelwrp.supabase.co/auth/v1/callback`
+1. Providers → Email: activo. Confirmación por **OTP** (código). En la plantilla usa `{{ .Token }}`, no solo el magic link.
+2. Providers → Google: **Enable**. En Google Cloud crea OAuth (tipo Web), Client ID y Secret. Authorized redirect: `https://wcrgbcxewqqbnjvelwrp.supabase.co/auth/v1/callback`
 3. Cubacel gratis: crea un bot en Telegram con @BotFather. Pon `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_USERNAME` y `SUPABASE_SERVICE_ROLE_KEY`. Webhook:
    `https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://mecuadra.vercel.app/api/auth/telegram`
 4. SMS de pago (opcional): Phone + gancho a `/api/auth/send-sms` y cuenta en [BudgetSMS](https://www.budgetsms.net).

@@ -36,7 +36,7 @@ SEND_SMS_HOOK_SECRET=`}
       </p>
       <h2>Auth en el dashboard</h2>
       <ul>
-        <li>Email: activo, usuarios pueden registrarse con contraseña.</li>
+        <li>Email activo, confirmación por OTP. Plantilla con <code>{"{{ .Token }}"}</code>.</li>
         <li>
           Phone activo. En Hooks → Send SMS (HTTPS):{" "}
           <code>https://mecuadra.vercel.app/api/auth/send-sms</code>. No uses Twilio

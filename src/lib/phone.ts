@@ -13,7 +13,10 @@ export function isCubanMobile(e164: string) {
 
 export function friendlyAuthError(message: string) {
   const m = message.toLowerCase();
-  if (m.includes("unsupported phone provider") || m.includes("unsupported provider")) {
+  if (m.includes("unsupported provider") || m.includes("provider is not enabled")) {
+    return "Google no está encendido en Supabase. Authentication → Providers → Google: actívalo y pega el Client ID y el Secret de Google Cloud.";
+  }
+  if (m.includes("unsupported phone provider")) {
     return "Twilio y Google no envían a Cuba. En Supabase activa Phone y el gancho Send SMS hacia /api/auth/send-sms (BudgetSMS).";
   }
   if (m.includes("error sending") && m.includes("sms")) {
