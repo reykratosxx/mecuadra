@@ -67,7 +67,7 @@ export default function ComoFuncionaPage() {
             "Barrios reales: Vedado, La Víbora, Cerro… no códigos raros.",
             "Las fotos se recorren con flechas, Escape o deslizando.",
             "Puedes pausar, editar o dar de baja un artículo.",
-            "Entras con Google o con tu teléfono. Publicar y aplicar piden teléfono verificado.",
+            "Entras con Google, correo y contraseña, o SMS al celular cubano.",
             "Cero efectivo en los listados. Si es venta, no es MeCuadra.",
           ].map((x) => (
             <li key={x} className="card p-3">

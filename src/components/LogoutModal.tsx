@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { friendlyAuthError } from "@/lib/phone";
 import { IconX } from "./icons";
 
 type Channel = "email" | "sms";
@@ -19,7 +20,7 @@ export function LogoutModal({
 }) {
   const canEmail = Boolean(email);
   const canSms = Boolean(phone);
-  const [channel, setChannel] = useState<Channel>(canSms ? "sms" : "email");
+  const [channel, setChannel] = useState<Channel>(canEmail ? "email" : "sms");
   const [sent, setSent] = useState(false);
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
@@ -35,7 +36,7 @@ export function LogoutModal({
         : await supabase.auth.signInWithOtp({ email: email! });
     setBusy(false);
     if (err) {
-      setError(err.message);
+      setError(friendlyAuthError(err.message));
       return;
     }
     setSent(true);
@@ -52,7 +53,7 @@ export function LogoutModal({
         : await supabase.auth.verifyOtp({ email: email!, token, type: "email" });
     if (err) {
       setBusy(false);
-      setError(err.message);
+      setError(friendlyAuthError(err.message));
       return;
     }
     await onDone();
@@ -66,7 +67,7 @@ export function LogoutModal({
           <div>
             <h2 className="font-display text-xl">Cerrar sesión</h2>
             <p className="text-sm text-mute">
-              Te enviamos un código para confirmar que eres tú. Elige correo o SMS.
+              Confirma con un código al correo o un SMS al celular.
             </p>
           </div>
           <button type="button" onClick={onClose} aria-label="Cerrar">
@@ -79,27 +80,30 @@ export function LogoutModal({
             <div className="mb-3 grid grid-cols-2 gap-2">
               <button
                 type="button"
-                disabled={!canSms}
-                onClick={() => setChannel("sms")}
-                className={`pill ${channel === "sms" ? "pill-on" : ""} ${!canSms ? "opacity-40" : ""}`}
-              >
-                SMS
-              </button>
-              <button
-                type="button"
                 disabled={!canEmail}
                 onClick={() => setChannel("email")}
                 className={`pill ${channel === "email" ? "pill-on" : ""} ${!canEmail ? "opacity-40" : ""}`}
               >
                 Correo
               </button>
+              <button
+                type="button"
+                disabled={!canSms}
+                onClick={() => setChannel("sms")}
+                className={`pill ${channel === "sms" ? "pill-on" : ""} ${!canSms ? "opacity-40" : ""}`}
+              >
+                SMS
+              </button>
             </div>
             <p className="mb-4 text-sm text-mute">
-              {channel === "sms"
-                ? `Código al ${phone}`
-                : `Código a ${email}`}
+              {channel === "sms" ? `Código al ${phone}` : `Código a ${email}`}
             </p>
-            <button type="button" className="btn-primary w-full" disabled={busy || (!canEmail && !canSms)} onClick={() => void send()}>
+            <button
+              type="button"
+              className="btn-primary w-full"
+              disabled={busy || (!canEmail && !canSms)}
+              onClick={() => void send()}
+            >
               Enviar código
             </button>
           </>

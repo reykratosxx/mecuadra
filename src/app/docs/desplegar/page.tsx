@@ -15,7 +15,12 @@ export default function Page() {
         label=".env"
         code={`NEXT_PUBLIC_SUPABASE_URL=https://wcrgbcxewqqbnjvelwrp.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
-MESSAGE_ENCRYPTION_KEY=`}
+MESSAGE_ENCRYPTION_KEY=
+BUDGETSMS_USERNAME=
+BUDGETSMS_USERID=
+BUDGETSMS_HANDLE=
+BUDGETSMS_FROM=MeCuadra
+SEND_SMS_HOOK_SECRET=`}
       />
       <p>
         La llave de mensajes son 32 bytes en hex (64 caracteres). No la subas al repo.
@@ -31,9 +36,19 @@ MESSAGE_ENCRYPTION_KEY=`}
       </p>
       <h2>Auth en el dashboard</h2>
       <ul>
-        <li>Email con plantilla <code>{"{{ .Token }}"}</code>.</li>
-        <li>Phone / SMS para +53.</li>
-        <li>Google, con callback de Supabase.</li>
+        <li>Email: activo, usuarios pueden registrarse con contraseña.</li>
+        <li>
+          Phone activo. En Hooks → Send SMS (HTTPS):{" "}
+          <code>https://mecuadra.vercel.app/api/auth/send-sms</code>. No uses Twilio
+          (bloquea +53).
+        </li>
+        <li>
+          Telegram (gratis, Cubacel): crea un bot con @BotFather, pon{" "}
+          <code>TELEGRAM_BOT_TOKEN</code> y <code>TELEGRAM_BOT_USERNAME</code>, y el
+          service role. Webhook:{" "}
+          <code>https://mecuadra.vercel.app/api/auth/telegram</code>
+        </li>
+        <li>Google, con callback de Supabase (opcional en la isla si está bloqueado).</li>
         <li>
           Redirects: <code>http://localhost:3000/auth/callback</code> y el dominio de
           Vercel.

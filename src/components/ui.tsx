@@ -102,7 +102,7 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
     return (
       <Empty
         title="Inicia sesión para continuar"
-        hint="Entra con Google o con tu número de teléfono."
+        hint="Entra con Google, correo y contraseña, o SMS al celular."
         action={
           <a href="/login" className="btn-primary">
             Entrar

@@ -56,6 +56,16 @@ create unique index if not exists profiles_phone_unique
   on public.profiles (phone)
   where phone is not null;
 
+create table if not exists public.telegram_links (
+  token text primary key,
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  chat_id bigint,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists telegram_links_user_idx on public.telegram_links (user_id);
+alter table public.telegram_links add column if not exists chat_id bigint;
+
 create table if not exists public.items (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles(id) on delete cascade,
@@ -304,6 +314,7 @@ create trigger trades_notify
   for each row execute function public.tg_on_trade_change();
 
 alter table public.profiles enable row level security;
+alter table public.telegram_links enable row level security;
 alter table public.items enable row level security;
 alter table public.offers enable row level security;
 alter table public.trades enable row level security;
@@ -317,6 +328,13 @@ drop policy if exists "own profile insert" on public.profiles;
 create policy "profiles are readable" on public.profiles for select using (true);
 create policy "own profile insert" on public.profiles for insert with check (auth.uid() = id);
 create policy "own profile" on public.profiles for update using (auth.uid() = id);
+
+drop policy if exists "own telegram link" on public.telegram_links;
+drop policy if exists "own telegram link insert" on public.telegram_links;
+create policy "own telegram link" on public.telegram_links
+  for select using (auth.uid() = user_id);
+create policy "own telegram link insert" on public.telegram_links
+  for insert with check (auth.uid() = user_id);
 
 drop policy if exists "items public" on public.items;
 drop policy if exists "own items insert" on public.items;

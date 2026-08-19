@@ -23,7 +23,7 @@ export function AppShell({
       {currentUser && needsPhone ? (
         <div className="bg-brand text-center text-sm text-white">
           <Link href="/login?paso=telefono" className="block px-4 py-2 font-medium">
-            Verifica tu teléfono para publicar y aplicar a ofertas
+            Verifica tu celular cubano para publicar y aplicar a ofertas
           </Link>
         </div>
       ) : null}

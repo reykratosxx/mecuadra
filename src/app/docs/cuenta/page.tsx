@@ -7,36 +7,37 @@ export default function Page() {
     <article className="docs-prose max-w-3xl">
       <DocHero
         kicker="Cuenta"
-        title="Un código, y eres tú."
-        lead="Entras con Google, con un código al correo o con un SMS al +53. Publicar y aplicar piden teléfono verificado: un número es más difícil de fabricar que mil Gmails."
+        title="Telegram es el SMS gratis de Cuba."
+        lead="No existe un proveedor que envíe SMS a Cubacel de balde: ETECSA cobra el mensaje. Lo que sí es gratis y llega a la isla es Telegram. MeCuadra verifica el celular pidiéndote que compartas el contacto Cubacel con el bot."
       />
-      <h2>Tres puertas</h2>
+      <h2>Las puertas</h2>
       <ul>
         <li>
-          <strong>SMS</strong> — código de 6 dígitos al celular cubano.
+          <strong>Google</strong> — sin contraseña. Si la isla lo bloquea, usa correo.
         </li>
         <li>
-          <strong>Correo</strong> — el mismo estilo de código, en la bandeja.
+          <strong>Correo y contraseña</strong> — Nauta, Outlook, Proton.
         </li>
         <li>
-          <strong>Google</strong> — rápido, y después te pedimos el teléfono si aún no lo tienes.
+          <strong>Cubacel por Telegram</strong> — gratis. El bot pide tu contacto; Telegram
+          ya comprobó ese número cuando te registraste.
+        </li>
+        <li>
+          <strong>SMS de pago</strong> — solo si hay crédito en BudgetSMS. No es
+          obligatorio.
         </li>
       </ul>
       <Steps
         items={[
-          { title: "Pides el código", text: "En /login eliges SMS o correo y tocas enviar." },
-          { title: "Lo escribes", text: "Caduca en minutos. No lo reenvíes a nadie." },
-          { title: "Listo", text: "Si falta el teléfono, te llevamos a verificarlo antes de publicar." },
+          { title: "Entras", text: "Google o correo y clave." },
+          { title: "Abres el bot", text: "Tocas Verificar con Telegram." },
+          { title: "Compartes el Cubacel", text: "Un botón. Sin SMS. Sin cobro." },
         ]}
       />
-      <h2>Cerrar sesión</h2>
-      <p>
-        No basta con tocar el botón. Te enviamos un código al SMS o al correo — el canal
-        que elijas entre los que ya tienes — y solo entonces se cierra la sesión.
-      </p>
-      <Callout title="En el panel de Auth" tone="warn">
-        El correo debe usar la plantilla con el token numérico. El SMS necesita un
-        proveedor (por ejemplo Twilio) habilitado para números +53.
+      <Callout title="Por qué no hay SMS gratis" tone="warn">
+        Cubacel no termina mensajes internacionales de a gratis. Twilio cortó +53 en 2025.
+        Las APIs “free” o no cubren Cuba, o son números virtuales para recibir, no para
+        enviarte el código a tu SIM.
       </Callout>
     </article>
   );

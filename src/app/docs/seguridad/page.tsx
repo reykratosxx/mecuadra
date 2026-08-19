@@ -16,8 +16,8 @@ export default function Page() {
           <strong>Tránsito</strong> — HTTPS en Vercel y en Supabase.
         </li>
         <li>
-          <strong>Identidad</strong> — OTP de correo o SMS; Google; teléfono para
-          publicar y aplicar.
+          <strong>Identidad</strong> — Google, correo con contraseña, o SMS al +53
+          por BudgetSMS (Cubacel).
         </li>
         <li>
           <strong>Autorización</strong> — Row Level Security en todas las tablas.
@@ -31,8 +31,7 @@ export default function Page() {
         </li>
       </ul>
       <Callout title="Cerrar sesión" tone="ok">
-        Pedimos de nuevo un código al correo o al SMS. No es un adorno: confirma que
-        quien sale eres tú.
+        Pedimos de nuevo un código al correo o un SMS. Confirma que quien sale eres tú.
       </Callout>
     </article>
   );

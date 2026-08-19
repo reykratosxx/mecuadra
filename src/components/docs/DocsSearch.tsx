@@ -38,7 +38,7 @@ export function DocsSearch({ onClose }: { onClose: () => void }) {
           <input
             autoFocus
             className="h-12 flex-1 bg-transparent text-sm outline-none"
-            placeholder="Busca trueque, SMS, cifrado, API…"
+            placeholder="Busca trueque, correo, cifrado, API…"
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />

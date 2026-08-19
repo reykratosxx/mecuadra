@@ -75,6 +75,7 @@ type Store = AppState & {
   loadMessages: (tradeId: string) => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (patch: Partial<User>) => Promise<void>;
+  claimPhone: (e164: string) => Promise<void>;
   createItem: (input: CreateItemInput) => Promise<Item>;
   updateItem: (id: string, patch: Partial<Item>) => Promise<void>;
   createOffer: (input: CreateOfferInput) => Promise<Offer>;
@@ -106,7 +107,7 @@ const Ctx = createContext<Store | null>(null);
 
 function requirePhone(user: User | null): string | null {
   if (!user?.phoneVerified || !user.phone) {
-    return "Verifica tu teléfono para publicar o aplicar. Así evitamos cuentas falsas.";
+    return "Añade tu celular cubano para publicar o aplicar.";
   }
   return null;
 }
@@ -228,6 +229,20 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       if (patch.transport) row.transport = patch.transport;
       const { error } = await createClient().from("profiles").update(row).eq("id", state.currentUserId);
       if (error) throw error;
+      await refresh();
+    },
+    claimPhone: async (e164: string) => {
+      if (!state.currentUserId) throw new Error("Inicia sesión con el correo primero.");
+      const { error } = await createClient()
+        .from("profiles")
+        .update({ phone: e164, phone_verified: true })
+        .eq("id", state.currentUserId);
+      if (error) {
+        if (error.code === "23505") {
+          throw new Error("Ese celular ya está en otra cuenta.");
+        }
+        throw new Error(error.message);
+      }
       await refresh();
     },
     createItem: async (input) => {
