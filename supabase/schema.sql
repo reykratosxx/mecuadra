@@ -51,10 +51,15 @@ create table if not exists public.profiles (
 
 alter table public.profiles add column if not exists phone text;
 alter table public.profiles add column if not exists phone_verified boolean not null default false;
+alter table public.profiles add column if not exists telegram_id bigint;
 
 create unique index if not exists profiles_phone_unique
   on public.profiles (phone)
   where phone is not null;
+
+create unique index if not exists profiles_telegram_id_unique
+  on public.profiles (telegram_id)
+  where telegram_id is not null;
 
 create table if not exists public.telegram_links (
   token text primary key,

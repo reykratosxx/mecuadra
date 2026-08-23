@@ -11,19 +11,6 @@ export async function GET(request: Request) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("phone")
-          .eq("id", user.id)
-          .maybeSingle();
-        if (!profile?.phone) {
-          return NextResponse.redirect(`${origin}/login?paso=telefono`);
-        }
-      }
       return NextResponse.redirect(`${origin}${safeNext}`);
     }
   }

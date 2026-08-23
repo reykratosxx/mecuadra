@@ -11,7 +11,7 @@ export const DOC_GROUPS: { title: string; items: DocLink[] }[] = [
   {
     title: "Usar la app",
     items: [
-      { href: "/docs/cuenta", title: "Cuenta y códigos", hint: "Google, correo y SMS a Cuba" },
+      { href: "/docs/cuenta", title: "Cuenta y códigos", hint: "Login con Telegram" },
       { href: "/docs/ofertas", title: "Artículos y ofertas", hint: "#cambio #necesito #municipio" },
       { href: "/docs/aplicar", title: "El botón MeCuadra", hint: "Cómo aplicar a un trueque" },
       { href: "/docs/chat", title: "Chat", hint: "Solo ustedes dos, cifrado" },

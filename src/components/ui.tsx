@@ -101,11 +101,11 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
   if (!currentUser) {
     return (
       <Empty
-        title="Inicia sesión para continuar"
-        hint="Entra con Google, correo y contraseña, o SMS al celular."
+        title="Entra con Telegram para continuar"
+        hint="El mercado es libre. Publicar, aplicar y chatear piden tu cuenta de Telegram."
         action={
           <a href="/login" className="btn-primary">
-            Entrar
+            Entrar con Telegram
           </a>
         }
       />

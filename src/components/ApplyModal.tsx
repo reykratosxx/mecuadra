@@ -28,10 +28,10 @@ export function ApplyModal({
     return (
       <div className="fixed inset-0 z-50 grid place-items-center bg-brand/20 p-4">
         <div className="card max-w-sm p-6 text-center">
-          <p className="font-display text-lg">Inicia sesión para aplicar</p>
-          <p className="mt-1 text-sm text-mute">Sin depósito. Solo propones el trueque.</p>
-          <a href="/login" className="btn-primary mt-4">
-            Entrar
+          <p className="font-display text-lg">Entra con Telegram para aplicar</p>
+          <p className="mt-1 text-sm text-mute">El mercado se ve sin cuenta. Para tocar MeCuadra, usa Telegram.</p>
+          <a href={`/login?next=/oferta/${offerId}`} className="btn-primary mt-4">
+            Entrar con Telegram
           </a>
           <button type="button" className="btn-ghost mt-2 w-full" onClick={onClose}>
             Cerrar

@@ -1,14 +1,16 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Logo } from "@/components/Logo";
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
-import { useStore } from "@/lib/store";
-import { friendlyAuthError, isCubanMobile, normalizeCubanPhone } from "@/lib/phone";
 import Link from "next/link";
+import { Logo } from "@/components/Logo";
+import { TelegramLoginButton } from "@/components/TelegramLoginButton";
+import { isSupabaseConfigured } from "@/lib/supabase/client";
+import { useStore } from "@/lib/store";
 
-type Tab = "email" | "phone";
+const botUsername = (
+  process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME || ""
+).replace(/^@/, "");
 
 export default function LoginPage() {
   return (
@@ -26,387 +28,93 @@ export default function LoginPage() {
 function AuthCard() {
   const router = useRouter();
   const params = useSearchParams();
-  const { currentUser, needsPhone, refresh, claimPhone } = useStore();
-  const stepPhone = params.get("paso") === "telefono" || needsPhone;
-  const [tab, setTab] = useState<Tab>("email");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("+53");
-  const [otp, setOtp] = useState("");
-  const [emailSent, setEmailSent] = useState(false);
-  const [sent, setSent] = useState(false);
-  const [info, setInfo] = useState("");
+  const { currentUser, refresh } = useStore();
+  const next = params.get("next");
+  const safeNext = next && next.startsWith("/") ? next : "/explorar";
   const [error, setError] = useState(params.get("error") ? "No se pudo completar el acceso." : "");
   const [busy, setBusy] = useState(false);
 
-  const [waitingTelegram, setWaitingTelegram] = useState(false);
-
   useEffect(() => {
-    if (currentUser && !needsPhone && !stepPhone) router.replace("/explorar");
-  }, [currentUser, needsPhone, router, stepPhone]);
+    if (currentUser) router.replace(safeNext);
+  }, [currentUser, router, safeNext]);
 
-  useEffect(() => {
-    if (!waitingTelegram) return;
-    const t = window.setInterval(() => {
-      void refresh();
-    }, 2000);
-    return () => window.clearInterval(t);
-  }, [waitingTelegram, refresh]);
-
-  useEffect(() => {
-    if (waitingTelegram && currentUser?.phoneVerified) {
-      router.replace("/explorar");
-    }
-  }, [waitingTelegram, currentUser, router]);
+  const onAuth = useCallback(
+    async (user: {
+      id: number;
+      first_name: string;
+      last_name?: string;
+      username?: string;
+      photo_url?: string;
+      auth_date: number;
+      hash: string;
+    }) => {
+      setBusy(true);
+      setError("");
+      try {
+        const res = await fetch("/api/auth/telegram/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(user),
+        });
+        const json = (await res.json()) as { error?: string };
+        if (!res.ok) {
+          setError(json.error || "No se pudo iniciar sesión con Telegram.");
+          setBusy(false);
+          return;
+        }
+        await refresh();
+        router.replace(safeNext);
+      } catch {
+        setError("Falló la conexión. Inténtalo de nuevo.");
+        setBusy(false);
+      }
+    },
+    [refresh, router, safeNext],
+  );
 
   if (!isSupabaseConfigured()) {
     return (
       <div className="card p-6">
         <h1 className="font-display text-2xl">Falta configurar Supabase</h1>
         <p className="mt-2 text-sm text-mute">
-          Añade las claves en Vercel y en <code>.env.local</code> para activar el acceso.
+          Añade las claves en Vercel y en <code>.env.local</code>.
         </p>
       </div>
     );
   }
 
-  async function afterAuth() {
-    await refresh();
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
-      router.replace("/explorar");
-      return;
-    }
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("phone")
-      .eq("id", user.id)
-      .maybeSingle();
-    if (!profile?.phone && !user.phone) router.replace("/login?paso=telefono");
-    else router.replace("/explorar");
-  }
-
-  async function google() {
-    setBusy(true);
-    setError("");
-    const origin = window.location.origin;
-    const { data, error: err } = await createClient().auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${origin}/auth/callback`,
-        skipBrowserRedirect: true,
-      },
-    });
-    if (err || !data.url) {
-      setError(friendlyAuthError(err?.message || "No se pudo armar el acceso con Google."));
-      setBusy(false);
-      return;
-    }
-    const probe = await fetch("/api/auth/google", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: data.url }),
-    });
-    if (!probe.ok) {
-      const body = (await probe.json()) as { error?: string };
-      setError(friendlyAuthError(body.error || "Google no está activo en Supabase."));
-      setBusy(false);
-      return;
-    }
-    window.location.assign(data.url);
-  }
-
-  async function sendEmailOtp(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    setError("");
-    setInfo("");
-    const { error: err } = await createClient().auth.signInWithOtp({
-      email: email.trim(),
-      options: { shouldCreateUser: true },
-    });
-    setBusy(false);
-    if (err) {
-      setError(friendlyAuthError(err.message));
-      return;
-    }
-    setOtp("");
-    setEmailSent(true);
-    setInfo("Te enviamos un código de 6 dígitos al correo.");
-  }
-
-  async function verifyEmailOtp(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    setError("");
-    const { error: err } = await createClient().auth.verifyOtp({
-      email: email.trim(),
-      token: otp.trim(),
-      type: "email",
-    });
-    setBusy(false);
-    if (err) {
-      setError(friendlyAuthError(err.message));
-      return;
-    }
-    await afterAuth();
-  }
-
-  async function verifyTelegram() {
-    setBusy(true);
-    setError("");
-    const res = await fetch("/api/auth/telegram/start", { method: "POST" });
-    const json = (await res.json()) as { url?: string; error?: string };
-    setBusy(false);
-    if (!res.ok || !json.url) {
-      setError(json.error || "No se pudo abrir Telegram. Crea el bot (es gratis) y pon TELEGRAM_BOT_TOKEN.");
-      return;
-    }
-    setWaitingTelegram(true);
-    window.open(json.url, "_blank", "noopener,noreferrer");
-  }
-
-  async function sendSms() {
-    setBusy(true);
-    setError("");
-    const e164 = normalizeCubanPhone(phone);
-    if (!isCubanMobile(e164)) {
-      setBusy(false);
-      setError("Usa un celular cubano de 8 dígitos, por ejemplo +53 5xxxxxxx.");
-      return;
-    }
-    const supabase = createClient();
-    const { error: err } = currentUser
-      ? await supabase.auth.updateUser({ phone: e164 })
-      : await supabase.auth.signInWithOtp({ phone: e164 });
-    setBusy(false);
-    if (err) {
-      setError(friendlyAuthError(err.message));
-      return;
-    }
-    setPhone(e164);
-    setOtp("");
-    setSent(true);
-  }
-
-  async function verifySms() {
-    setBusy(true);
-    setError("");
-    const { error: err } = await createClient().auth.verifyOtp({
-      phone: normalizeCubanPhone(phone),
-      token: otp.trim(),
-      type: currentUser ? "phone_change" : "sms",
-    });
-    setBusy(false);
-    if (err) {
-      setError(friendlyAuthError(err.message));
-      return;
-    }
-    await afterAuth();
-  }
-
-  async function savePhoneWithoutSms() {
-    setBusy(true);
-    setError("");
-    try {
-      await claimPhone(normalizeCubanPhone(phone));
-      router.replace("/explorar");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "No se pudo guardar el número.");
-      setBusy(false);
-    }
-  }
-
   return (
-    <div className="card p-6">
-      <h1 className="font-display text-2xl">
-        {stepPhone ? "Verifica tu celular cubano" : "Entrar a MeCuadra"}
-      </h1>
-      <p className="mt-1 text-sm text-mute">
-        {stepPhone
-          ? "En Cuba no hay SMS gratis a Cubacel. Verifica el celular con Telegram (gratis, por WiFi o Nauta)."
-          : "Google (si está activo), código al correo, o celular por Telegram."}
-      </p>
+    <div className="card overflow-hidden p-0">
+      <div className="bg-[linear-gradient(135deg,#229ED9_0%,#7c3aed_100%)] px-6 py-8 text-white">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/80">MeCuadra</p>
+        <h1 className="mt-2 font-display text-3xl leading-tight">Entra con Telegram</h1>
+        <p className="mt-2 text-sm text-white/90">
+          El mercado se ve sin cuenta. Para publicar o tocar MeCuadra en una oferta,
+          inicia sesión con tu Telegram.
+        </p>
+      </div>
 
-      {!stepPhone ? (
-        <button type="button" className="btn-primary mt-5 w-full" onClick={() => void google()} disabled={busy}>
-          Continuar con Google
-        </button>
-      ) : null}
+      <div className="space-y-5 p-6">
+        {busy ? (
+          <p className="text-center text-sm text-mute">Confirmando con Telegram…</p>
+        ) : (
+          <TelegramLoginButton botUsername={botUsername} onAuth={(u) => void onAuth(u)} onError={setError} />
+        )}
 
-      {!stepPhone ? (
-        <div className="my-4 grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            className={`pill ${tab === "email" ? "pill-on" : ""}`}
-            onClick={() => {
-              setTab("email");
-              setSent(false);
-              setEmailSent(false);
-              setError("");
-            }}
-          >
-            Correo
-          </button>
-          <button
-            type="button"
-            className={`pill ${tab === "phone" ? "pill-on" : ""}`}
-            onClick={() => {
-              setTab("phone");
-              setSent(false);
-              setError("");
-            }}
-          >
-            Celular
-          </button>
-        </div>
-      ) : (
-        <div className="h-4" />
-      )}
+        {error ? <p className="text-sm text-rose-600">{error}</p> : null}
 
-      {!stepPhone && tab === "email" && !emailSent ? (
-        <form className="space-y-3" onSubmit={(e) => void sendEmailOtp(e)}>
-          <div>
-            <label className="label">Correo</label>
-            <input
-              className="input"
-              type="email"
-              placeholder="tu@correo.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <button type="submit" className="btn-primary w-full" disabled={busy}>
-            Enviar código
-          </button>
-        </form>
-      ) : null}
+        <ul className="space-y-2 text-sm text-mute">
+          <li>· Explorar ofertas: libre, sin registro.</li>
+          <li>· Publicar y aplicar: con Telegram.</li>
+          <li>· Sin Google, sin correo OTP, sin SMS.</li>
+        </ul>
 
-      {!stepPhone && tab === "email" && emailSent ? (
-        <form className="space-y-3" onSubmit={(e) => void verifyEmailOtp(e)}>
-          <label className="label">Código del correo</label>
-          <input
-            className="input tracking-[0.4em]"
-            inputMode="numeric"
-            maxLength={8}
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            autoFocus
-            required
-          />
-          <button type="submit" className="btn-primary w-full" disabled={busy || otp.trim().length < 6}>
-            Verificar código
-          </button>
-          <button
-            type="button"
-            className="btn-ghost w-full"
-            onClick={() => {
-              setEmailSent(false);
-              setOtp("");
-              setInfo("");
-            }}
-          >
-            Cambiar correo
-          </button>
-        </form>
-      ) : null}
-
-      {(stepPhone || tab === "phone") && !sent ? (
-        <div className="space-y-3">
-          {stepPhone && currentUser ? (
-            <>
-              <button
-                type="button"
-                className="btn-primary w-full"
-                disabled={busy}
-                onClick={() => void verifyTelegram()}
-              >
-                Verificar con Telegram (gratis)
-              </button>
-              {waitingTelegram ? (
-                <p className="text-center text-sm text-mute">
-                  Esperando que compartas tu Cubacel en Telegram…
-                </p>
-              ) : null}
-            </>
-          ) : (
-            <p className="text-sm text-mute">
-              Entra con el código al correo. El celular Cubacel se verifica después con Telegram,
-              sin pagar SMS.
-            </p>
-          )}
-          <form
-            className="space-y-3"
-            onSubmit={(e) => {
-              e.preventDefault();
-              void sendSms();
-            }}
-          >
-            <div>
-              <label className="label">SMS de pago (BudgetSMS)</label>
-              <input
-                className="input"
-                inputMode="tel"
-                placeholder="+53 5xxxxxxx"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
-            </div>
-            <button type="submit" className="btn-ghost w-full" disabled={busy}>
-              Enviar código SMS
-            </button>
-            {stepPhone && currentUser ? (
-              <button type="button" className="btn-ghost w-full" disabled={busy} onClick={() => void savePhoneWithoutSms()}>
-                Guardar número sin verificar
-              </button>
-            ) : null}
-          </form>
-        </div>
-      ) : null}
-
-      {(stepPhone || tab === "phone") && sent ? (
-        <form
-          className="space-y-3"
-          onSubmit={(e) => {
-            e.preventDefault();
-            void verifySms();
-          }}
-        >
-          <label className="label">Código SMS</label>
-          <input
-            className="input tracking-[0.4em]"
-            inputMode="numeric"
-            maxLength={8}
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            autoFocus
-            required
-          />
-          <button type="submit" className="btn-primary w-full" disabled={busy || otp.trim().length < 6}>
-            Verificar código
-          </button>
-          <button type="button" className="btn-ghost w-full" onClick={() => setSent(false)}>
-            Cambiar número
-          </button>
-        </form>
-      ) : null}
-
-      {error ? <p className="mt-3 text-sm text-rose-600">{error}</p> : null}
-      {info ? <p className="mt-3 text-sm text-brand">{info}</p> : null}
-
-      <p className="mt-4 text-center text-xs text-mute">
-        El código caduca en minutos. En Auth → Email usa la plantilla con {"{{ .Token }}"}.
-      </p>
-      {stepPhone ? (
-        <p className="mt-2 text-center text-sm">
-          <Link href="/explorar" className="text-brand">
-            Explorar sin publicar
+        <p className="text-center text-sm">
+          <Link href="/explorar" className="font-semibold text-brand">
+            Ver el mercado sin entrar
           </Link>
         </p>
-      ) : null}
+      </div>
     </div>
   );
 }

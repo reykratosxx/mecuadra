@@ -71,7 +71,7 @@ export function Header() {
             </Link>
           ) : (
             <Link href="/login" className="btn-ghost">
-              Entrar
+              Telegram
             </Link>
           )}
         </div>

@@ -75,7 +75,7 @@ type Store = AppState & {
   loadMessages: (tradeId: string) => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (patch: Partial<User>) => Promise<void>;
-  claimPhone: (e164: string) => Promise<void>;
+  claimPhone: (e164?: string) => Promise<void>;
   createItem: (input: CreateItemInput) => Promise<Item>;
   updateItem: (id: string, patch: Partial<Item>) => Promise<void>;
   createOffer: (input: CreateOfferInput) => Promise<Offer>;
@@ -105,10 +105,8 @@ const defaultFilters: Filters = {
 
 const Ctx = createContext<Store | null>(null);
 
-function requirePhone(user: User | null): string | null {
-  if (!user?.phoneVerified || !user.phone) {
-    return "Añade tu celular cubano para publicar o aplicar.";
-  }
+function requireSession(userId: string | null): string | null {
+  if (!userId) return "Entra con Telegram para publicar o aplicar.";
   return null;
 }
 
@@ -206,7 +204,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     ...state,
     ready,
     configured,
-    needsPhone: Boolean(state.currentUserId && (!currentUser?.phone || !currentUser.phoneVerified)),
+    needsPhone: false,
     filters,
     currentUser,
     setFilters: (patch) => setFiltersState((f) => ({ ...f, ...patch })),
@@ -231,24 +229,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       if (error) throw error;
       await refresh();
     },
-    claimPhone: async (e164: string) => {
-      if (!state.currentUserId) throw new Error("Inicia sesión con el correo primero.");
-      const { error } = await createClient()
-        .from("profiles")
-        .update({ phone: e164, phone_verified: true })
-        .eq("id", state.currentUserId);
-      if (error) {
-        if (error.code === "23505") {
-          throw new Error("Ese celular ya está en otra cuenta.");
-        }
-        throw new Error(error.message);
-      }
-      await refresh();
+    claimPhone: async () => {
+      /* legado: el acceso es Telegram Login Widget */
     },
     createItem: async (input) => {
-      const gate = requirePhone(currentUser);
+      const gate = requireSession(state.currentUserId);
       if (gate) throw new Error(gate);
-      if (!state.currentUserId) throw new Error("Inicia sesión");
+      if (!state.currentUserId) throw new Error("Entra con Telegram");
       const { data, error } = await createClient()
         .from("items")
         .insert({
@@ -276,9 +263,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       await refresh();
     },
     createOffer: async (input) => {
-      const gate = requirePhone(currentUser);
+      const gate = requireSession(state.currentUserId);
       if (gate) throw new Error(gate);
-      if (!state.currentUserId) throw new Error("Inicia sesión");
+      if (!state.currentUserId) throw new Error("Entra con Telegram");
       const { data, error } = await createClient()
         .from("offers")
         .insert({
@@ -307,9 +294,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       await refresh();
     },
     applyToOffer: async (offerId, proposedItemIds, proposalNote) => {
-      const gate = requirePhone(currentUser);
+      const gate = requireSession(state.currentUserId);
       if (gate) return { error: gate };
-      if (!state.currentUserId) return { error: "Inicia sesión para aplicar." };
+      if (!state.currentUserId) return { error: "Entra con Telegram para aplicar." };
       const offer = state.offers.find((o) => o.id === offerId);
       if (!offer) return { error: "La oferta ya no existe." };
       if (offer.userId === state.currentUserId) return { error: "No puedes aplicar a tu propia oferta." };

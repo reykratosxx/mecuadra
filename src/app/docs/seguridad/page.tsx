@@ -16,7 +16,8 @@ export default function Page() {
           <strong>Tránsito</strong> — HTTPS en Vercel y en Supabase.
         </li>
         <li>
-          <strong>Identidad</strong> — Google, código al correo, o Cubacel por Telegram.
+          <strong>Identidad</strong> — Telegram Login Widget. Explorar es público;
+          publicar y aplicar piden sesión.
         </li>
         <li>
           <strong>Autorización</strong> — Row Level Security en todas las tablas.
@@ -30,7 +31,7 @@ export default function Page() {
         </li>
       </ul>
       <Callout title="Cerrar sesión" tone="ok">
-        Cerrar sesión es un sí/no. El código es solo para entrar.
+        Cerrar sesión es un sí/no. La identidad vive en Telegram.
       </Callout>
     </article>
   );

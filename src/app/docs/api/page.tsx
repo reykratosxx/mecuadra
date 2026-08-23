@@ -12,14 +12,14 @@ export default function Page() {
       />
       <h2>Sesión</h2>
       <p>
-        Google y los OTP vuelven por <code>/auth/callback</code> (PKCE, cookies). El
-        proxy de Next refresca la sesión en cada navegación. En el servidor se usa{" "}
-        <code>getUser()</code>, nunca un JWT leído a ciegas.
+        El Login Widget de Telegram autentica en <code>POST /api/auth/telegram/login</code>{" "}
+        (HMAC del bot). La sesión queda en cookies SSR. El proxy de Next refresca con{" "}
+        <code>getUser()</code>.
       </p>
       <CodeBlock
         label="auth"
-        code={`GET  /auth/callback?code=…
-POST /auth/signout`}
+        code={`POST /api/auth/telegram/login
+GET  /auth/signout`}
       />
       <h2>Mensajes</h2>
       <CodeBlock
