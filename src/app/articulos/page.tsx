@@ -65,10 +65,19 @@ function List() {
                   <button
                     type="button"
                     className="text-rose-600"
-                    onClick={() => void updateItem(item.id, { status: "canjeado" })}
                     hidden={item.status === "canjeado"}
+                    onClick={() => {
+                      if (
+                        !window.confirm(
+                          "¿Eliminar este artículo? Desaparece de publicar oferta y del mercado.",
+                        )
+                      ) {
+                        return;
+                      }
+                      void updateItem(item.id, { status: "canjeado" });
+                    }}
                   >
-                    Dar de baja
+                    Eliminar
                   </button>
                 </div>
               </div>

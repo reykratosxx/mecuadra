@@ -19,7 +19,7 @@ export default function PublicarPage() {
 
 function Form() {
   const router = useRouter();
-  const { currentUser, items, createOffer } = useStore();
+  const { currentUser, items, createOffer, updateItem } = useStore();
   const mine = items.filter((i) => i.userId === currentUser?.id && i.status === "activo");
   const [selected, setSelected] = useState<string[]>([]);
   const [wantTitle, setWantTitle] = useState("");
@@ -31,7 +31,19 @@ function Form() {
   const [municipality, setMunicipality] = useState(currentUser?.municipality ?? "Plaza de la Revolución");
   const [neighborhood, setNeighborhood] = useState(currentUser?.neighborhood ?? "");
   const [transport, setTransport] = useState<Transport>(currentUser?.transport ?? "sin");
+  const [busyId, setBusyId] = useState<string | null>(null);
   const munis = useMemo(() => municipalitiesOf(province), [province]);
+
+  async function removeItem(id: string) {
+    if (!window.confirm("¿Eliminar este artículo? No aparecerá más en tus ofertas.")) return;
+    setBusyId(id);
+    try {
+      await updateItem(id, { status: "canjeado" });
+      setSelected((s) => s.filter((x) => x !== id));
+    } finally {
+      setBusyId(null);
+    }
+  }
 
   if (mine.length === 0) {
     return (
@@ -75,31 +87,55 @@ function Form() {
       >
         <fieldset>
           <legend className="label">#cambio · artículos que ofreces</legend>
+          <p className="mb-2 text-xs text-mute">
+            Toca para elegirlos en la oferta. La × los elimina si los creaste por error.{" "}
+            <Link href="/articulos" className="font-semibold text-brand">
+              Ver mis artículos
+            </Link>
+          </p>
           <ul className="grid gap-2">
             {mine.map((item) => {
               const on = selected.includes(item.id);
               return (
-                <li key={item.id}>
+                <li
+                  key={item.id}
+                  className={`flex items-center gap-2 rounded-2xl border p-2 ${
+                    on ? "border-brand bg-brand-50" : "border-line bg-white"
+                  }`}
+                >
                   <button
                     type="button"
                     onClick={() =>
                       setSelected((s) => (on ? s.filter((x) => x !== item.id) : [...s, item.id]))
                     }
-                    className={`flex w-full items-center gap-3 rounded-2xl border p-2 text-left ${
-                      on ? "border-brand bg-brand-50" : "border-line bg-white"
-                    }`}
+                    className="flex min-w-0 flex-1 items-center gap-3 text-left"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={item.photos[0]} alt="" className="h-14 w-14 rounded-xl object-cover" />
-                    <span>
-                      <span className="block font-medium">{item.title}</span>
-                      <span className="text-xs text-mute">{item.condition}</span>
+                    <span className="min-w-0">
+                      <span className="block truncate font-medium">{item.title}</span>
+                      <span className="text-xs text-mute">
+                        {item.condition}
+                        {on ? " · en esta oferta" : ""}
+                      </span>
                     </span>
+                  </button>
+                  <button
+                    type="button"
+                    className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-lg text-rose-600 hover:bg-rose-50"
+                    aria-label={`Eliminar ${item.title}`}
+                    disabled={busyId === item.id}
+                    onClick={() => void removeItem(item.id)}
+                  >
+                    ×
                   </button>
                 </li>
               );
             })}
           </ul>
+          <Link href="/articulos/nuevo" className="btn-ghost mt-2 w-full">
+            + Otro artículo
+          </Link>
         </fieldset>
 
         <fieldset>
