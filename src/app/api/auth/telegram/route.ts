@@ -89,7 +89,7 @@ export async function POST(request: Request) {
         const resume = `${siteOrigin()}/login?resume=${token}`;
         await telegramSend(
           chatId,
-          "Listo. Ya confirmamos que eres tú en MeCuadra.\n\nVuelve a la web — o toca el botón:",
+          "✓ Acceso a MeCuadra confirmado.\n\nEres tú quien abrió el login desde mecuadra.vercel.app. Vuelve a la web o toca el botón — no compartas este chat con nadie.",
           {
             reply_markup: {
               inline_keyboard: [[{ text: "Volver a MeCuadra", url: resume }]],

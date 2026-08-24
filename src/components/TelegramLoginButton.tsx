@@ -18,11 +18,7 @@ declare global {
   }
 }
 
-/**
- * Login Widget como en TopEstrenos: data-onauth (callback).
- * Evita el redirect a oauth.telegram.org que pide teléfono y se queda
- * esperando un mensaje que a veces no llega.
- */
+/** Botón oficial Login Widget (Telegram). Preferido por confianza. */
 export function TelegramLoginButton({
   botUsername,
   onAuth,
@@ -31,7 +27,6 @@ export function TelegramLoginButton({
   botUsername: string;
   onAuth: (user: TgUser) => void;
   onError?: (message: string) => void;
-  /** @deprecated el callback no necesita nextPath */
   nextPath?: string;
 }) {
   const host = useRef<HTMLDivElement>(null);
@@ -75,7 +70,6 @@ export function TelegramLoginButton({
     script.setAttribute("data-size", "large");
     script.setAttribute("data-radius", "14");
     script.setAttribute("data-userpic", "true");
-    // Igual que TopEstrenos: confirma en popup / app, sin forzar número.
     script.setAttribute("data-onauth", "onMeCuadraTelegramAuth(user)");
     script.onload = () => {
       window.setTimeout(() => {
@@ -88,7 +82,7 @@ export function TelegramLoginButton({
       if (cancelled) return;
       setPhase("error");
       onErrorRef.current?.(
-        "No se pudo cargar Telegram. Desactiva la VPN o prueba otra red e inténtalo de nuevo.",
+        "No se pudo cargar el botón oficial de Telegram. Prueba la alternativa de abajo o desactiva la VPN.",
       );
     };
     el.appendChild(script);
@@ -98,7 +92,7 @@ export function TelegramLoginButton({
       if (!el.querySelector("iframe") && !el.querySelector("button")) {
         setPhase("error");
         onErrorRef.current?.(
-          "Telegram tarda demasiado en cargar. Desactiva la VPN y recarga la página.",
+          "El botón oficial no cargó. Usa “Acceso por el bot oficial” más abajo.",
         );
       } else {
         markReady();
@@ -123,53 +117,30 @@ export function TelegramLoginButton({
   }
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <div className="relative flex min-h-[52px] w-full flex-col items-center justify-center">
-        {phase === "loading" ? (
-          <div className="flex flex-col items-center gap-3 py-2" role="status" aria-live="polite">
-            <span className="h-9 w-9 animate-spin rounded-full border-[3px] border-brand/25 border-t-brand" />
-            <p className="text-center text-sm font-medium text-ink">Preparando Telegram…</p>
-            <p className="max-w-xs text-center text-xs text-mute">
-              Esto puede tardar unos segundos. No cierres la página.
-            </p>
-          </div>
-        ) : null}
+    <div className="relative flex min-h-[52px] w-full flex-col items-center justify-center">
+      {phase === "loading" ? (
+        <div className="flex flex-col items-center gap-3 py-2" role="status" aria-live="polite">
+          <span className="h-9 w-9 animate-spin rounded-full border-[3px] border-brand/25 border-t-brand" />
+          <p className="text-center text-sm font-medium text-ink">Cargando login oficial de Telegram…</p>
+        </div>
+      ) : null}
 
-        <div
-          ref={host}
-          className={
-            phase === "loading"
-              ? "pointer-events-none absolute opacity-0"
-              : "flex w-full justify-center"
-          }
-        />
+      <div
+        ref={host}
+        className={
+          phase === "loading" ? "pointer-events-none absolute opacity-0" : "flex w-full justify-center"
+        }
+      />
 
-        {phase === "error" ? (
-          <button
-            type="button"
-            className="btn-ghost mt-2 text-sm"
-            onClick={() => window.location.reload()}
-          >
-            Reintentar
-          </button>
-        ) : null}
-      </div>
-
-      <div className="w-full rounded-2xl border border-line bg-stone-50 px-4 py-3 text-left text-xs leading-5 text-mute">
-        <p className="font-semibold text-ink">Cómo entrar (sin SMS ni teléfono)</p>
-        <ol className="mt-1.5 list-decimal space-y-1 pl-4">
-          <li>Toca el botón azul de Telegram.</li>
-          <li>
-            En Telegram confirma <span className="font-medium text-ink">“Aceptar”</span> / que eres
-            tú — no hace falta escribir el número.
-          </li>
-          <li>Vuelves a MeCuadra ya con la sesión abierta.</li>
-        </ol>
-        <p className="mt-2 text-[11px] text-mute">
-          Si el navegador bloquea ventanas emergentes, permítelas para mecuadra.vercel.app. Con VPN
-          a veces falla: pruébalo un momento sin ella.
-        </p>
-      </div>
+      {phase === "error" ? (
+        <button
+          type="button"
+          className="btn-ghost mt-2 text-sm"
+          onClick={() => window.location.reload()}
+        >
+          Reintentar botón oficial
+        </button>
+      ) : null}
     </div>
   );
 }

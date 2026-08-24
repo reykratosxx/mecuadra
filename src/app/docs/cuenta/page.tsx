@@ -8,7 +8,7 @@ export default function Page() {
       <DocHero
         kicker="Cuenta"
         title="Un toque. Tu Telegram. Listo."
-        lead="MeCuadra entra abriendo el bot de Telegram (sin pedir teléfono en el navegador). Sin Google, sin correo OTP y sin SMS. El mercado se ve libre; publicar y aplicar piden la sesión."
+        lead="Priorizamos el Login Widget oficial de Telegram (la confirmación sale de Telegram, no de un chat raro). Si en el móvil se atasca pidiendo número, hay un acceso alternativo por el bot oficial de MeCuadra."
       />
       <h2>Cómo funciona</h2>
       <ul>
@@ -16,25 +16,27 @@ export default function Page() {
           <strong>Explorar</strong> — sin cuenta. Ves ofertas y detalles.
         </li>
         <li>
-          <strong>Entrar</strong> — Continuar con Telegram abre el bot. Confirmas con Start
-          y vuelves a la web.
+          <strong>Entrar (recomendado)</strong> — botón oficial de Telegram. Confirmas en la app.
         </li>
         <li>
-          <strong>Publicar / MeCuadra</strong> — con la sesión abierta.
+          <strong>Alternativa</strong> — bot oficial de MeCuadra solo si el widget pide teléfono
+          y no avanza.
         </li>
       </ul>
       <Steps
         items={[
-          { title: "Abres /login", text: "Tocas Continuar con Telegram." },
-          { title: "Confirmas en el bot", text: "Start en @mecuadrabot. Sin número ni SMS." },
-          { title: "Ya estás dentro", text: "La web detecta la confirmación y abre la sesión." },
+          { title: "Login oficial", text: "El botón azul de Telegram. Aceptas en la app." },
+          {
+            title: "Si se atasca",
+            text: "“¿No llega la confirmación?” → abre el bot oficial y pulsa Iniciar.",
+          },
+          { title: "Listo", text: "La web abre la sesión. Publicas y aplicas." },
         ]}
       />
-      <Callout title="BotFather + webhook" tone="warn">
-        El bot necesita webhook apuntando a{" "}
-        <code>/api/auth/telegram</code>. Variables: <code>TELEGRAM_BOT_TOKEN</code> y{" "}
-        <code>NEXT_PUBLIC_TELEGRAM_BOT_USERNAME</code>. En Supabase ejecuta el SQL de{" "}
-        <code>telegram_auth_sessions</code>.
+      <Callout title="BotFather + SQL" tone="warn">
+        Widget: /setdomain → <code>mecuadra.vercel.app</code>. Alternativa por bot: webhook en{" "}
+        <code>/api/auth/telegram</code> y tabla <code>telegram_auth_sessions</code>. Variables:{" "}
+        <code>TELEGRAM_BOT_TOKEN</code>, <code>NEXT_PUBLIC_TELEGRAM_BOT_USERNAME</code>.
       </Callout>
     </article>
   );
