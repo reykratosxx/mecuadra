@@ -18,15 +18,20 @@ declare global {
   }
 }
 
+/**
+ * Login Widget como en TopEstrenos: data-onauth (callback).
+ * Evita el redirect a oauth.telegram.org que pide teléfono y se queda
+ * esperando un mensaje que a veces no llega.
+ */
 export function TelegramLoginButton({
   botUsername,
   onAuth,
   onError,
-  nextPath = "/explorar",
 }: {
   botUsername: string;
   onAuth: (user: TgUser) => void;
   onError?: (message: string) => void;
+  /** @deprecated el callback no necesita nextPath */
   nextPath?: string;
 }) {
   const host = useRef<HTMLDivElement>(null);
@@ -47,9 +52,6 @@ export function TelegramLoginButton({
       onAuthRef.current(user);
     };
 
-    const safeNext = nextPath.startsWith("/") ? nextPath : "/explorar";
-    const authUrl = `${window.location.origin}/auth/telegram?next=${encodeURIComponent(safeNext)}`;
-
     const el = host.current;
     el.innerHTML = "";
 
@@ -69,14 +71,13 @@ export function TelegramLoginButton({
     const script = document.createElement("script");
     script.src = "https://telegram.org/js/telegram-widget.js?22";
     script.async = true;
-    script.setAttribute("data-telegram-login", botUsername);
+    script.setAttribute("data-telegram-login", botUsername.replace(/^@/, ""));
     script.setAttribute("data-size", "large");
     script.setAttribute("data-radius", "14");
-    script.setAttribute("data-request-access", "write");
     script.setAttribute("data-userpic", "true");
-    script.setAttribute("data-auth-url", authUrl);
+    // Igual que TopEstrenos: confirma en popup / app, sin forzar número.
+    script.setAttribute("data-onauth", "onMeCuadraTelegramAuth(user)");
     script.onload = () => {
-      // El iframe llega un poco después del script.
       window.setTimeout(() => {
         if (!cancelled && (el.querySelector("iframe") || el.querySelector("button"))) {
           markReady();
@@ -108,9 +109,10 @@ export function TelegramLoginButton({
       cancelled = true;
       observer.disconnect();
       window.clearTimeout(timeout);
+      el.innerHTML = "";
       delete window.onMeCuadraTelegramAuth;
     };
-  }, [botUsername, nextPath]);
+  }, [botUsername]);
 
   if (!botUsername) {
     return (
@@ -135,7 +137,11 @@ export function TelegramLoginButton({
 
         <div
           ref={host}
-          className={phase === "loading" ? "pointer-events-none absolute opacity-0" : ""}
+          className={
+            phase === "loading"
+              ? "pointer-events-none absolute opacity-0"
+              : "flex w-full justify-center"
+          }
         />
 
         {phase === "error" ? (
@@ -150,15 +156,19 @@ export function TelegramLoginButton({
       </div>
 
       <div className="w-full rounded-2xl border border-line bg-stone-50 px-4 py-3 text-left text-xs leading-5 text-mute">
-        <p className="font-semibold text-ink">No llega ningún SMS</p>
+        <p className="font-semibold text-ink">Cómo entrar (sin SMS ni teléfono)</p>
         <ol className="mt-1.5 list-decimal space-y-1 pl-4">
           <li>Toca el botón azul de Telegram.</li>
-          <li>Escribe tu número con <span className="font-medium text-ink">+53</span>.</li>
           <li>
-            Abre la <span className="font-medium text-ink">app de Telegram</span> y confirma el
-            acceso — el aviso llega ahí, no por mensaje de texto.
+            En Telegram confirma <span className="font-medium text-ink">“Aceptar”</span> / que eres
+            tú — no hace falta escribir el número.
           </li>
+          <li>Vuelves a MeCuadra ya con la sesión abierta.</li>
         </ol>
+        <p className="mt-2 text-[11px] text-mute">
+          Si el navegador bloquea ventanas emergentes, permítelas para mecuadra.vercel.app. Con VPN
+          a veces falla: pruébalo un momento sin ella.
+        </p>
       </div>
     </div>
   );

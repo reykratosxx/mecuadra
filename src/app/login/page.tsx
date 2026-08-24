@@ -92,7 +92,7 @@ function AuthCard() {
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/80">MeCuadra</p>
         <h1 className="mt-2 font-display text-3xl leading-tight">Entra con Telegram</h1>
         <p className="mt-2 text-sm text-white/90">
-          Confirma en la app de Telegram. No usamos SMS ni códigos por mensaje de texto.
+          Un toque en Telegram para confirmar que eres tú. Sin SMS y sin escribir el número.
         </p>
       </div>
 
@@ -106,7 +106,6 @@ function AuthCard() {
         ) : (
           <TelegramLoginButton
             botUsername={botUsername}
-            nextPath={safeNext}
             onAuth={(u) => void onAuth(u)}
             onError={setError}
           />
