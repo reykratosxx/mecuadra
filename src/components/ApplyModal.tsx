@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/lib/store";
 import { IconX } from "./icons";
+import { MeCuadraLabel, MeCuadraMark } from "./MeCuadraMark";
 
 export function ApplyModal({
   offerId,
@@ -46,7 +47,10 @@ export function ApplyModal({
       <div className="card max-h-[90vh] w-full max-w-lg overflow-y-auto p-5">
         <div className="mb-4 flex items-start justify-between">
           <div>
-            <h2 className="font-display text-xl">MeCuadra</h2>
+            <h2 className="flex items-center gap-2 font-display text-xl">
+              <MeCuadraMark size={28} />
+              MeCuadra
+            </h2>
             <p className="text-sm text-mute">
               Propón qué das a cambio{wants ? ` · busca: ${wants}` : ""}.
             </p>
@@ -118,7 +122,7 @@ export function ApplyModal({
             router.push(`/chat/${res.id}`);
           }}
         >
-          Aplicar a esta oferta
+          <MeCuadraLabel />
         </button>
         <p className="mt-2 text-center text-xs text-mute">
           No hay dinero en custodia. El trato se confirma entre las dos partes.

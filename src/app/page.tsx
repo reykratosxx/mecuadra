@@ -5,6 +5,7 @@ import { OfferCard } from "@/components/OfferCard";
 import { IconArrows, IconCheck, IconChat, IconShield, IconStar } from "@/components/icons";
 import { useStore } from "@/lib/store";
 import { Logo } from "@/components/Logo";
+import { MeCuadraLabel } from "@/components/MeCuadraMark";
 
 const steps = [
   {
@@ -90,7 +91,9 @@ export default function HomePage() {
                   <p className="text-xs text-mute">Voy al lugar</p>
                 </div>
               </div>
-              <button className="btn-primary mt-4 w-full pointer-events-none">MeCuadra</button>
+              <button className="btn-primary mt-4 w-full pointer-events-none">
+                <MeCuadraLabel />
+              </button>
               <p className="mt-3 text-center text-xs text-mute">
                 Un toque. Propones. Se abre el chat.
               </p>
@@ -163,14 +166,20 @@ export default function HomePage() {
             </article>
           ))}
         </div>
-        <div className="mx-auto mt-8 max-w-6xl card flex flex-col items-start gap-4 bg-[image:var(--grad)] p-8 text-white md:flex-row md:items-center md:justify-between">
+        <div
+          className="mx-auto mt-8 flex max-w-6xl flex-col items-start gap-4 rounded-[1.35rem] p-8 text-white shadow-lg shadow-brand/20 md:flex-row md:items-center md:justify-between"
+          style={{ background: "var(--grad)" }}
+        >
           <div>
             <p className="font-display text-2xl">¿Tienes algo que ya no usas?</p>
-            <p className="mt-1 text-white/80">
+            <p className="mt-1 text-white/85">
               Alguien en tu municipio lo está buscando hoy.
             </p>
           </div>
-          <Link href="/publicar" className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-brand">
+          <Link
+            href="/publicar"
+            className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-brand shadow-sm"
+          >
             Publicar oferta
           </Link>
         </div>

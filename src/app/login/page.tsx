@@ -92,14 +92,17 @@ function AuthCard() {
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/80">MeCuadra</p>
         <h1 className="mt-2 font-display text-3xl leading-tight">Entra con Telegram</h1>
         <p className="mt-2 text-sm text-white/90">
-          El mercado se ve sin cuenta. Para publicar o tocar MeCuadra en una oferta,
-          inicia sesión con tu Telegram.
+          Confirma en la app de Telegram. No usamos SMS ni códigos por mensaje de texto.
         </p>
       </div>
 
       <div className="space-y-5 p-6">
         {busy ? (
-          <p className="text-center text-sm text-mute">Confirmando con Telegram…</p>
+          <div className="flex flex-col items-center gap-3 py-6" role="status">
+            <span className="h-9 w-9 animate-spin rounded-full border-[3px] border-brand/25 border-t-brand" />
+            <p className="text-center text-sm font-medium text-ink">Abriendo tu sesión…</p>
+            <p className="text-center text-xs text-mute">Ya confirmaste en Telegram. Un momento.</p>
+          </div>
         ) : (
           <TelegramLoginButton
             botUsername={botUsername}
@@ -114,7 +117,7 @@ function AuthCard() {
         <ul className="space-y-2 text-sm text-mute">
           <li>· Explorar ofertas: libre, sin registro.</li>
           <li>· Publicar y aplicar: con Telegram.</li>
-          <li>· Sin Google, sin correo OTP, sin SMS.</li>
+          <li>· Sin Google, sin correo y <strong className="font-semibold text-ink">sin SMS</strong>.</li>
         </ul>
 
         <p className="text-center text-sm">

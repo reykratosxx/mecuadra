@@ -12,6 +12,7 @@ import { useStore } from "@/lib/store";
 import { timeAgo } from "@/lib/utils";
 import { IconArrows, IconPin, IconShield, IconTruck } from "@/components/icons";
 import { ShareOffer } from "@/components/ShareOffer";
+import { MeCuadraLabel } from "@/components/MeCuadraMark";
 
 export default function OfertaPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -116,7 +117,7 @@ export default function OfertaPage({ params }: { params: Promise<{ id: string }>
             </Link>
           ) : offer.status === "abierta" ? (
             <button type="button" className="btn-primary mt-5 w-full" onClick={() => setOpen(true)}>
-              MeCuadra
+              <MeCuadraLabel />
             </button>
           ) : (
             <p className="mt-5 text-sm text-mute">Esta oferta ya no está abierta.</p>

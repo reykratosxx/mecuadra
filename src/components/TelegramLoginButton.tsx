@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type TgUser = {
   id: number;
@@ -35,19 +35,37 @@ export function TelegramLoginButton({
   onAuthRef.current = onAuth;
   onErrorRef.current = onError;
 
+  const [phase, setPhase] = useState<"loading" | "ready" | "error">("loading");
+
   useEffect(() => {
     if (!botUsername || !host.current) return;
 
-    // Callback en página: si Telegram abre el popup y vuelve sin navegación completa.
+    let cancelled = false;
+    setPhase("loading");
+
     window.onMeCuadraTelegramAuth = (user) => {
       onAuthRef.current(user);
     };
 
     const safeNext = nextPath.startsWith("/") ? nextPath : "/explorar";
-    // Redirect: más fiable con VPN / bloqueo de scripts de terceros.
     const authUrl = `${window.location.origin}/auth/telegram?next=${encodeURIComponent(safeNext)}`;
 
-    host.current.innerHTML = "";
+    const el = host.current;
+    el.innerHTML = "";
+
+    const markReady = () => {
+      if (cancelled) return;
+      setPhase("ready");
+    };
+
+    const observer = new MutationObserver(() => {
+      if (el.querySelector("iframe") || el.querySelector("button") || el.querySelector("a")) {
+        markReady();
+        observer.disconnect();
+      }
+    });
+    observer.observe(el, { childList: true, subtree: true });
+
     const script = document.createElement("script");
     script.src = "https://telegram.org/js/telegram-widget.js?22";
     script.async = true;
@@ -57,13 +75,39 @@ export function TelegramLoginButton({
     script.setAttribute("data-request-access", "write");
     script.setAttribute("data-userpic", "true");
     script.setAttribute("data-auth-url", authUrl);
-    script.onerror = () =>
+    script.onload = () => {
+      // El iframe llega un poco después del script.
+      window.setTimeout(() => {
+        if (!cancelled && (el.querySelector("iframe") || el.querySelector("button"))) {
+          markReady();
+        }
+      }, 400);
+    };
+    script.onerror = () => {
+      if (cancelled) return;
+      setPhase("error");
       onErrorRef.current?.(
         "No se pudo cargar Telegram. Desactiva la VPN o prueba otra red e inténtalo de nuevo.",
       );
-    host.current.appendChild(script);
+    };
+    el.appendChild(script);
+
+    const timeout = window.setTimeout(() => {
+      if (cancelled) return;
+      if (!el.querySelector("iframe") && !el.querySelector("button")) {
+        setPhase("error");
+        onErrorRef.current?.(
+          "Telegram tarda demasiado en cargar. Desactiva la VPN y recarga la página.",
+        );
+      } else {
+        markReady();
+      }
+    }, 12000);
 
     return () => {
+      cancelled = true;
+      observer.disconnect();
+      window.clearTimeout(timeout);
       delete window.onMeCuadraTelegramAuth;
     };
   }, [botUsername, nextPath]);
@@ -77,12 +121,45 @@ export function TelegramLoginButton({
   }
 
   return (
-    <div className="flex flex-col items-center gap-3">
-      <div ref={host} className="min-h-[44px]" />
-      <p className="text-center text-xs text-mute">
-        Telegram confirma que eres tú. Si el botón no carga o se queda colgado, desactiva
-        la VPN un momento — a menudo bloquea telegram.org.
-      </p>
+    <div className="flex flex-col items-center gap-4">
+      <div className="relative flex min-h-[52px] w-full flex-col items-center justify-center">
+        {phase === "loading" ? (
+          <div className="flex flex-col items-center gap-3 py-2" role="status" aria-live="polite">
+            <span className="h-9 w-9 animate-spin rounded-full border-[3px] border-brand/25 border-t-brand" />
+            <p className="text-center text-sm font-medium text-ink">Preparando Telegram…</p>
+            <p className="max-w-xs text-center text-xs text-mute">
+              Esto puede tardar unos segundos. No cierres la página.
+            </p>
+          </div>
+        ) : null}
+
+        <div
+          ref={host}
+          className={phase === "loading" ? "pointer-events-none absolute opacity-0" : ""}
+        />
+
+        {phase === "error" ? (
+          <button
+            type="button"
+            className="btn-ghost mt-2 text-sm"
+            onClick={() => window.location.reload()}
+          >
+            Reintentar
+          </button>
+        ) : null}
+      </div>
+
+      <div className="w-full rounded-2xl border border-line bg-stone-50 px-4 py-3 text-left text-xs leading-5 text-mute">
+        <p className="font-semibold text-ink">No llega ningún SMS</p>
+        <ol className="mt-1.5 list-decimal space-y-1 pl-4">
+          <li>Toca el botón azul de Telegram.</li>
+          <li>Escribe tu número con <span className="font-medium text-ink">+53</span>.</li>
+          <li>
+            Abre la <span className="font-medium text-ink">app de Telegram</span> y confirma el
+            acceso — el aviso llega ahí, no por mensaje de texto.
+          </li>
+        </ol>
+      </div>
     </div>
   );
 }
