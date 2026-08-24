@@ -1,12 +1,17 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isCubanMobile, normalizeCubanPhone } from "@/lib/phone";
-import { shareContactKeyboard, telegramSend } from "@/lib/telegram";
+import { shareContactKeyboard, telegramBotUsername, telegramSend } from "@/lib/telegram";
 
 export const runtime = "nodejs";
 
 type TgContact = { phone_number?: string; user_id?: number };
 type TgChat = { id: number };
-type TgFrom = { id: number };
+type TgFrom = {
+  id: number;
+  first_name?: string;
+  last_name?: string;
+  username?: string;
+};
 type TgMessage = {
   chat?: TgChat;
   from?: TgFrom;
@@ -21,6 +26,10 @@ function authorized(request: Request) {
   return request.headers.get("x-telegram-bot-api-secret-token") === expected;
 }
 
+function siteOrigin() {
+  return (process.env.NEXT_PUBLIC_SITE_URL || "https://mecuadra.vercel.app").replace(/\/$/, "");
+}
+
 export async function POST(request: Request) {
   if (!authorized(request)) {
     return new Response("unauthorized", { status: 401 });
@@ -33,32 +42,89 @@ export async function POST(request: Request) {
 
   try {
     const admin = createAdminClient();
+    const text = msg?.text?.trim() || "";
 
-    if (msg?.text?.startsWith("/start")) {
-      const token = msg.text.replace("/start", "").trim();
-      if (!token) {
+    if (text.startsWith("/start")) {
+      const payload = text.replace(/^\/start\s*/, "").trim();
+
+      // Login web: /start login_<token>
+      if (payload.startsWith("login_")) {
+        const token = payload.slice("login_".length);
+        const from = msg?.from;
+        if (!from?.id || !/^[a-f0-9]{32}$/.test(token)) {
+          await telegramSend(chatId, "Enlace inválido. Vuelve a MeCuadra y toca Entrar otra vez.");
+          return Response.json({ ok: true });
+        }
+
+        const { data: session } = await admin
+          .from("telegram_auth_sessions")
+          .select("token, status, created_at")
+          .eq("token", token)
+          .maybeSingle();
+
+        const fresh =
+          session && Date.now() - new Date(session.created_at as string).getTime() < 15 * 60 * 1000;
+
+        if (!fresh || session.status === "consumed") {
+          await telegramSend(
+            chatId,
+            "Ese enlace caducó. Vuelve a MeCuadra → Entrar y abre Telegram de nuevo.",
+          );
+          return Response.json({ ok: true });
+        }
+
+        await admin
+          .from("telegram_auth_sessions")
+          .update({
+            status: "confirmed",
+            telegram_id: from.id,
+            first_name: from.first_name ?? null,
+            last_name: from.last_name ?? null,
+            username: from.username ?? null,
+            photo_url: null,
+          })
+          .eq("token", token)
+          .neq("status", "consumed");
+
+        const resume = `${siteOrigin()}/login?resume=${token}`;
         await telegramSend(
           chatId,
-          "Entra a MeCuadra, toca Verificar con Telegram y vuelve a abrir el bot desde ahí.",
+          "Listo. Ya confirmamos que eres tú en MeCuadra.\n\nVuelve a la web — o toca el botón:",
+          {
+            reply_markup: {
+              inline_keyboard: [[{ text: "Volver a MeCuadra", url: resume }]],
+            },
+          },
         );
         return Response.json({ ok: true });
       }
-      const { data: link } = await admin
-        .from("telegram_links")
-        .select("token, user_id, created_at")
-        .eq("token", token)
-        .maybeSingle();
-      const fresh =
-        link && Date.now() - new Date(link.created_at as string).getTime() < 20 * 60 * 1000;
-      if (!fresh) {
-        await telegramSend(chatId, "Ese enlace caducó. Vuelve a MeCuadra y pide uno nuevo.");
+
+      // Flujo legado: vincular Cubacel a una cuenta ya logueada
+      if (payload) {
+        const { data: link } = await admin
+          .from("telegram_links")
+          .select("token, user_id, created_at")
+          .eq("token", payload)
+          .maybeSingle();
+        const fresh =
+          link && Date.now() - new Date(link.created_at as string).getTime() < 20 * 60 * 1000;
+        if (!fresh) {
+          await telegramSend(chatId, "Ese enlace caducó. Vuelve a MeCuadra y pide uno nuevo.");
+          return Response.json({ ok: true });
+        }
+        await admin.from("telegram_links").update({ chat_id: chatId }).eq("token", payload);
+        await telegramSend(
+          chatId,
+          "Toca el botón para compartir el celular Cubacel con el que te registraste en Telegram. Es gratis: no hay SMS.",
+          { reply_markup: shareContactKeyboard() },
+        );
         return Response.json({ ok: true });
       }
-      await admin.from("telegram_links").update({ chat_id: chatId }).eq("token", token);
+
+      const bot = telegramBotUsername();
       await telegramSend(
         chatId,
-        "Toca el botón para compartir el celular Cubacel con el que te registraste en Telegram. Es gratis: no hay SMS.",
-        { reply_markup: shareContactKeyboard() },
+        `Hola. Para entrar a MeCuadra abre https://mecuadra.vercel.app/login y toca Continuar con Telegram${bot ? ` (o @${bot})` : ""}.`,
       );
       return Response.json({ ok: true });
     }
@@ -85,7 +151,10 @@ export async function POST(request: Request) {
       const fresh =
         link && Date.now() - new Date(link.created_at as string).getTime() < 20 * 60 * 1000;
       if (!fresh || !link) {
-        await telegramSend(chatId, "No encuentro una sesión abierta. Vuelve a MeCuadra y toca Verificar con Telegram.");
+        await telegramSend(
+          chatId,
+          "No encuentro una sesión abierta. Vuelve a MeCuadra y toca Verificar con Telegram.",
+        );
         return Response.json({ ok: true });
       }
 
@@ -102,7 +171,10 @@ export async function POST(request: Request) {
         return Response.json({ ok: true });
       }
       await admin.from("telegram_links").delete().eq("user_id", link.user_id);
-      await telegramSend(chatId, "Listo. Vuelve a MeCuadra: tu Cubacel ya está verificado. Gratis, sin SMS.");
+      await telegramSend(
+        chatId,
+        "Listo. Vuelve a MeCuadra: tu Cubacel ya está verificado. Gratis, sin SMS.",
+      );
     }
   } catch {
     if (chatId) {

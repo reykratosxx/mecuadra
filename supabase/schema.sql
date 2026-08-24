@@ -71,6 +71,22 @@ create table if not exists public.telegram_links (
 create index if not exists telegram_links_user_idx on public.telegram_links (user_id);
 alter table public.telegram_links add column if not exists chat_id bigint;
 
+-- Login por bot (sin oauth / sin pedir teléfono en el navegador)
+create table if not exists public.telegram_auth_sessions (
+  token text primary key,
+  status text not null default 'pending'
+    check (status in ('pending', 'confirmed', 'consumed')),
+  telegram_id bigint,
+  first_name text,
+  last_name text,
+  username text,
+  photo_url text,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists telegram_auth_sessions_status_idx
+  on public.telegram_auth_sessions (status, created_at);
+
 create table if not exists public.items (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references public.profiles(id) on delete cascade,
@@ -320,6 +336,7 @@ create trigger trades_notify
 
 alter table public.profiles enable row level security;
 alter table public.telegram_links enable row level security;
+alter table public.telegram_auth_sessions enable row level security;
 alter table public.items enable row level security;
 alter table public.offers enable row level security;
 alter table public.trades enable row level security;
