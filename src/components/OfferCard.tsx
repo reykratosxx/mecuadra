@@ -17,70 +17,70 @@ export function OfferCard({ offer }: { offer: Offer }) {
   const cover = offered[0]?.photos[0] ?? "/logo.png";
 
   return (
-    <article className="card group overflow-hidden transition hover:-translate-y-0.5 hover:border-brand/25 hover:shadow-lg hover:shadow-brand/5">
+    <article className="card group overflow-hidden transition hover:border-brand/25 hover:shadow-md hover:shadow-brand/5">
       <Link href={`/oferta/${offer.id}`} className="block">
-      <div className="relative aspect-[4/3] overflow-hidden bg-stone-100">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={cover}
-          alt={offered[0]?.title ?? "Oferta"}
-          className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
-        />
-        {offer.featured ? (
-          <span className="absolute left-3 top-3 rounded-full bg-[image:var(--grad)] px-2.5 py-1 text-[11px] font-semibold text-white">
-            Destacada
+        <div className="relative aspect-[2/1] overflow-hidden bg-stone-100 sm:aspect-[16/10]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={cover}
+            alt={offered[0]?.title ?? "Oferta"}
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+          />
+          {offer.featured ? (
+            <span className="absolute left-2 top-2 rounded-full bg-[image:var(--grad)] px-2 py-0.5 text-[10px] font-semibold text-white sm:left-3 sm:top-3 sm:px-2.5 sm:py-1 sm:text-[11px]">
+              Destacada
+            </span>
+          ) : null}
+          <span className="absolute bottom-2 left-2 rounded-full bg-black/55 px-2 py-0.5 text-[10px] text-white backdrop-blur sm:bottom-3 sm:left-3 sm:px-2.5 sm:py-1 sm:text-[11px]">
+            {offered.length} {offered.length === 1 ? "artículo" : "artículos"}
           </span>
-        ) : null}
-        <span className="absolute bottom-3 left-3 rounded-full bg-black/55 px-2.5 py-1 text-[11px] text-white backdrop-blur">
-          {offered.length} {offered.length === 1 ? "artículo" : "artículos"}
-        </span>
-      </div>
-      <div className="space-y-3 p-4">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <Avatar src={owner?.avatar} name={owner?.name ?? "?"} size={28} />
-            <div>
-              <p className="flex items-center gap-1 text-sm font-medium text-ink">
-                {owner?.name}
-                {owner?.verified ? <IconShield className="h-3.5 w-3.5 text-brand" /> : null}
+        </div>
+        <div className="space-y-1.5 p-2.5 sm:space-y-3 sm:p-4">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
+              <Avatar src={owner?.avatar} name={owner?.name ?? "?"} size={22} />
+              <div className="min-w-0">
+                <p className="flex items-center gap-1 truncate text-[13px] font-medium text-ink sm:text-sm">
+                  {owner?.name}
+                  {owner?.verified ? <IconShield className="h-3 w-3 shrink-0 text-brand sm:h-3.5 sm:w-3.5" /> : null}
+                </p>
+                <span className="hidden sm:inline">{owner ? <Stars value={owner.ratingAvg} count={owner.ratingCount} /> : null}</span>
+              </div>
+            </div>
+            <span className="shrink-0 text-[10px] text-mute sm:text-[11px]">{timeAgo(offer.createdAt)}</span>
+          </div>
+
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1 sm:gap-2">
+            <div className="min-w-0">
+              <p className="text-[9px] font-semibold uppercase tracking-wider text-mute sm:text-[10px]">Ofrece</p>
+              <p className="line-clamp-1 text-xs font-medium text-ink sm:line-clamp-2 sm:text-sm">
+                {offered.map((i) => i.title).join(" · ") || "Sin artículos"}
               </p>
-              {owner ? <Stars value={owner.ratingAvg} count={owner.ratingCount} /> : null}
+            </div>
+            <span className="grid h-6 w-6 place-items-center rounded-full bg-brand-50 text-brand sm:h-8 sm:w-8">
+              <IconArrows className="h-3 w-3 sm:h-4 sm:w-4" />
+            </span>
+            <div className="min-w-0">
+              <p className="text-[9px] font-semibold uppercase tracking-wider text-mute sm:text-[10px]">Necesita</p>
+              <p className="line-clamp-1 text-xs font-medium text-ink sm:line-clamp-2 sm:text-sm">
+                {offer.wants.map((w) => w.title).join(" · ")}
+              </p>
             </div>
           </div>
-          <span className="text-[11px] text-mute">{timeAgo(offer.createdAt)}</span>
-        </div>
 
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-mute">Ofrece</p>
-            <p className="line-clamp-2 text-sm font-medium text-ink">
-              {offered.map((i) => i.title).join(" · ") || "Sin artículos"}
-            </p>
-          </div>
-          <span className="grid h-8 w-8 place-items-center rounded-full bg-brand-50 text-brand">
-            <IconArrows className="h-4 w-4" />
-          </span>
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-mute">Necesita</p>
-            <p className="line-clamp-2 text-sm font-medium text-ink">
-              {offer.wants.map((w) => w.title).join(" · ")}
-            </p>
+          <div className="flex flex-wrap items-center gap-1 sm:gap-1.5">
+            {offer.openToProposals ? <Badge>Escucha propuestas</Badge> : null}
+            {offered[0] ? <Badge tone="mute">{categoryLabel(offered[0].category)}</Badge> : null}
+            <span className="ml-auto inline-flex items-center gap-1 text-[10px] text-mute sm:text-[11px]">
+              <IconPin className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+              {offer.neighborhood || offer.municipality}
+            </span>
+            <span className="inline-flex items-center gap-1 text-[10px] text-mute sm:text-[11px]">
+              <IconTruck className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+              {TRANSPORT_LABEL[offer.transport].split("·")[0]}
+            </span>
           </div>
         </div>
-
-        <div className="flex flex-wrap items-center gap-1.5">
-          {offer.openToProposals ? <Badge>Escucha propuestas</Badge> : null}
-          {offered[0] ? <Badge tone="mute">{categoryLabel(offered[0].category)}</Badge> : null}
-          <span className="ml-auto inline-flex items-center gap-1 text-[11px] text-mute">
-            <IconPin className="h-3.5 w-3.5" />
-            {offer.neighborhood || offer.municipality}
-          </span>
-          <span className="inline-flex items-center gap-1 text-[11px] text-mute">
-            <IconTruck className="h-3.5 w-3.5" />
-            {TRANSPORT_LABEL[offer.transport].split("·")[0]}
-          </span>
-        </div>
-      </div>
       </Link>
       <ShareStrip offer={offer} titles={offered.map((i) => i.title)} />
     </article>
@@ -99,18 +99,17 @@ function ShareStrip({ offer, titles }: { offer: Offer; titles: string[] }) {
       place,
       transport: TRANSPORT_LABEL[offer.transport],
     });
-    const href = pack[kind];
-    window.open(href, "_blank", "noopener,noreferrer,width=640,height=720");
+    window.open(pack[kind], "_blank", "noopener,noreferrer,width=640,height=720");
   }
   return (
     <div className="flex border-t border-line">
-      <button type="button" className="flex-1 py-2 text-center text-[11px] font-semibold text-mute hover:bg-brand-50" onClick={() => go("telegram")}>
+      <button type="button" className="flex-1 py-1.5 text-center text-[10px] font-semibold text-mute hover:bg-brand-50 sm:py-2 sm:text-[11px]" onClick={() => go("telegram")}>
         Telegram
       </button>
-      <button type="button" className="flex-1 border-x border-line py-2 text-center text-[11px] font-semibold text-mute hover:bg-brand-50" onClick={() => go("whatsapp")}>
+      <button type="button" className="flex-1 border-x border-line py-1.5 text-center text-[10px] font-semibold text-mute hover:bg-brand-50 sm:py-2 sm:text-[11px]" onClick={() => go("whatsapp")}>
         WhatsApp
       </button>
-      <button type="button" className="flex-1 py-2 text-center text-[11px] font-semibold text-mute hover:bg-brand-50" onClick={() => go("facebook")}>
+      <button type="button" className="flex-1 py-1.5 text-center text-[10px] font-semibold text-mute hover:bg-brand-50 sm:py-2 sm:text-[11px]" onClick={() => go("facebook")}>
         Facebook
       </button>
     </div>

@@ -30,22 +30,51 @@ export function telegramConfigured() {
   return Boolean(process.env.TELEGRAM_BOT_TOKEN && telegramBotUsername());
 }
 
-/** Verifica el payload del Login Widget (HMAC-SHA256 del bot token). */
+/** Normaliza el payload del widget (números pueden llegar como string). */
+export function coerceTelegramLogin(raw: Record<string, unknown>): TelegramLoginPayload | null {
+  const id = Number(raw.id);
+  const auth_date = Number(raw.auth_date);
+  const hash = typeof raw.hash === "string" ? raw.hash : "";
+  if (!Number.isFinite(id) || !Number.isFinite(auth_date) || !hash) return null;
+
+  const out: TelegramLoginPayload = {
+    id,
+    first_name: String(raw.first_name ?? ""),
+    auth_date,
+    hash,
+  };
+  if (raw.last_name != null && String(raw.last_name)) out.last_name = String(raw.last_name);
+  if (raw.username != null && String(raw.username)) out.username = String(raw.username);
+  if (raw.photo_url != null && String(raw.photo_url)) out.photo_url = String(raw.photo_url);
+  return out;
+}
+
+/**
+ * Verifica el payload del Login Widget (HMAC-SHA256 del bot token).
+ * Solo incluye campos presentes — campos vacíos rompen el hash.
+ */
 export function verifyTelegramLogin(data: TelegramLoginPayload, maxAgeSec = 86400) {
   const { hash, ...rest } = data;
   if (!hash || !data.id || !data.auth_date) return false;
   if (Math.floor(Date.now() / 1000) - Number(data.auth_date) > maxAgeSec) return false;
 
   const checkString = Object.keys(rest)
+    .filter((key) => {
+      const v = (rest as Record<string, unknown>)[key];
+      return v !== undefined && v !== null && v !== "";
+    })
     .sort()
-    .map((key) => `${key}=${String((rest as Record<string, unknown>)[key] ?? "")}`)
+    .map((key) => `${key}=${String((rest as Record<string, unknown>)[key])}`)
     .join("\n");
 
   const secret = createHash("sha256").update(botToken()).digest();
   const hmac = createHmac("sha256", secret).update(checkString).digest("hex");
 
   try {
-    return timingSafeEqual(Buffer.from(hmac, "hex"), Buffer.from(hash, "hex"));
+    const a = Buffer.from(hmac, "hex");
+    const b = Buffer.from(String(hash), "hex");
+    if (a.length !== b.length) return false;
+    return timingSafeEqual(a, b);
   } catch {
     return false;
   }

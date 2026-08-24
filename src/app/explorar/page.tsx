@@ -41,8 +41,8 @@ export default function ExplorarPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="font-display text-3xl">Explorar</h1>
-        <p className="text-mute">Libro de ofertas abiertas. El municipio es opcional.</p>
+        <h1 className="font-display text-2xl sm:text-3xl">Ofertas</h1>
+        <p className="text-sm text-mute">Mercado P2P de trueque. El municipio es opcional.</p>
       </div>
       <FilterBar />
       <div className="mt-4 flex gap-2 overflow-x-auto pb-2">
@@ -76,7 +76,7 @@ export default function ExplorarPage() {
           />
         </div>
       ) : (
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
           {list.map((o) => (
             <OfferCard key={o.id} offer={o} />
           ))}

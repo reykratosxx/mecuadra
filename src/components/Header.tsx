@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "./Logo";
-import { IconBell, IconPlus, IconSearch } from "./icons";
+import { IconBell, IconPlus } from "./icons";
 import { Avatar } from "./ui";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -22,10 +22,11 @@ export function Header() {
   ).length;
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line/80 bg-white/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4">
-        <Logo withWord size={34} />
-        <nav className="ml-4 hidden items-center gap-1 md:flex">
+    <header className="sticky top-0 z-40 border-b border-line/80 bg-white/90 backdrop-blur-xl">
+      <div className="mx-auto flex h-14 max-w-6xl items-center gap-2 px-3 sm:h-16 sm:gap-3 sm:px-4">
+        <Logo withWord size={28} className="min-w-0" />
+
+        <nav className="ml-1 hidden items-center gap-1 md:flex">
           {links.map((l) => (
             <Link
               key={l.href}
@@ -41,37 +42,41 @@ export function Header() {
             </Link>
           ))}
         </nav>
-        <div className="ml-auto flex items-center gap-2">
+
+        <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
+          {currentUser ? (
+            <Link
+              href="/notificaciones"
+              className="relative grid h-9 w-9 place-items-center rounded-full text-mute hover:bg-stone-50"
+              aria-label="Notificaciones"
+            >
+              <IconBell className="h-5 w-5" />
+              {unread > 0 ? (
+                <span className="absolute right-0.5 top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">
+                  {unread > 9 ? "9+" : unread}
+                </span>
+              ) : null}
+            </Link>
+          ) : null}
+
           <Link
-            href="/explorar"
-            className="hidden h-10 w-10 items-center justify-center rounded-full text-mute hover:bg-stone-50 md:flex"
-            aria-label="Buscar"
+            href="/publicar"
+            className="btn-primary hidden h-9 gap-1 px-3 text-sm md:inline-flex"
           >
-            <IconSearch className="h-5 w-5" />
-          </Link>
-          <Link
-            href="/notificaciones"
-            className="relative flex h-10 w-10 items-center justify-center rounded-full text-mute hover:bg-stone-50"
-            aria-label="Notificaciones"
-          >
-            <IconBell className="h-5 w-5" />
-            {unread > 0 ? (
-              <span className="absolute right-1.5 top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">
-                {unread}
-              </span>
-            ) : null}
-          </Link>
-          <Link href="/publicar" className="btn-primary hidden sm:inline-flex">
             <IconPlus className="h-4 w-4" />
             Publicar
           </Link>
+
           {currentUser ? (
-            <Link href="/perfil" className="flex items-center gap-2 rounded-full p-0.5 hover:bg-stone-50">
-              <Avatar src={currentUser.avatar} name={currentUser.name} size={36} />
+            <Link href="/perfil" className="rounded-full p-0.5 hover:bg-stone-50" aria-label="Perfil">
+              <Avatar src={currentUser.avatar} name={currentUser.name} size={32} />
             </Link>
           ) : (
-            <Link href="/login" className="btn-ghost">
-              Telegram
+            <Link
+              href="/login"
+              className="inline-flex h-9 items-center rounded-full border border-line bg-white px-3 text-sm font-semibold text-ink hover:bg-brand-50"
+            >
+              Entrar
             </Link>
           )}
         </div>

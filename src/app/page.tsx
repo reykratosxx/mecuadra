@@ -36,18 +36,18 @@ export default function HomePage() {
             <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1 text-xs font-semibold text-brand">
               Mercado P2P de bienes · Cuba
             </p>
-            <h1 className="font-display text-4xl font-semibold leading-[1.1] tracking-tight text-ink md:text-6xl">
+            <h1 className="font-display text-3xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-4xl md:text-6xl">
               Si te cuadra,
               <span className="block bg-[image:var(--grad)] bg-clip-text text-transparent">
                 se cierra el trueque.
               </span>
             </h1>
-            <p className="mt-5 max-w-lg text-lg leading-7 text-mute">
+            <p className="mt-4 max-w-lg text-base leading-7 text-mute sm:mt-5 sm:text-lg">
               El trueque que ya se hace en grupos, con fotos, municipio y reputación.
               Publicas lo que tienes, aplicas a lo que necesitas y cierras el trato
               en el chat. Sin ventas y sin pedir efectivo en el listado.
             </p>
-            <div className="mt-7 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-wrap gap-3 sm:mt-7">
               <Link href="/explorar" className="btn-primary">
                 Explorar ofertas
               </Link>
@@ -55,7 +55,7 @@ export default function HomePage() {
                 Publicar un trueque
               </Link>
             </div>
-            <dl className="mt-10 grid grid-cols-3 gap-4 max-w-md">
+            <dl className="mt-8 grid max-w-md grid-cols-3 gap-3 sm:mt-10 sm:gap-4">
               {[
                 ["Solo trueque", "Cero efectivo en listados"],
                 ["Municipio", "Nunca un GPS que bloquee"],
@@ -122,14 +122,14 @@ export default function HomePage() {
         <div className="mx-auto max-w-6xl">
           <div className="mb-6 flex items-end justify-between">
             <div>
-              <h2 className="font-display text-3xl">Libro de ofertas</h2>
-              <p className="text-mute">Formato #cambio / #necesito / #municipio, con fotos y reputación.</p>
+              <h2 className="font-display text-2xl sm:text-3xl">Mercado P2P</h2>
+              <p className="text-sm text-mute sm:text-base">Ofertas abiertas · #cambio / #necesito / municipio</p>
             </div>
             <Link href="/explorar" className="text-sm font-semibold text-brand">
               Ver todas
             </Link>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
             {featured.map((o) => (
               <OfferCard key={o.id} offer={o} />
             ))}

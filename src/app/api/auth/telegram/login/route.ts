@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import {
+  coerceTelegramLogin,
   telegramAuthEmail,
   verifyTelegramLogin,
   type TelegramLoginPayload,
@@ -19,11 +20,16 @@ function usernameFromTg(data: TelegramLoginPayload) {
 }
 
 export async function POST(request: Request) {
-  let body: TelegramLoginPayload;
+  let raw: Record<string, unknown>;
   try {
-    body = (await request.json()) as TelegramLoginPayload;
+    raw = (await request.json()) as Record<string, unknown>;
   } catch {
     return NextResponse.json({ error: "Datos inválidos." }, { status: 400 });
+  }
+
+  const body = coerceTelegramLogin(raw);
+  if (!body) {
+    return NextResponse.json({ error: "Datos de Telegram incompletos." }, { status: 400 });
   }
 
   if (!process.env.TELEGRAM_BOT_TOKEN) {
@@ -32,7 +38,10 @@ export async function POST(request: Request) {
 
   if (!verifyTelegramLogin(body)) {
     return NextResponse.json(
-      { error: "La sesión de Telegram no es válida o caducó. Inténtalo de nuevo." },
+      {
+        error:
+          "La sesión de Telegram no es válida o caducó. Si usas VPN, desactívala e inténtalo de nuevo.",
+      },
       { status: 401 },
     );
   }
@@ -62,7 +71,6 @@ export async function POST(request: Request) {
         telegram_username: body.username ?? null,
       },
     });
-    // Si el correo ya existía, createUser falla y seguimos con generateLink.
   }
 
   const { data: link, error: linkErr } = await admin.auth.admin.generateLink({
@@ -90,12 +98,12 @@ export async function POST(request: Request) {
     })
     .eq("id", userId);
 
-  // Si el trigger aún no creó el perfil, lo insertamos.
   const { data: profile } = await admin.from("profiles").select("id").eq("id", userId).maybeSingle();
   if (!profile) {
+    const uniq = `${username}_${String(body.id).slice(-4)}`;
     await admin.from("profiles").insert({
       id: userId,
-      username,
+      username: uniq.slice(0, 24),
       name,
       avatar_url: avatar,
       telegram_id: body.id,

@@ -31,7 +31,10 @@ function AuthCard() {
   const { currentUser, refresh } = useStore();
   const next = params.get("next");
   const safeNext = next && next.startsWith("/") ? next : "/explorar";
-  const [error, setError] = useState(params.get("error") ? "No se pudo completar el acceso." : "");
+  const errParam = params.get("error");
+  const [error, setError] = useState(
+    errParam ? decodeURIComponent(errParam) : "",
+  );
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -98,7 +101,12 @@ function AuthCard() {
         {busy ? (
           <p className="text-center text-sm text-mute">Confirmando con Telegram…</p>
         ) : (
-          <TelegramLoginButton botUsername={botUsername} onAuth={(u) => void onAuth(u)} onError={setError} />
+          <TelegramLoginButton
+            botUsername={botUsername}
+            nextPath={safeNext}
+            onAuth={(u) => void onAuth(u)}
+            onError={setError}
+          />
         )}
 
         {error ? <p className="text-sm text-rose-600">{error}</p> : null}

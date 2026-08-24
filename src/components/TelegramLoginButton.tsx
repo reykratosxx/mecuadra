@@ -22,19 +22,30 @@ export function TelegramLoginButton({
   botUsername,
   onAuth,
   onError,
+  nextPath = "/explorar",
 }: {
   botUsername: string;
   onAuth: (user: TgUser) => void;
   onError?: (message: string) => void;
+  nextPath?: string;
 }) {
   const host = useRef<HTMLDivElement>(null);
+  const onAuthRef = useRef(onAuth);
+  const onErrorRef = useRef(onError);
+  onAuthRef.current = onAuth;
+  onErrorRef.current = onError;
 
   useEffect(() => {
     if (!botUsername || !host.current) return;
 
+    // Callback en página: si Telegram abre el popup y vuelve sin navegación completa.
     window.onMeCuadraTelegramAuth = (user) => {
-      onAuth(user);
+      onAuthRef.current(user);
     };
+
+    const safeNext = nextPath.startsWith("/") ? nextPath : "/explorar";
+    // Redirect: más fiable con VPN / bloqueo de scripts de terceros.
+    const authUrl = `${window.location.origin}/auth/telegram?next=${encodeURIComponent(safeNext)}`;
 
     host.current.innerHTML = "";
     const script = document.createElement("script");
@@ -45,14 +56,17 @@ export function TelegramLoginButton({
     script.setAttribute("data-radius", "14");
     script.setAttribute("data-request-access", "write");
     script.setAttribute("data-userpic", "true");
-    script.setAttribute("data-onauth", "onMeCuadraTelegramAuth(user)");
-    script.onerror = () => onError?.("No se pudo cargar el widget de Telegram.");
+    script.setAttribute("data-auth-url", authUrl);
+    script.onerror = () =>
+      onErrorRef.current?.(
+        "No se pudo cargar Telegram. Desactiva la VPN o prueba otra red e inténtalo de nuevo.",
+      );
     host.current.appendChild(script);
 
     return () => {
       delete window.onMeCuadraTelegramAuth;
     };
-  }, [botUsername, onAuth, onError]);
+  }, [botUsername, nextPath]);
 
   if (!botUsername) {
     return (
@@ -66,7 +80,8 @@ export function TelegramLoginButton({
     <div className="flex flex-col items-center gap-3">
       <div ref={host} className="min-h-[44px]" />
       <p className="text-center text-xs text-mute">
-        Telegram confirma que eres tú. Sin contraseñas ni SMS.
+        Telegram confirma que eres tú. Si el botón no carga o se queda colgado, desactiva
+        la VPN un momento — a menudo bloquea telegram.org.
       </p>
     </div>
   );

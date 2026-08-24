@@ -5,7 +5,7 @@ export const metadata = { title: "Cómo funciona" };
 const flow = [
   {
     t: "Oferta abierta",
-    d: "Publicas #cambio, #necesito y municipio. Queda en el libro público, filtrable por categoría, condición y zona.",
+    d: "Publicas #cambio, #necesito y municipio. Queda en el mercado P2P, filtrable por categoría, condición y zona.",
   },
   {
     t: "MeCuadra",
