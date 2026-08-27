@@ -54,8 +54,13 @@ export async function GET(request: Request) {
     .eq("token", token)
     .maybeSingle();
 
-  if (error || !data) {
+  if (error) {
     return NextResponse.json({ error: "Sesión no encontrada." }, { status: 404 });
+  }
+
+  // La fila se borra cuando el usuario responde “No fui yo” en el bot.
+  if (!data) {
+    return NextResponse.json({ status: "cancelled" });
   }
 
   const age = Date.now() - new Date(data.created_at as string).getTime();
@@ -122,7 +127,10 @@ export async function PUT(request: Request) {
   }
 
   if (data.status !== "confirmed" || !data.telegram_id) {
-    return NextResponse.json({ error: "Aún no confirmaste en Telegram." }, { status: 409 });
+    return NextResponse.json(
+      { error: "Aún no confirmaste en Telegram. Toca “Sí, iniciar sesión” en el chat del bot." },
+      { status: 409 },
+    );
   }
 
   const result = await establishTelegramSession({

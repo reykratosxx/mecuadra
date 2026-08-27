@@ -80,8 +80,72 @@ export function verifyTelegramLogin(data: TelegramLoginPayload, maxAgeSec = 8640
   }
 }
 
+export type TelegramInitDataUser = {
+  id: number;
+  first_name?: string;
+  last_name?: string;
+  username?: string;
+  photo_url?: string;
+};
+
+/**
+ * Verifica el `initData` de una Mini App de Telegram.
+ * Clave secreta = HMAC-SHA256(bot_token) con la constante "WebAppData".
+ */
+export function verifyTelegramInitData(
+  initData: string,
+  maxAgeSec = 24 * 60 * 60,
+): TelegramInitDataUser | null {
+  if (!initData) return null;
+
+  const params = new URLSearchParams(initData);
+  const hash = params.get("hash");
+  if (!hash) return null;
+  params.delete("hash");
+
+  const authDate = Number(params.get("auth_date"));
+  if (!Number.isFinite(authDate)) return null;
+  if (Math.floor(Date.now() / 1000) - authDate > maxAgeSec) return null;
+
+  const checkString = [...params.entries()]
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+    .map(([key, value]) => `${key}=${value}`)
+    .join("\n");
+
+  const secret = createHmac("sha256", "WebAppData").update(botToken()).digest();
+  const expected = createHmac("sha256", secret).update(checkString).digest("hex");
+
+  try {
+    const a = Buffer.from(expected, "hex");
+    const b = Buffer.from(hash, "hex");
+    if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
+  } catch {
+    return null;
+  }
+
+  try {
+    const user = JSON.parse(params.get("user") || "null") as TelegramInitDataUser | null;
+    if (!user?.id) return null;
+    return user;
+  } catch {
+    return null;
+  }
+}
+
 export function telegramAuthEmail(telegramId: number) {
   return `tg_${telegramId}@telegram.mecuadra.app`;
+}
+
+async function telegramCall(method: string, body: Record<string, unknown>) {
+  const res = await fetch(`${API}/bot${botToken()}/${method}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    throw new Error(`Telegram ${method} ${res.status}`);
+  }
+  return res.json() as Promise<{ ok: boolean; result?: unknown }>;
 }
 
 export async function telegramSend(
@@ -89,14 +153,32 @@ export async function telegramSend(
   text: string,
   extra?: Record<string, unknown>,
 ) {
-  const res = await fetch(`${API}/bot${botToken()}/sendMessage`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ chat_id: chatId, text, ...extra }),
+  await telegramCall("sendMessage", { chat_id: chatId, text, ...extra });
+}
+
+export async function telegramAnswerCallback(
+  callbackQueryId: string,
+  text?: string,
+  showAlert = false,
+) {
+  await telegramCall("answerCallbackQuery", {
+    callback_query_id: callbackQueryId,
+    ...(text ? { text, show_alert: showAlert } : {}),
   });
-  if (!res.ok) {
-    throw new Error(`Telegram ${res.status}`);
-  }
+}
+
+export async function telegramEditMessage(
+  chatId: number,
+  messageId: number,
+  text: string,
+  extra?: Record<string, unknown>,
+) {
+  await telegramCall("editMessageText", {
+    chat_id: chatId,
+    message_id: messageId,
+    text,
+    ...extra,
+  });
 }
 
 export function shareContactKeyboard() {

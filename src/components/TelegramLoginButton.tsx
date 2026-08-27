@@ -18,6 +18,12 @@ declare global {
   }
 }
 
+function preferredWidgetSize(): "large" | "medium" {
+  if (typeof window === "undefined") return "large";
+  // En móvil el botón "large" + foto suele salirse y se corta la foto.
+  return window.matchMedia("(max-width: 480px)").matches ? "medium" : "large";
+}
+
 /** Botón oficial Login Widget (Telegram). Preferido por confianza. */
 export function TelegramLoginButton({
   botUsername,
@@ -32,10 +38,13 @@ export function TelegramLoginButton({
   const host = useRef<HTMLDivElement>(null);
   const onAuthRef = useRef(onAuth);
   const onErrorRef = useRef(onError);
-  onAuthRef.current = onAuth;
-  onErrorRef.current = onError;
 
   const [phase, setPhase] = useState<"loading" | "ready" | "error">("loading");
+
+  useEffect(() => {
+    onAuthRef.current = onAuth;
+    onErrorRef.current = onError;
+  }, [onAuth, onError]);
 
   useEffect(() => {
     if (!botUsername || !host.current) return;
@@ -49,6 +58,7 @@ export function TelegramLoginButton({
 
     const el = host.current;
     el.innerHTML = "";
+    const size = preferredWidgetSize();
 
     const markReady = () => {
       if (cancelled) return;
@@ -67,9 +77,10 @@ export function TelegramLoginButton({
     script.src = "https://telegram.org/js/telegram-widget.js?22";
     script.async = true;
     script.setAttribute("data-telegram-login", botUsername.replace(/^@/, ""));
-    script.setAttribute("data-size", "large");
+    script.setAttribute("data-size", size);
     script.setAttribute("data-radius", "14");
     script.setAttribute("data-userpic", "true");
+    script.setAttribute("data-lang", "es");
     script.setAttribute("data-onauth", "onMeCuadraTelegramAuth(user)");
     script.onload = () => {
       window.setTimeout(() => {
@@ -117,7 +128,7 @@ export function TelegramLoginButton({
   }
 
   return (
-    <div className="relative flex min-h-[52px] w-full flex-col items-center justify-center">
+    <div className="relative flex min-h-[48px] w-full flex-col items-center justify-center overflow-visible">
       {phase === "loading" ? (
         <div className="flex flex-col items-center gap-3 py-2" role="status" aria-live="polite">
           <span className="h-9 w-9 animate-spin rounded-full border-[3px] border-brand/25 border-t-brand" />
@@ -128,7 +139,9 @@ export function TelegramLoginButton({
       <div
         ref={host}
         className={
-          phase === "loading" ? "pointer-events-none absolute opacity-0" : "flex w-full justify-center"
+          phase === "loading"
+            ? "pointer-events-none absolute opacity-0"
+            : "flex w-full max-w-full justify-center overflow-visible max-sm:origin-center max-sm:scale-[0.9]"
         }
       />
 
