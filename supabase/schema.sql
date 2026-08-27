@@ -30,6 +30,18 @@ do $$ begin
 exception when duplicate_object then null;
 end $$;
 
+-- Categorías estilo Revolico: text flexible (migración desde enum legado).
+do $$ begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'items' and column_name = 'category'
+      and udt_name = 'category_t'
+  ) then
+    alter table public.items alter column category type text using category::text;
+  end if;
+exception when others then null;
+end $$;
+
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   username text unique not null,
@@ -92,7 +104,7 @@ create table if not exists public.items (
   user_id uuid not null references public.profiles(id) on delete cascade,
   title text not null,
   description text not null,
-  category category_t not null,
+  category text not null,
   condition condition_t not null,
   photos text[] not null default '{}',
   status item_status_t not null default 'activo',

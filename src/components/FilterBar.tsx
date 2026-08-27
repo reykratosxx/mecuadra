@@ -1,16 +1,18 @@
 "use client";
 
-import { CATEGORIES, CONDITIONS } from "@/lib/categories";
-import { PROVINCES, TRANSPORT_LABEL, municipalitiesOf } from "@/lib/cuba";
 import { useStore } from "@/lib/store";
+import { CategorySelect } from "./CategorySelect";
 import { IconFilter, IconX } from "./icons";
+import { CATEGORY_GROUPS, CONDITIONS, type CategoryGroupId } from "@/lib/categories";
 import { useState } from "react";
+import { PROVINCES, TRANSPORT_LABEL, municipalitiesOf } from "@/lib/cuba";
 
 export function FilterBar() {
   const { filters, setFilters, resetFilters } = useStore();
   const [open, setOpen] = useState(false);
   const active =
     Boolean(filters.category) ||
+    Boolean(filters.categoryGroup) ||
     Boolean(filters.condition) ||
     Boolean(filters.province) ||
     Boolean(filters.transport) ||
@@ -21,7 +23,7 @@ export function FilterBar() {
       <div className="flex flex-col gap-3 sm:flex-row">
         <input
           className="input"
-          placeholder="Busca arroz, dipirona, Vedado, Paloma…"
+          placeholder="Busca celular, nevera, Vedado…"
           value={filters.q}
           onChange={(e) => setFilters({ q: e.target.value })}
         />
@@ -34,7 +36,7 @@ export function FilterBar() {
 
       {open ? (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-brand/20 p-3 sm:items-center">
-          <div className="card w-full max-w-md p-5">
+          <div className="card max-h-[90vh] w-full max-w-md overflow-y-auto p-5">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="font-display text-xl">Filtrar</h2>
               <button type="button" onClick={() => setOpen(false)} aria-label="Cerrar">
@@ -42,19 +44,38 @@ export function FilterBar() {
               </button>
             </div>
 
-            <label className="label">Categoría</label>
+            <label className="label">Grupo</label>
             <select
               className="input mb-3"
-              value={filters.category}
-              onChange={(e) => setFilters({ category: e.target.value as typeof filters.category })}
+              value={filters.categoryGroup}
+              onChange={(e) =>
+                setFilters({
+                  categoryGroup: e.target.value as CategoryGroupId | "",
+                  category: "",
+                })
+              }
             >
-              <option value="">Todas las categorías</option>
-              {CATEGORIES.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.label}
+              <option value="">Todos los grupos</option>
+              {CATEGORY_GROUPS.map((g) => (
+                <option key={g.id} value={g.id}>
+                  {g.emoji} {g.label}
                 </option>
               ))}
             </select>
+
+            <label className="label">Categoría</label>
+            <div className="mb-3">
+              <CategorySelect
+                allowEmpty
+                value={filters.category}
+                onChange={(v) =>
+                  setFilters({
+                    category: v === "abierto" || v === "" ? "" : v,
+                    categoryGroup: "",
+                  })
+                }
+              />
+            </div>
 
             <label className="label">Condición</label>
             <div className="mb-3 flex flex-wrap gap-2">
@@ -108,7 +129,9 @@ export function FilterBar() {
             <select
               className="input mb-3"
               value={filters.transport}
-              onChange={(e) => setFilters({ transport: e.target.value as typeof filters.transport })}
+              onChange={(e) =>
+                setFilters({ transport: e.target.value as typeof filters.transport })
+              }
             >
               <option value="">Cualquiera</option>
               {Object.entries(TRANSPORT_LABEL).map(([k, v]) => (
@@ -118,28 +141,21 @@ export function FilterBar() {
               ))}
             </select>
 
-            <label className="mb-5 flex items-center gap-2 text-sm">
+            <label className="mb-4 flex items-center gap-2 text-sm">
               <input
                 type="checkbox"
                 checked={filters.openToProposals}
                 onChange={(e) => setFilters({ openToProposals: e.target.checked })}
               />
-              Solo ofertas que escuchan propuestas
+              Solo quien escucha propuestas
             </label>
 
             <div className="flex gap-2">
-              <button
-                type="button"
-                className="btn-ghost flex-1"
-                onClick={() => {
-                  resetFilters();
-                  setOpen(false);
-                }}
-              >
+              <button type="button" className="btn-ghost flex-1" onClick={() => resetFilters()}>
                 Limpiar
               </button>
               <button type="button" className="btn-primary flex-1" onClick={() => setOpen(false)}>
-                Filtrar
+                Ver resultados
               </button>
             </div>
           </div>

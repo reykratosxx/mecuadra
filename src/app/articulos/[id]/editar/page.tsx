@@ -4,12 +4,13 @@ import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CATEGORIES, CONDITIONS } from "@/lib/categories";
+import { CONDITIONS } from "@/lib/categories";
 import { useStore } from "@/lib/store";
 import type { CategoryId, Condition } from "@/lib/types";
 import { RequireAuth } from "@/components/ui";
 import { IconCamera } from "@/components/icons";
 import { uploadDataUrl } from "@/lib/upload";
+import { CategorySelect } from "@/components/CategorySelect";
 
 export default function EditarArticuloPage({
   params,
@@ -31,7 +32,7 @@ function Form({ id }: { id: string }) {
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState<CategoryId>("alimentos");
+  const [category, setCategory] = useState<CategoryId>("alimentos_bebidas");
   const [condition, setCondition] = useState<Condition>("sellado");
   const [photos, setPhotos] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
@@ -137,17 +138,7 @@ function Form({ id }: { id: string }) {
         </div>
         <div>
           <label className="label">Categoría</label>
-          <select
-            className="input"
-            value={category}
-            onChange={(e) => setCategory(e.target.value as CategoryId)}
-          >
-            {CATEGORIES.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.label}
-              </option>
-            ))}
-          </select>
+          <CategorySelect value={category} onChange={(v) => setCategory(v as CategoryId)} />
         </div>
         <div>
           <label className="label">Condición</label>

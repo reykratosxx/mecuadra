@@ -1,3 +1,4 @@
+import { normalizeCategoryId } from "./categories";
 import type {
   CategoryId,
   Condition,
@@ -38,7 +39,7 @@ type ItemRow = {
   user_id: string;
   title: string;
   description: string;
-  category: CategoryId;
+  category: string;
   condition: Condition;
   photos: string[];
   status: ItemStatus;
@@ -128,7 +129,7 @@ export function mapItem(row: ItemRow): Item {
     userId: row.user_id,
     title: row.title,
     description: row.description,
-    category: row.category,
+    category: normalizeCategoryId(row.category),
     condition: row.condition,
     photos: row.photos || [],
     status: row.status,
@@ -141,7 +142,10 @@ export function mapOffer(row: OfferRow): Offer {
     id: row.id,
     userId: row.user_id,
     itemIds: row.item_ids || [],
-    wants: row.wants || [],
+    wants: (row.wants || []).map((w) => ({
+      title: w.title,
+      category: w.category === "abierto" ? "abierto" : normalizeCategoryId(String(w.category)),
+    })),
     openToProposals: row.open_to_proposals,
     message: row.message || "",
     province: row.province,

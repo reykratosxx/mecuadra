@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { CATEGORIES, CONDITIONS } from "@/lib/categories";
+import { CONDITIONS } from "@/lib/categories";
 import { useStore } from "@/lib/store";
 import type { CategoryId, Condition } from "@/lib/types";
 import { RequireAuth } from "@/components/ui";
 import { IconCamera } from "@/components/icons";
 import { uploadDataUrl } from "@/lib/upload";
+import { CategorySelect } from "@/components/CategorySelect";
 
 const SAMPLES = [
   "https://images.unsplash.com/photo-1563453392212-326f5e854473?auto=format&fit=crop&w=800&q=70",
@@ -31,7 +32,7 @@ function Form() {
   const { createItem } = useStore();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState<CategoryId>("alimentos");
+  const [category, setCategory] = useState<CategoryId>("alimentos_bebidas");
   const [condition, setCondition] = useState<Condition>("sellado");
   const [photos, setPhotos] = useState<string[]>([]);
 
@@ -107,13 +108,7 @@ function Form() {
         </div>
         <div>
           <label className="label">Categoría</label>
-          <select className="input" value={category} onChange={(e) => setCategory(e.target.value as CategoryId)}>
-            {CATEGORIES.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.label}
-              </option>
-            ))}
-          </select>
+          <CategorySelect value={category} onChange={(v) => setCategory(v as CategoryId)} />
         </div>
         <div>
           <label className="label">Condición</label>

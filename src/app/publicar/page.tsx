@@ -2,12 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CATEGORIES } from "@/lib/categories";
 import { PROVINCES, TRANSPORT_LABEL, municipalitiesOf } from "@/lib/cuba";
 import { useStore } from "@/lib/store";
 import type { CategoryId, Transport, Want } from "@/lib/types";
 import { Empty, RequireAuth } from "@/components/ui";
 import Link from "next/link";
+import { CategorySelect } from "@/components/CategorySelect";
 
 export default function PublicarPage() {
   return (
@@ -161,18 +161,12 @@ function Form() {
               value={wantTitle}
               onChange={(e) => setWantTitle(e.target.value)}
             />
-            <select
-              className="input max-w-[40%]"
+            <CategorySelect
+              className="input max-w-[50%]"
+              allowOpen
               value={wantCat}
-              onChange={(e) => setWantCat(e.target.value as typeof wantCat)}
-            >
-              <option value="abierto">Abierto</option>
-              {CATEGORIES.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.label}
-                </option>
-              ))}
-            </select>
+              onChange={(v) => setWantCat(v === "" ? "abierto" : v)}
+            />
           </div>
           <button
             type="button"

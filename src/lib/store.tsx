@@ -10,6 +10,7 @@ import {
 } from "react";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { mapItem, mapNotif, mapOffer, mapRating, mapTrade, mapUser } from "@/lib/mappers";
+import type { CategoryGroupId } from "@/lib/categories";
 import type {
   AppState,
   CategoryId,
@@ -37,6 +38,7 @@ const empty: AppState = {
 type Filters = {
   q: string;
   category: CategoryId | "";
+  categoryGroup: CategoryGroupId | "";
   condition: Condition | "";
   province: string;
   municipality: string;
@@ -96,6 +98,7 @@ type Store = AppState & {
 const defaultFilters: Filters = {
   q: "",
   category: "",
+  categoryGroup: "",
   condition: "",
   province: "",
   municipality: "",
