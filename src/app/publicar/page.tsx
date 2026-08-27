@@ -8,7 +8,7 @@ import type { CategoryId, Transport, Want } from "@/lib/types";
 import { Empty, RequireAuth } from "@/components/ui";
 import Link from "next/link";
 import { CategorySelect } from "@/components/CategorySelect";
-import { cn } from "@/lib/utils";
+import { cn, displayTitle } from "@/lib/utils";
 
 export default function PublicarPage() {
   return (
@@ -175,7 +175,9 @@ function Form() {
                       className="h-14 w-14 rounded-xl object-cover"
                     />
                     <span className="min-w-0">
-                      <span className="block truncate font-medium">{item.title}</span>
+                      <span className="block break-words text-sm font-medium leading-snug">
+                        {displayTitle(item.title)}
+                      </span>
                       <span className="text-xs text-mute">
                         {item.condition}
                         {on ? " · en esta oferta" : " · toca para elegir"}

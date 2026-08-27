@@ -9,7 +9,7 @@ import { Avatar, Badge, Stars } from "@/components/ui";
 import { TRANSPORT_LABEL } from "@/lib/cuba";
 import { categoryLabel } from "@/lib/categories";
 import { useStore } from "@/lib/store";
-import { formatDateTime, timeAgo, wasEdited } from "@/lib/utils";
+import { formatDateTime, timeAgo, wasEdited, displayTitle } from "@/lib/utils";
 import { IconArrows, IconPin, IconShield, IconTruck } from "@/components/icons";
 import { ShareOffer } from "@/components/ShareOffer";
 import { MeCuadraLabel } from "@/components/MeCuadraMark";
@@ -65,7 +65,7 @@ export default function OfertaPage({ params }: { params: Promise<{ id: string }>
           {offered.map((item) => (
             <article key={item.id} className="card p-4">
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="font-display text-xl">{item.title}</h2>
+                <h2 className="break-words font-display text-xl">{displayTitle(item.title)}</h2>
                 <Badge>{categoryLabel(item.category)}</Badge>
                 <Badge tone="mute">{item.condition}</Badge>
               </div>
@@ -111,7 +111,9 @@ export default function OfertaPage({ params }: { params: Promise<{ id: string }>
               <p className="text-[10px] font-semibold uppercase text-mute">Ofrece</p>
               <ul className="mt-1 space-y-1 text-sm font-medium">
                 {offered.map((i) => (
-                  <li key={i.id}>{i.title}</li>
+                  <li key={i.id} className="break-words">
+                    {displayTitle(i.title)}
+                  </li>
                 ))}
               </ul>
             </div>
@@ -122,7 +124,9 @@ export default function OfertaPage({ params }: { params: Promise<{ id: string }>
               <p className="text-[10px] font-semibold uppercase text-mute">Necesita</p>
               <ul className="mt-1 space-y-1 text-sm font-medium">
                 {offer.wants.map((w) => (
-                  <li key={w.title}>{w.title}</li>
+                  <li key={w.title} className="break-words">
+                    {displayTitle(w.title)}
+                  </li>
                 ))}
               </ul>
             </div>

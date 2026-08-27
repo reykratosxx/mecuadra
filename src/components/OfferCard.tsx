@@ -5,7 +5,7 @@ import { TRANSPORT_LABEL } from "@/lib/cuba";
 import { categoryLabel } from "@/lib/categories";
 import type { Offer } from "@/lib/types";
 import { useStore } from "@/lib/store";
-import { formatDateTime, timeAgo, wasEdited } from "@/lib/utils";
+import { timeAgo, formatDateTime, wasEdited, displayTitle } from "@/lib/utils";
 import { Avatar, Badge, Stars } from "./ui";
 import { IconArrows, IconPin, IconShield, IconTruck } from "./icons";
 import { buildOfferShare } from "@/lib/share";
@@ -61,8 +61,8 @@ export function OfferCard({ offer }: { offer: Offer }) {
           <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1 sm:gap-2">
             <div className="min-w-0">
               <p className="text-[9px] font-semibold uppercase tracking-wider text-mute sm:text-[10px]">Ofrece</p>
-              <p className="line-clamp-1 text-xs font-medium text-ink sm:line-clamp-2 sm:text-sm">
-                {offered.map((i) => i.title).join(" · ") || "Sin artículos"}
+              <p className="line-clamp-2 break-words text-xs font-medium text-ink sm:text-sm">
+                {offered.map((i) => displayTitle(i.title)).join(" · ") || "Sin artículos"}
               </p>
             </div>
             <span className="grid h-6 w-6 place-items-center rounded-full bg-brand-50 text-brand sm:h-8 sm:w-8">
@@ -70,8 +70,8 @@ export function OfferCard({ offer }: { offer: Offer }) {
             </span>
             <div className="min-w-0">
               <p className="text-[9px] font-semibold uppercase tracking-wider text-mute sm:text-[10px]">Necesita</p>
-              <p className="line-clamp-1 text-xs font-medium text-ink sm:line-clamp-2 sm:text-sm">
-                {offer.wants.map((w) => w.title).join(" · ")}
+              <p className="line-clamp-2 break-words text-xs font-medium text-ink sm:text-sm">
+                {offer.wants.map((w) => displayTitle(w.title)).join(" · ")}
               </p>
             </div>
           </div>

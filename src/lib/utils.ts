@@ -51,3 +51,18 @@ export function initials(name: string) {
     .join("")
     .toUpperCase();
 }
+
+/**
+ * Títulos en MAYÚSCULAS se ven en minúsculas con inicial mayúscula
+ * (más legible y no estiran tanto el layout en móvil).
+ */
+export function displayTitle(raw: string) {
+  const t = raw.trim().replace(/\s+/g, " ");
+  if (!t) return t;
+  const letters = t.replace(/[^a-zA-ZáéíóúüñÁÉÍÓÚÜÑ]/g, "");
+  if (letters.length < 4) return t;
+  const upper = (letters.match(/[A-ZÁÉÍÓÚÜÑ]/g) || []).length;
+  if (upper / letters.length < 0.65) return t;
+  const lower = t.toLocaleLowerCase("es");
+  return lower.charAt(0).toLocaleUpperCase("es") + lower.slice(1);
+}

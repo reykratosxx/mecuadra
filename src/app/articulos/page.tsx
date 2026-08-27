@@ -6,6 +6,7 @@ import { useStore } from "@/lib/store";
 import { Badge, Empty, RequireAuth } from "@/components/ui";
 import { categoryLabel } from "@/lib/categories";
 import type { ItemStatus } from "@/lib/types";
+import { displayTitle } from "@/lib/utils";
 
 const STATUS_LABEL: Record<ItemStatus, string> = {
   activo: "Activo",
@@ -99,15 +100,17 @@ function List() {
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2">
           {visible.map((item) => (
-            <li key={item.id} className="card flex gap-3 p-3">
+            <li key={item.id} className="card flex min-w-0 gap-3 overflow-hidden p-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={item.photos[0] || "/logo.png"}
                 alt=""
-                className="h-24 w-24 shrink-0 rounded-2xl object-cover bg-stone-100"
+                className="h-20 w-20 shrink-0 rounded-2xl object-cover bg-stone-100 sm:h-24 sm:w-24"
               />
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-semibold">{item.title}</p>
+              <div className="min-w-0 flex-1 overflow-hidden">
+                <p className="break-words text-sm font-semibold leading-snug text-ink sm:text-base">
+                  {displayTitle(item.title)}
+                </p>
                 <div className="mt-1 flex flex-wrap gap-1">
                   <Badge>{categoryLabel(item.category)}</Badge>
                   <Badge tone={item.status === "activo" ? "ok" : "mute"}>
