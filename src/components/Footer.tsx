@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "./Logo";
+import { COMMUNITY_TELEGRAM, SUPPORT_TELEGRAM } from "@/lib/support";
 
 export function Footer() {
   return (
@@ -22,11 +23,29 @@ export function Footer() {
           </ul>
         </div>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-mute">Confianza</p>
-          <ul className="mt-3 space-y-2 text-sm text-mute">
-            <li>Solo intercambio · cero efectivo en listados</li>
-            <li>Municipio y barrio, no GPS obligatorio</li>
-            <li>Reputación, chat y confirmación mutua</li>
+          <p className="text-xs font-semibold uppercase tracking-wider text-mute">Soporte</p>
+          <ul className="mt-3 space-y-2 text-sm">
+            <li>
+              <a
+                href={SUPPORT_TELEGRAM}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-brand"
+              >
+                Contactar soporte
+              </a>
+            </li>
+            <li>
+              <a
+                href={COMMUNITY_TELEGRAM}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-brand"
+              >
+                Grupo de Telegram
+              </a>
+            </li>
+            <li className="text-mute">Dudas, errores y sugerencias</li>
           </ul>
         </div>
       </div>
