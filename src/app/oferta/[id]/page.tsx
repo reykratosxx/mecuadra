@@ -185,7 +185,7 @@ export default function OfertaPage({ params }: { params: Promise<{ id: string }>
               Abrir chat
             </Link>
           ) : offer.status === "abierta" ? (
-            <button type="button" className="btn-primary mt-5 w-full" onClick={() => setOpen(true)}>
+            <button type="button" className="btn-primary mt-5" onClick={() => setOpen(true)}>
               <MeCuadraLabel />
             </button>
           ) : (

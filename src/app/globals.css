@@ -87,6 +87,13 @@ body {
 }
 .btn-primary:hover { filter: brightness(1.05); transform: translateY(-1px); }
 
+/* El icono y el texto mandan; el óvalo solo los envuelve. */
+.btn-primary:has([data-mecuadra-label]) {
+  width: fit-content;
+  margin-inline: auto;
+  padding: 0.35rem 1.35rem;
+}
+
 .btn-ghost {
   display: inline-flex;
   align-items: center;

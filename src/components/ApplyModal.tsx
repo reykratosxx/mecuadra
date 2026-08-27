@@ -111,7 +111,7 @@ export function ApplyModal({
 
         <button
           type="button"
-          className="btn-primary w-full"
+          className="btn-primary"
           onClick={async () => {
             const res = await applyToOffer(offerId, selected, note);
             if ("error" in res) {

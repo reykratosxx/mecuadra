@@ -42,7 +42,10 @@ export function MeCuadraLabel({
   className?: string;
 }) {
   return (
-    <span className={cn("inline-flex items-center gap-3 text-xl font-semibold leading-none", className)}>
+    <span
+      data-mecuadra-label
+      className={cn("inline-flex items-center gap-3 text-xl font-semibold leading-none", className)}
+    >
       <MeCuadraGlyph size={size} />
       MeCuadra
     </span>
