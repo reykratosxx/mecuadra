@@ -27,7 +27,7 @@ export function ApplyModal({
 
   if (!currentUser) {
     return (
-      <div className="fixed inset-0 z-50 grid place-items-center bg-brand/20 p-4">
+      <div className="fixed inset-0 z-[80] grid place-items-center bg-brand/20 p-4">
         <div className="card max-w-sm p-6 text-center">
           <p className="font-display text-lg">Entra con Telegram para aplicar</p>
           <p className="mt-1 text-sm text-mute">El mercado se ve sin cuenta. Para tocar MeCuadra, usa Telegram.</p>
@@ -43,7 +43,7 @@ export function ApplyModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-brand/25 p-3 sm:items-center">
+    <div className="fixed inset-0 z-[80] flex items-end justify-center bg-brand/25 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:items-center sm:pb-3">
       <div className="card max-h-[90vh] w-full max-w-lg overflow-y-auto p-5">
         <div className="mb-4 flex items-start justify-between">
           <div>
@@ -109,24 +109,26 @@ export function ApplyModal({
 
         {error ? <p className="mb-3 text-sm text-rose-600">{error}</p> : null}
 
-        <button
-          type="button"
-          className="btn-primary"
-          onClick={async () => {
-            const res = await applyToOffer(offerId, selected, note);
-            if ("error" in res) {
-              setError(res.error);
-              return;
-            }
-            onClose();
-            router.push(`/chat/${res.id}`);
-          }}
-        >
-          <MeCuadraLabel />
-        </button>
-        <p className="mt-2 text-center text-xs text-mute">
-          No hay dinero en custodia. El trato se confirma entre las dos partes.
-        </p>
+        <div className="flex w-full flex-col items-center">
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={async () => {
+              const res = await applyToOffer(offerId, selected, note);
+              if ("error" in res) {
+                setError(res.error);
+                return;
+              }
+              onClose();
+              router.push(`/chat/${res.id}`);
+            }}
+          >
+            <MeCuadraLabel />
+          </button>
+          <p className="mt-2 text-center text-xs text-mute">
+            No hay dinero en custodia. El trato se confirma entre las dos partes.
+          </p>
+        </div>
       </div>
     </div>
   );

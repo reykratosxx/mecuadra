@@ -25,8 +25,13 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-line/80 bg-surface/90 backdrop-blur-xl">
-      <div className="mx-auto flex h-14 max-w-6xl items-center gap-2 px-3 sm:h-16 sm:gap-3 sm:px-4">
-        <Logo withWord size={40} className="min-w-0" />
+      <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-3 sm:h-16 sm:px-4">
+        <Logo
+          withWord
+          size={40}
+          className="shrink-0 [&_img]:h-8 [&_img]:w-8 sm:[&_img]:h-10 sm:[&_img]:w-10"
+          wordClassName="text-[1.2rem] sm:text-[1.5rem]"
+        />
 
         <nav className="ml-1 hidden items-center gap-1 md:flex">
           {links.map((l) => (
@@ -45,11 +50,11 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
+        <div className="ml-auto flex shrink-0 items-center gap-1 pl-4 sm:gap-2 sm:pl-0">
           {currentUser ? (
             <Link
               href="/notificaciones"
-              className="relative grid h-9 w-9 place-items-center rounded-full text-mute hover:bg-hover"
+              className="relative grid h-8 w-8 place-items-center rounded-full text-mute hover:bg-hover sm:h-9 sm:w-9"
               aria-label="Notificaciones"
             >
               <IconBell className="h-5 w-5" />

@@ -180,7 +180,6 @@ export async function POST(request: Request) {
             first_name: from.first_name ?? null,
             last_name: from.last_name ?? null,
             username: from.username ?? null,
-            photo_url: null,
           })
           .eq("token", token)
           .eq("status", "pending");

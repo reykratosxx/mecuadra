@@ -116,12 +116,14 @@ export default function HomePage() {
                   <p className="text-xs text-mute">Voy al lugar</p>
                 </div>
               </div>
-              <button className="btn-primary mt-4 pointer-events-none">
-                <MeCuadraLabel />
-              </button>
-              <p className="mt-3 text-center text-xs text-mute">
-                Un toque. Propones. Se abre el chat.
-              </p>
+              <div className="mt-4 flex w-full flex-col items-center">
+                <button className="btn-primary pointer-events-none">
+                  <MeCuadraLabel />
+                </button>
+                <p className="mt-3 text-center text-xs text-mute">
+                  Un toque. Propones. Se abre el chat.
+                </p>
+              </div>
             </div>
           </div>
         </div>

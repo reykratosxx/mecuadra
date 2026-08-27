@@ -1,6 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { telegramAuthEmail } from "@/lib/telegram";
+import { telegramAuthEmail, telegramUserPhotoFile } from "@/lib/telegram";
 
 export type TelegramIdentity = {
   id: number;
@@ -23,13 +23,29 @@ function usernameFromTg(data: TelegramIdentity) {
   return raw.slice(0, 24) || `tg${data.id}`;
 }
 
+async function persistTelegramAvatar(telegramId: number, photoUrl?: string | null) {
+  const admin = createAdminClient();
+  const file = await telegramUserPhotoFile(telegramId);
+  if (file) {
+    const path = `telegram/${telegramId}.${file.ext}`;
+    const { error } = await admin.storage.from("avatars").upload(path, file.bytes, {
+      contentType: file.contentType,
+      upsert: true,
+    });
+    if (!error) {
+      return admin.storage.from("avatars").getPublicUrl(path).data.publicUrl;
+    }
+  }
+  return photoUrl?.trim() || null;
+}
+
 /** Crea/actualiza el usuario Supabase y deja la cookie de sesión. */
 export async function establishTelegramSession(identity: TelegramIdentity) {
   const admin = createAdminClient();
   const email = telegramAuthEmail(identity.id);
   const name = displayName(identity);
   const username = usernameFromTg(identity);
-  const avatar = identity.photo_url || null;
+  const avatar = await persistTelegramAvatar(identity.id, identity.photo_url);
 
   const { data: existing } = await admin
     .from("profiles")
@@ -63,16 +79,15 @@ export async function establishTelegramSession(identity: TelegramIdentity) {
 
   const userId = link.user.id;
 
-  await admin
-    .from("profiles")
-    .update({
-      telegram_id: identity.id,
-      name,
-      avatar_url: avatar,
-      phone_verified: true,
-      verified: true,
-    })
-    .eq("id", userId);
+  const profilePatch: Record<string, unknown> = {
+    telegram_id: identity.id,
+    name,
+    phone_verified: true,
+    verified: true,
+  };
+  if (avatar) profilePatch.avatar_url = avatar;
+
+  await admin.from("profiles").update(profilePatch).eq("id", userId);
 
   const { data: profile } = await admin.from("profiles").select("id").eq("id", userId).maybeSingle();
   if (!profile) {

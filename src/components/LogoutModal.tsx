@@ -21,7 +21,7 @@ export function LogoutModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-brand/25 p-4">
+    <div className="fixed inset-0 z-[80] grid place-items-center bg-brand/25 p-4">
       <div className="card w-full max-w-md p-5">
         <div className="mb-3 flex items-start justify-between">
           <div>

@@ -148,6 +148,35 @@ async function telegramCall(method: string, body: Record<string, unknown>) {
   return res.json() as Promise<{ ok: boolean; result?: unknown }>;
 }
 
+/** Foto de perfil del usuario que ya abrió el bot (no viene en /start). */
+export async function telegramUserPhotoFile(userId: number): Promise<{
+  bytes: Uint8Array;
+  contentType: string;
+  ext: string;
+} | null> {
+  try {
+    const listed = await telegramCall("getUserProfilePhotos", { user_id: userId, limit: 1 });
+    const photos = (listed.result as { photos?: { file_id: string }[][] } | undefined)?.photos;
+    const sizes = photos?.[0];
+    const fileId = sizes?.[sizes.length - 1]?.file_id;
+    if (!fileId) return null;
+
+    const file = await telegramCall("getFile", { file_id: fileId });
+    const filePath = (file.result as { file_path?: string } | undefined)?.file_path;
+    if (!filePath) return null;
+
+    const res = await fetch(`${API}/file/bot${botToken()}/${filePath}`);
+    if (!res.ok) return null;
+    const bytes = new Uint8Array(await res.arrayBuffer());
+    const contentType = res.headers.get("content-type") || "image/jpeg";
+    const rawExt = filePath.split(".").pop() || "jpg";
+    const ext = /^[a-z0-9]+$/i.test(rawExt) ? rawExt.toLowerCase() : "jpg";
+    return { bytes, contentType, ext };
+  } catch {
+    return null;
+  }
+}
+
 export async function telegramSend(
   chatId: number,
   text: string,

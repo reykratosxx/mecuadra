@@ -10,7 +10,7 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={toggle}
-      className="grid h-9 w-9 place-items-center rounded-full text-mute transition hover:bg-hover hover:text-ink"
+      className="grid h-8 w-8 place-items-center rounded-full text-mute transition hover:bg-hover hover:text-ink sm:h-9 sm:w-9"
       aria-label="Cambiar tema"
       title="Cambiar tema"
     >

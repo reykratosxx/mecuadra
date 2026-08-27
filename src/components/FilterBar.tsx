@@ -35,7 +35,7 @@ export function FilterBar() {
       </div>
 
       {open ? (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-brand/20 p-3 sm:items-center">
+        <div className="fixed inset-0 z-[80] flex items-end justify-center bg-brand/20 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:items-center sm:pb-3">
           <div className="card max-h-[90vh] w-full max-w-md overflow-y-auto p-5">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="font-display text-xl">Filtrar</h2>

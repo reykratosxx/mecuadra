@@ -152,13 +152,13 @@ function Thread({ id }: { id: string }) {
 
       {confirmCancel ? (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-ink/45 backdrop-blur-sm sm:items-center sm:p-4"
+          className="fixed inset-0 z-[80] flex items-end justify-center bg-ink/45 backdrop-blur-sm sm:items-center sm:p-4"
           role="dialog"
           aria-modal="true"
           onClick={() => (cancelBusy ? null : setConfirmCancel(false))}
         >
           <div
-            className="card w-full max-w-md rounded-b-none p-5 sm:rounded-b-[1.35rem]"
+            className="card w-full max-w-md rounded-b-none p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:rounded-b-[1.35rem] sm:pb-5"
             onClick={(e) => e.stopPropagation()}
           >
             <p className="font-display text-lg">¿Marcar como no completado?</p>

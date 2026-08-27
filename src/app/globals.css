@@ -87,11 +87,22 @@ body {
 }
 .btn-primary:hover { filter: brightness(1.05); transform: translateY(-1px); }
 
-/* El icono y el texto mandan; el óvalo solo los envuelve. */
+/* En móvil ocupa el ancho de la tarjeta, contenido al centro. En desktop, píldora compacta. */
 .btn-primary:has([data-mecuadra-label]) {
-  width: fit-content;
+  display: flex;
+  width: 100%;
+  max-width: 100%;
   margin-inline: auto;
-  padding: 0.35rem 1.35rem;
+  justify-content: center;
+  align-items: center;
+  padding: 0.2rem 1.1rem;
+}
+
+@media (min-width: 640px) {
+  .btn-primary:has([data-mecuadra-label]) {
+    width: fit-content;
+    padding: 0.2rem 1.25rem;
+  }
 }
 
 .btn-ghost {
