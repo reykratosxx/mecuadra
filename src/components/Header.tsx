@@ -17,10 +17,11 @@ const links = [
 
 export function Header() {
   const path = usePathname();
-  const { currentUser, notifications } = useStore();
-  const unread = notifications.filter(
-    (n) => n.userId === currentUser?.id && !n.read,
-  ).length;
+  const { currentUser, notifications, ready } = useStore();
+  const unread =
+    ready && currentUser
+      ? notifications.filter((n) => n.userId === currentUser.id && !n.read).length
+      : 0;
 
   return (
     <header className="sticky top-0 z-40 border-b border-line/80 bg-surface/90 backdrop-blur-xl">

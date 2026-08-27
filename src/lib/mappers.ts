@@ -1,6 +1,5 @@
 import { normalizeCategoryId } from "./categories";
 import type {
-  CategoryId,
   Condition,
   Item,
   ItemStatus,

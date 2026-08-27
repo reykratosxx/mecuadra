@@ -115,16 +115,13 @@ function requireSession(userId: string | null): string | null {
 }
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<AppState>(empty);
-  const [ready, setReady] = useState(false);
-  const [filters, setFiltersState] = useState<Filters>(defaultFilters);
   const configured = isSupabaseConfigured();
+  const [state, setState] = useState<AppState>(empty);
+  const [ready, setReady] = useState(!configured);
+  const [filters, setFiltersState] = useState<Filters>(defaultFilters);
 
   const refresh = useCallback(async () => {
-    if (!configured) {
-      setReady(true);
-      return;
-    }
+    if (!configured) return;
     const supabase = createClient();
     const {
       data: { user: authUser },
@@ -165,6 +162,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, [configured]);
 
   useEffect(() => {
+    // Carga inicial: refresh() solo escribe estado cuando responde la red, nunca en el commit.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void refresh();
     if (!configured) return;
     const supabase = createClient();

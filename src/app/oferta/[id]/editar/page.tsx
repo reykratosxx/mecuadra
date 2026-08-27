@@ -1,11 +1,11 @@
 "use client";
 
-import { use, useEffect, useMemo, useState } from "react";
+import { use, useMemo, useState } from "react";
 import { useRouter, notFound } from "next/navigation";
 import Link from "next/link";
 import { PROVINCES, TRANSPORT_LABEL, municipalitiesOf } from "@/lib/cuba";
 import { useStore } from "@/lib/store";
-import type { CategoryId, Transport, Want } from "@/lib/types";
+import type { CategoryId, Offer, Transport, Want } from "@/lib/types";
 import { RequireAuth } from "@/components/ui";
 import { CategorySelect } from "@/components/CategorySelect";
 
@@ -23,43 +23,8 @@ export default function EditarOfertaPage({
 }
 
 function Form({ id }: { id: string }) {
-  const router = useRouter();
-  const { currentUser, items, offers, updateOffer, ready } = useStore();
+  const { currentUser, offers, ready } = useStore();
   const offer = offers.find((o) => o.id === id);
-
-  const mine = items.filter(
-    (i) =>
-      i.userId === currentUser?.id &&
-      (i.status === "activo" || offer?.itemIds.includes(i.id)),
-  );
-
-  const [selected, setSelected] = useState<string[]>([]);
-  const [wantTitle, setWantTitle] = useState("");
-  const [wantCat, setWantCat] = useState<CategoryId | "abierto">("abierto");
-  const [wants, setWants] = useState<Want[]>([]);
-  const [openToProposals, setOpenToProposals] = useState(true);
-  const [message, setMessage] = useState("");
-  const [province, setProvince] = useState("La Habana");
-  const [municipality, setMunicipality] = useState("Plaza de la Revolución");
-  const [neighborhood, setNeighborhood] = useState("");
-  const [transport, setTransport] = useState<Transport>("sin");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-  const [hydrated, setHydrated] = useState(false);
-  const munis = useMemo(() => municipalitiesOf(province), [province]);
-
-  useEffect(() => {
-    if (!offer || hydrated) return;
-    setSelected(offer.itemIds);
-    setWants(offer.wants.length ? offer.wants : [{ title: "Escucho propuestas", category: "abierto" }]);
-    setOpenToProposals(offer.openToProposals);
-    setMessage(offer.message);
-    setProvince(offer.province);
-    setMunicipality(offer.municipality);
-    setNeighborhood(offer.neighborhood);
-    setTransport(offer.transport);
-    setHydrated(true);
-  }, [offer, hydrated]);
 
   if (!ready) return <p className="py-10 text-center text-mute">Cargando…</p>;
   if (!offer || offer.userId !== currentUser?.id) notFound();
@@ -73,6 +38,37 @@ function Form({ id }: { id: string }) {
       </div>
     );
   }
+
+  return <EditForm offer={offer} />;
+}
+
+/** Se monta ya con la oferta cargada, así el formulario nace con sus valores. */
+function EditForm({ offer }: { offer: Offer }) {
+  const router = useRouter();
+  const { currentUser, items, updateOffer } = useStore();
+  const id = offer.id;
+
+  const mine = items.filter(
+    (i) =>
+      i.userId === currentUser?.id &&
+      (i.status === "activo" || offer.itemIds.includes(i.id)),
+  );
+
+  const [selected, setSelected] = useState<string[]>(offer.itemIds);
+  const [wantTitle, setWantTitle] = useState("");
+  const [wantCat, setWantCat] = useState<CategoryId | "abierto">("abierto");
+  const [wants, setWants] = useState<Want[]>(
+    offer.wants.length ? offer.wants : [{ title: "Escucho propuestas", category: "abierto" }],
+  );
+  const [openToProposals, setOpenToProposals] = useState(offer.openToProposals);
+  const [message, setMessage] = useState(offer.message);
+  const [province, setProvince] = useState(offer.province);
+  const [municipality, setMunicipality] = useState(offer.municipality);
+  const [neighborhood, setNeighborhood] = useState(offer.neighborhood);
+  const [transport, setTransport] = useState<Transport>(offer.transport);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const munis = useMemo(() => municipalitiesOf(province), [province]);
 
   return (
     <div className="mx-auto max-w-xl">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { buildOfferShare } from "@/lib/share";
 import type { Offer } from "@/lib/types";
 import { TRANSPORT_LABEL } from "@/lib/cuba";
@@ -13,27 +13,28 @@ export function ShareOffer({
   offeredTitles: string[];
 }) {
   const [copied, setCopied] = useState(false);
-  const pack = useMemo(() => {
-    const origin = typeof window !== "undefined" ? window.location.origin : "https://mecuadra.app";
+
+  function pack() {
     const place = [offer.neighborhood, offer.municipality, offer.province].filter(Boolean).join(", ");
     return buildOfferShare({
-      origin,
+      origin: window.location.origin,
       offerId: offer.id,
       offered: offeredTitles,
       wants: offer.wants.map((w) => w.title),
       place,
       transport: TRANSPORT_LABEL[offer.transport],
     });
-  }, [offer, offeredTitles]);
+  }
 
-  function open(href: string) {
-    window.open(href, "_blank", "noopener,noreferrer,width=640,height=720");
+  function open(kind: "telegram" | "whatsapp" | "facebook") {
+    window.open(pack()[kind], "_blank", "noopener,noreferrer,width=640,height=720");
   }
 
   async function nativeShare() {
+    const current = pack();
     if (navigator.share) {
       try {
-        await navigator.share({ title: pack.title, text: pack.text, url: pack.url });
+        await navigator.share({ title: current.title, text: current.text, url: current.url });
       } catch {
         /* canceló */
       }
@@ -43,7 +44,7 @@ export function ShareOffer({
   }
 
   async function copy() {
-    await navigator.clipboard.writeText(pack.text);
+    await navigator.clipboard.writeText(pack().text);
     setCopied(true);
     setTimeout(() => setCopied(false), 1600);
   }
@@ -56,15 +57,15 @@ export function ShareOffer({
         Trueque, el del barrio, o un chat.
       </p>
       <div className="mt-3 grid grid-cols-3 gap-2">
-        <button type="button" className="share-btn" onClick={() => open(pack.telegram)}>
+        <button type="button" className="share-btn" onClick={() => open("telegram")}>
           <TelegramIcon />
           Telegram
         </button>
-        <button type="button" className="share-btn" onClick={() => open(pack.whatsapp)}>
+        <button type="button" className="share-btn" onClick={() => open("whatsapp")}>
           <WhatsAppIcon />
           WhatsApp
         </button>
-        <button type="button" className="share-btn" onClick={() => open(pack.facebook)}>
+        <button type="button" className="share-btn" onClick={() => open("facebook")}>
           <FacebookIcon />
           Facebook
         </button>

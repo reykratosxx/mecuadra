@@ -20,7 +20,7 @@ export function Logo({
         alt="MeCuadra"
         width={size}
         height={size}
-        className="shrink-0 drop-shadow-sm"
+        className="shrink-0 drop-shadow-[0_1px_5px_rgba(124,58,237,0.4)] dark:drop-shadow-[0_0_10px_rgba(217,70,239,0.6)]"
         priority
       />
       {withWord ? (

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useStore } from "@/lib/store";
 import { Avatar, Badge, RequireAuth, Stars } from "@/components/ui";
 import { PROVINCES, TRANSPORT_LABEL, municipalitiesOf } from "@/lib/cuba";
@@ -20,6 +21,7 @@ export default function PerfilPage() {
 }
 
 function Me() {
+  const router = useRouter();
   const { currentUser, updateProfile, logout, offers, items } = useStore();
   const u = currentUser!;
   const mine = offers.filter((o) => o.userId === u.id);
@@ -39,16 +41,7 @@ function Me() {
 
   const munis = useMemo(() => municipalitiesOf(province), [province]);
 
-  useEffect(() => {
-    if (editing) return;
-    setName(u.name);
-    setBio(u.bio);
-    setProvince(u.province);
-    setMunicipality(u.municipality);
-    setNeighborhood(u.neighborhood);
-    setTransport(u.transport);
-  }, [u, editing]);
-
+  /** El formulario solo existe en modo edición, así que se siembra al abrirlo. */
   function startEdit() {
     setName(u.name);
     setBio(u.bio);
@@ -306,7 +299,8 @@ function Me() {
           onClose={() => setLogoutOpen(false)}
           onDone={async () => {
             await logout();
-            window.location.href = "/";
+            router.replace("/");
+            router.refresh();
           }}
         />
       ) : null}

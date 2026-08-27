@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
-/** Marca del botón MeCuadra: mismo icono de manos que el logo de la app. */
+/** Hexágono completo: para fondos claros u oscuros planos. */
 export function MeCuadraMark({ size = 22, className }: { size?: number; className?: string }) {
   return (
     <Image
@@ -11,14 +11,31 @@ export function MeCuadraMark({ size = 22, className }: { size?: number; classNam
       alt=""
       width={size}
       height={size}
-      className={cn("shrink-0 drop-shadow-sm", className)}
+      className={cn(
+        "shrink-0 drop-shadow-[0_1px_3px_rgba(15,6,32,0.35)]",
+        className,
+      )}
+      aria-hidden
+    />
+  );
+}
+
+/** Solo el apretón en blanco: sobre el degradado el hexágono se pierde. */
+export function MeCuadraGlyph({ size = 20, className }: { size?: number; className?: string }) {
+  return (
+    <Image
+      src="/mark-handshake.png"
+      alt=""
+      width={size}
+      height={size}
+      className={cn("shrink-0 drop-shadow-[0_1px_2px_rgba(15,6,32,0.45)]", className)}
       aria-hidden
     />
   );
 }
 
 export function MeCuadraLabel({
-  size = 22,
+  size = 26,
   className,
 }: {
   size?: number;
@@ -26,7 +43,7 @@ export function MeCuadraLabel({
 }) {
   return (
     <span className={cn("inline-flex items-center gap-2", className)}>
-      <MeCuadraMark size={size} />
+      <MeCuadraGlyph size={size} />
       MeCuadra
     </span>
   );

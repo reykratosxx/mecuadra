@@ -16,10 +16,11 @@ const items = [
 
 export function BottomNav() {
   const path = usePathname();
-  const { currentUser, trades } = useStore();
-  const pending = trades.filter(
-    (t) => currentUser && t.ownerId === currentUser.id && t.status === "pendiente",
-  ).length;
+  const { currentUser, trades, ready } = useStore();
+  const pending =
+    ready && currentUser
+      ? trades.filter((t) => t.ownerId === currentUser.id && t.status === "pendiente").length
+      : 0;
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">

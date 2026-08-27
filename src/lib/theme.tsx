@@ -4,8 +4,8 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
-  useState,
+  useMemo,
+  useSyncExternalStore,
 } from "react";
 import { THEME_STORAGE_KEY } from "./theme-script";
 
@@ -19,35 +19,71 @@ type ThemeContextValue = {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
+/**
+ * La clase del <html> es la fuente de verdad: el script de arranque la pone
+ * antes de hidratar, así que se lee de ahí en vez de duplicarla en un estado.
+ */
+const listeners = new Set<() => void>();
+
+function notify() {
+  for (const listener of listeners) listener();
+}
+
+function readStored(): Theme {
+  try {
+    return localStorage.getItem(THEME_STORAGE_KEY) === "dark" ? "dark" : "light";
+  } catch {
+    return "light";
+  }
+}
+
 function applyTheme(theme: Theme) {
   document.documentElement.classList.toggle("dark", theme === "dark");
+  notify();
+}
+
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  const onStorage = (event: StorageEvent) => {
+    if (event.key === THEME_STORAGE_KEY) applyTheme(readStored());
+  };
+  window.addEventListener("storage", onStorage);
+  return () => {
+    listeners.delete(listener);
+    window.removeEventListener("storage", onStorage);
+  };
+}
+
+function getSnapshot(): Theme {
+  return document.documentElement.classList.contains("dark") ? "dark" : "light";
+}
+
+function getServerSnapshot(): Theme {
+  return "light";
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("light");
-
-  useEffect(() => {
-    const stored = localStorage.getItem(THEME_STORAGE_KEY);
-    const initial: Theme = stored === "dark" ? "dark" : "light";
-    setThemeState(initial);
-    applyTheme(initial);
-  }, []);
+  const theme = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   const setTheme = useCallback((next: Theme) => {
-    setThemeState(next);
-    localStorage.setItem(THEME_STORAGE_KEY, next);
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, next);
+    } catch {
+      // Modo privado o almacenamiento bloqueado: el tema dura la sesión.
+    }
     applyTheme(next);
   }, []);
 
-  const toggle = useCallback(() => {
-    setTheme(theme === "dark" ? "light" : "dark");
-  }, [theme, setTheme]);
-
-  return (
-    <ThemeContext.Provider value={{ theme, setTheme, toggle }}>
-      {children}
-    </ThemeContext.Provider>
+  const value = useMemo(
+    () => ({
+      theme,
+      setTheme,
+      toggle: () => setTheme(theme === "dark" ? "light" : "dark"),
+    }),
+    [theme, setTheme],
   );
+
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
 export function useTheme() {

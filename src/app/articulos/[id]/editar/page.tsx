@@ -1,12 +1,12 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { use, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CONDITIONS } from "@/lib/categories";
 import { useStore } from "@/lib/store";
-import type { CategoryId, Condition } from "@/lib/types";
+import type { CategoryId, Condition, Item } from "@/lib/types";
 import { RequireAuth } from "@/components/ui";
 import { IconCamera } from "@/components/icons";
 import { uploadDataUrl } from "@/lib/upload";
@@ -26,31 +26,27 @@ export default function EditarArticuloPage({
 }
 
 function Form({ id }: { id: string }) {
-  const router = useRouter();
-  const { currentUser, items, updateItem, ready } = useStore();
+  const { currentUser, items, ready } = useStore();
   const item = items.find((i) => i.id === id);
-
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState<CategoryId>("alimentos_bebidas");
-  const [condition, setCondition] = useState<Condition>("sellado");
-  const [photos, setPhotos] = useState<string[]>([]);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-  const [hydrated, setHydrated] = useState(false);
-
-  useEffect(() => {
-    if (!item || hydrated) return;
-    setTitle(item.title);
-    setDescription(item.description);
-    setCategory(item.category);
-    setCondition(item.condition);
-    setPhotos(item.photos);
-    setHydrated(true);
-  }, [item, hydrated]);
 
   if (!ready) return <p className="py-10 text-center text-mute">Cargando…</p>;
   if (!item || item.userId !== currentUser?.id) notFound();
+
+  return <EditForm item={item} />;
+}
+
+/** Se monta ya con el artículo cargado, así el formulario nace con sus valores. */
+function EditForm({ item }: { item: Item }) {
+  const router = useRouter();
+  const { updateItem } = useStore();
+
+  const [title, setTitle] = useState(item.title);
+  const [description, setDescription] = useState(item.description);
+  const [category, setCategory] = useState<CategoryId>(item.category);
+  const [condition, setCondition] = useState<Condition>(item.condition);
+  const [photos, setPhotos] = useState<string[]>(item.photos);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
 
   return (
     <div className="mx-auto max-w-xl">
@@ -70,7 +66,7 @@ function Form({ id }: { id: string }) {
             const uploaded = await Promise.all(
               photos.map((p) => (p.startsWith("http") || p.startsWith("/") ? p : uploadDataUrl("items", p))),
             );
-            await updateItem(id, {
+            await updateItem(item.id, {
               title,
               description,
               category,
