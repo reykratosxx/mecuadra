@@ -11,7 +11,7 @@ export const DOC_GROUPS: { title: string; items: DocLink[] }[] = [
   {
     title: "Usar la app",
     items: [
-      { href: "/docs/cuenta", title: "Cuenta y códigos", hint: "Login con Telegram" },
+      { href: "/docs/cuenta", title: "Cuenta y Telegram", hint: "Widget oficial y acceso por bot" },
       { href: "/docs/ofertas", title: "Artículos y ofertas", hint: "#cambio #necesito #municipio" },
       { href: "/docs/aplicar", title: "El botón MeCuadra", hint: "Cómo aplicar a un trueque" },
       { href: "/docs/chat", title: "Chat", hint: "Solo ustedes dos, cifrado" },
@@ -22,7 +22,7 @@ export const DOC_GROUPS: { title: string; items: DocLink[] }[] = [
     title: "Construir",
     items: [
       { href: "/docs/api", title: "API", hint: "Auth, mensajes, tiempo real" },
-      { href: "/docs/seguridad", title: "Seguridad", hint: "RLS, cifrado, teléfono" },
+      { href: "/docs/seguridad", title: "Seguridad", hint: "RLS, cifrado, Telegram" },
       { href: "/docs/desplegar", title: "Desplegar", hint: "Supabase, Vercel, variables" },
     ],
   },

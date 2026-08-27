@@ -21,7 +21,8 @@ export default function Page() {
       <h2>Qué sube al perfil</h2>
       <p>
         Promedio, cantidad de notas y trueques cerrados. Un sello de verificado aparece
-        cuando el equipo lo marca. No sustituye al teléfono: lo acompaña.
+        cuando el equipo lo marca. La reputación acompaña tu identidad de Telegram; no
+        sustituye el sentido común al quedar.
       </p>
     </article>
   );

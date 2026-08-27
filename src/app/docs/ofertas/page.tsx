@@ -12,9 +12,9 @@ export default function Page() {
       />
       <h2>Primero el artículo</h2>
       <p>
-        Título, descripción, categoría, condición (nuevo, usado o sellado) y varias fotos.
-        Las recorres con flechas, Escape o deslizando. Puedes pausar o dar de baja cuando
-        quieras.
+        Título, descripción, categoría (estilo Revolico: grupos y subcategorías), condición
+        (nuevo, usado o sellado) y varias fotos. Las recorres con flechas, Escape o
+        deslizando. Puedes editar o eliminar los tuyos cuando quieras.
       </p>
       <h2>Luego la oferta</h2>
       <ul>
@@ -23,15 +23,19 @@ export default function Page() {
         <li>Provincia, municipio, barrio.</li>
         <li>Transporte: tengo, sin (debe venir) o voy al lugar.</li>
       </ul>
+      <p>
+        También puedes editar o borrar una oferta tuya mientras esté abierta. Si la
+        tocaste después de crearla, se ve cuándo se editó.
+      </p>
       <Callout title="Filtros">
         Categoría, condición, provincia, municipio, transporte y si acepta propuestas.
         El buscador mira títulos, barrios y nombres. Ver lejos de tu casa siempre está
         permitido.
       </Callout>
       <Callout title="Compartir en grupos">
-        En cada oferta puedes mandarla a un grupo de Telegram, WhatsApp o Facebook. Se
-        abre la app y tú eliges el grupo; el texto ya va en formato #cambio / #necesito /
-        #municipio.
+        En cada oferta puedes mandarla a Telegram, WhatsApp o Facebook. Se abre la app y
+        tú eliges el chat; el texto va en formato #cambio / #necesito / #municipio con el
+        enlace al final.
       </Callout>
     </article>
   );

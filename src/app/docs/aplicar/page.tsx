@@ -27,7 +27,7 @@ export default function Page() {
         ]}
       />
       <Callout title="No puedes aplicar a lo tuyo">
-        Ni sin teléfono verificado. El servidor lo bloquea; no es solo la interfaz.
+        Ni sin sesión. El servidor lo bloquea; no es solo la interfaz.
       </Callout>
     </article>
   );

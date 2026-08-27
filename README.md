@@ -6,22 +6,23 @@ Mercado de trueque entre personas en Cuba. Publicas lo que tienes, alguien toca 
 
 - Next.js (App Router) en Vercel
 - Supabase: Auth, Postgres, Storage, Realtime
-- Login: **solo Telegram Login Widget** (sin Google, correo OTP ni SMS)
+- Login: **Telegram** (Login Widget oficial; acceso alternativo por el bot si el widget se atasca)
 - Explorar el mercado: público, sin cuenta
-- Publicar y aplicar: con sesión de Telegram
+- Publicar y aplicar: con sesión
 - Chat cifrado en reposo con AES-256-GCM; TLS en tránsito; RLS
 
 ## Configuración local
 
-Copia `.env.example` a `.env.local`:
+Crea `.env.local` con tu propio proyecto (no pegues URLs ni tokens ajenos en un repo público):
 
 ```
-NEXT_PUBLIC_SUPABASE_URL=https://wcrgbcxewqqbnjvelwrp.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 MESSAGE_ENCRYPTION_KEY=
 TELEGRAM_BOT_TOKEN=
 TELEGRAM_BOT_USERNAME=
 NEXT_PUBLIC_TELEGRAM_BOT_USERNAME=
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 SUPABASE_SERVICE_ROLE_KEY=
 ```
 
@@ -38,15 +39,15 @@ npm run dev
 
 ## Base de datos
 
-En el SQL Editor de Supabase ejecuta `supabase/schema.sql` (incluye `profiles.telegram_id`).
+En el SQL Editor de Supabase ejecuta `supabase/schema.sql` y las migraciones en `supabase/*.sql` que apliquen a tu entorno.
 
-## Telegram Login Widget
+## Telegram
 
-1. Crea el bot en [@BotFather](https://t.me/BotFather) y copia el token.
-2. `/setdomain` → `mecuadra.vercel.app` (y `localhost` no sirve en prod; para local usa un túnel o el dominio de Vercel).
-3. En Vercel: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_USERNAME`, `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` (mismo nombre sin @), `SUPABASE_SERVICE_ROLE_KEY`.
-4. El widget llama a `/api/auth/telegram/login`, verifica el HMAC y abre sesión Supabase.
+1. Crea el bot en [@BotFather](https://t.me/BotFather) y guarda el token solo en variables de entorno.
+2. `/setdomain` → el dominio público de tu despliegue (`localhost` no sirve en prod; para local usa un túnel o el dominio de preview).
+3. En Vercel: las variables de Telegram, Supabase y `MESSAGE_ENCRYPTION_KEY`.
+4. El widget autentica vía el endpoint de login (HMAC). Si hace falta, configura el webhook del bot desde el setup del proyecto.
 
 ## Vercel
 
-Importa `reykratosxx/mecuadra`, pega las variables y despliega.
+Importa el repo, pega las variables de **tu** proyecto y despliega.

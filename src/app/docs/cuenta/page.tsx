@@ -1,6 +1,6 @@
 import { Callout, DocHero, Steps } from "@/components/docs/widgets";
 
-export const metadata = { title: "Cuenta y códigos" };
+export const metadata = { title: "Cuenta y Telegram" };
 
 export default function Page() {
   return (
@@ -8,7 +8,7 @@ export default function Page() {
       <DocHero
         kicker="Cuenta"
         title="Un toque. Tu Telegram. Listo."
-        lead="Priorizamos el Login Widget oficial de Telegram (la confirmación sale de Telegram, no de un chat raro). Si en el móvil se atasca pidiendo número, hay un acceso alternativo por el bot oficial de MeCuadra."
+        lead="Priorizamos el Login Widget oficial de Telegram: la confirmación sale de Telegram, no de un chat raro. Si en el móvil se atasca (a veces pide número y no avanza), hay un acceso alternativo por el bot oficial de MeCuadra."
       />
       <h2>Cómo funciona</h2>
       <ul>
@@ -20,7 +20,7 @@ export default function Page() {
         </li>
         <li>
           <strong>Alternativa</strong> — bot oficial de MeCuadra solo si el widget pide teléfono
-          y no avanza.
+          y no avanza. En Telegram tocas <em>Iniciar</em> y vuelves a la web.
         </li>
       </ul>
       <Steps
@@ -33,10 +33,16 @@ export default function Page() {
           { title: "Listo", text: "La web abre la sesión. Publicas y aplicas." },
         ]}
       />
-      <Callout title="BotFather + SQL" tone="warn">
-        Widget: /setdomain → <code>mecuadra.vercel.app</code>. Alternativa por bot: webhook en{" "}
-        <code>/api/auth/telegram</code> y tabla <code>telegram_auth_sessions</code>. Variables:{" "}
-        <code>TELEGRAM_BOT_TOKEN</code>, <code>NEXT_PUBLIC_TELEGRAM_BOT_USERNAME</code>.
+      <h2>Qué pedimos y qué no</h2>
+      <ul>
+        <li>No pedimos SMS ni correo para entrar.</li>
+        <li>No pedimos GPS. Municipio y barrio los escribes tú en las ofertas.</li>
+        <li>La identidad de la sesión viene de Telegram (nombre, foto y usuario si los tienes públicos).</li>
+      </ul>
+      <Callout title="Privacidad" tone="ok">
+        No compartas el chat del bot ni enlaces de acceso con nadie. Si alguien te escribe
+        pidiendo el código o el token “para ayudarte a entrar”, cierra y vuelve a{" "}
+        <code>/login</code> desde MeCuadra.
       </Callout>
     </article>
   );
