@@ -44,7 +44,7 @@ export function Avatar({
 }) {
   return (
     <span
-      className="inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-50 font-semibold text-brand ring-2 ring-white"
+      className="inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-50 font-semibold text-brand ring-2 ring-surface"
       style={{ width: size, height: size, fontSize: size * 0.32 }}
     >
       {src ? (
@@ -68,7 +68,7 @@ export function Badge({
     brand: "bg-brand-50 text-brand",
     ok: "bg-emerald-50 text-emerald-700",
     warn: "bg-amber-50 text-amber-700",
-    mute: "bg-stone-100 text-mute",
+    mute: "bg-surface-2 text-mute",
   };
   return (
     <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium", map[tone])}>

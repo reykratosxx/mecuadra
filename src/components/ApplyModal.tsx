@@ -62,7 +62,7 @@ export function ApplyModal({
 
         <p className="label">Tus artículos</p>
         {mine.length === 0 ? (
-          <p className="mb-3 rounded-2xl bg-stone-50 p-3 text-sm text-mute">
+          <p className="mb-3 rounded-2xl bg-surface-2 p-3 text-sm text-mute">
             Aún no tienes artículos. Puedes describir la propuesta abajo o{" "}
             <a className="text-brand underline" href="/articulos/nuevo">
               publicar uno

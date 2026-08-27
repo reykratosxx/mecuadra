@@ -18,7 +18,7 @@ export function DocsShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="docs-root min-h-full">
-      <header className="sticky top-0 z-40 border-b border-line/80 bg-[#fbf7ff]/85 backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b border-line/80 bg-surface/85 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-[1400px] items-center gap-3 px-4">
           <Logo withWord size={30} />
           <span className="hidden rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-brand sm:inline">
@@ -27,7 +27,7 @@ export function DocsShell({ children }: { children: React.ReactNode }) {
           <button
             type="button"
             data-docs-search
-            className="ml-auto flex h-9 items-center gap-2 rounded-full border border-line bg-white px-3 text-sm text-mute"
+            className="ml-auto flex h-9 items-center gap-2 rounded-full border border-line bg-surface px-3 text-sm text-mute"
             onClick={() => setOpen(true)}
           >
             <IconSearch className="h-4 w-4" />
@@ -47,7 +47,7 @@ export function DocsShell({ children }: { children: React.ReactNode }) {
         <aside
           className={cn(
             "docs-aside border-line lg:sticky lg:top-14 lg:block lg:h-[calc(100vh-3.5rem)] lg:overflow-y-auto lg:border-r",
-            menu ? "block border-b bg-[#fbf7ff] px-4 py-4" : "hidden px-4 py-6 lg:block",
+            menu ? "block border-b bg-surface px-4 py-4" : "hidden px-4 py-6 lg:block",
           )}
         >
           {DOC_GROUPS.map((g) => (
@@ -66,8 +66,8 @@ export function DocsShell({ children }: { children: React.ReactNode }) {
                         className={cn(
                           "block rounded-xl px-2 py-1.5 text-sm transition",
                           active
-                            ? "bg-white font-semibold text-brand shadow-sm ring-1 ring-brand/15"
-                            : "text-mute hover:bg-white/70 hover:text-ink",
+                            ? "bg-surface font-semibold text-brand shadow-sm ring-1 ring-brand/15"
+                            : "text-mute hover:bg-surface/70 hover:text-ink",
                         )}
                       >
                         {item.title}

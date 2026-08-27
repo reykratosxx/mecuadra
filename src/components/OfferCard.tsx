@@ -20,7 +20,7 @@ export function OfferCard({ offer }: { offer: Offer }) {
   return (
     <article className="card group overflow-hidden transition hover:border-brand/25 hover:shadow-md hover:shadow-brand/5">
       <Link href={`/oferta/${offer.id}`} className="block">
-        <div className="relative aspect-[2/1] overflow-hidden bg-stone-100 sm:aspect-[16/10]">
+        <div className="relative aspect-[2/1] overflow-hidden bg-surface-2 sm:aspect-[16/10]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={cover}

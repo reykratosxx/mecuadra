@@ -30,7 +30,7 @@ export function DocsSearch({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 bg-[#1c1428]/40 p-4 backdrop-blur-sm" onClick={onClose}>
       <div
-        className="mx-auto mt-[12vh] max-w-lg overflow-hidden rounded-3xl border border-line bg-white shadow-2xl"
+        className="mx-auto mt-[12vh] max-w-lg overflow-hidden rounded-3xl border border-line bg-surface shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-2 border-b border-line px-4">

@@ -62,7 +62,7 @@ function List() {
         <button
           type="button"
           className={`rounded-full px-3 py-1.5 font-medium ${
-            !showGone ? "bg-brand-50 text-brand" : "text-mute hover:bg-stone-50"
+            !showGone ? "bg-brand-50 text-brand" : "text-mute hover:bg-hover"
           }`}
           onClick={() => setShowGone(false)}
         >
@@ -71,7 +71,7 @@ function List() {
         <button
           type="button"
           className={`rounded-full px-3 py-1.5 font-medium ${
-            showGone ? "bg-brand-50 text-brand" : "text-mute hover:bg-stone-50"
+            showGone ? "bg-brand-50 text-brand" : "text-mute hover:bg-hover"
           }`}
           onClick={() => setShowGone(true)}
         >
@@ -105,7 +105,7 @@ function List() {
               <img
                 src={item.photos[0] || "/logo.png"}
                 alt=""
-                className="h-20 w-20 shrink-0 rounded-2xl object-cover bg-stone-100 sm:h-24 sm:w-24"
+                className="h-20 w-20 shrink-0 rounded-2xl object-cover bg-surface-2 sm:h-24 sm:w-24"
               />
               <div className="min-w-0 flex-1 overflow-hidden">
                 <p className="break-words text-sm font-semibold leading-snug text-ink sm:text-base">

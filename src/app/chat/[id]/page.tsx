@@ -80,7 +80,7 @@ function Thread({ id }: { id: string }) {
   return (
     <div className="mx-auto flex max-w-2xl flex-col">
       <div className="mb-3 flex items-center gap-3">
-        <Link href="/trueques" className="grid h-9 w-9 place-items-center rounded-full hover:bg-stone-100">
+        <Link href="/trueques" className="grid h-9 w-9 place-items-center rounded-full hover:bg-hover">
           <IconChevron dir="left" className="h-5 w-5" />
         </Link>
         <Avatar src={other?.avatar} name={other?.name ?? "?"} />
@@ -124,7 +124,7 @@ function Thread({ id }: { id: string }) {
               <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
                 <p
                   className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${
-                    mine ? "bg-[image:var(--grad)] text-white" : "bg-stone-100"
+                    mine ? "bg-[image:var(--grad)] text-white" : "bg-surface-2"
                   }`}
                 >
                   {m.text}

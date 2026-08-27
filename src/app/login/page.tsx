@@ -242,7 +242,7 @@ function AuthCard() {
               ) : null}
             </div>
 
-            <div className="rounded-2xl border border-line bg-stone-50 px-4 py-3 text-xs leading-5 text-mute">
+            <div className="rounded-2xl border border-line bg-surface-2 px-4 py-3 text-xs leading-5 text-mute">
               <p className="font-semibold text-ink">Así se ve el login oficial</p>
               <ol className="mt-1.5 list-decimal space-y-1 pl-4">
                 <li>Toca el botón azul de Telegram.</li>

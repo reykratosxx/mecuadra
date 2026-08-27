@@ -40,14 +40,14 @@ function Board() {
     <div>
       <h1 className="font-display text-3xl">Mis trueques</h1>
       <p className="text-mute">Aceptados, recibidos y enviados — el flujo P2P completo.</p>
-      <div className="mt-5 flex rounded-2xl bg-stone-100 p-1">
+      <div className="mt-5 flex rounded-2xl bg-surface-2 p-1">
         {TABS.map((t) => (
           <button
             key={t.id}
             type="button"
             onClick={() => setTab(t.id)}
             className={`flex-1 rounded-xl py-2 text-sm font-semibold ${
-              tab === t.id ? "bg-white text-brand shadow-sm" : "text-mute"
+              tab === t.id ? "bg-surface text-brand shadow-sm" : "text-mute"
             }`}
           >
             {t.label}

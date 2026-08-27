@@ -71,7 +71,7 @@ export default function HomePage() {
       <section className="relative overflow-hidden px-4 pb-12 pt-8 md:pb-16 md:pt-16">
         <div className="mx-auto grid max-w-6xl items-center gap-10 md:grid-cols-2">
           <div>
-            <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1 text-xs font-semibold text-brand">
+            <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs font-semibold text-brand">
               Mercado P2P de bienes · Cuba
             </p>
             <h1 className="font-display text-3xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-4xl md:text-6xl">
@@ -101,7 +101,7 @@ export default function HomePage() {
                 <Logo withWord size={32} />
                 <span className="text-xs text-mute">Oferta abierta</span>
               </div>
-              <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-2xl bg-stone-50 p-4">
+              <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-2xl bg-surface-2 p-4">
                 <div>
                   <p className="text-[10px] font-semibold uppercase text-mute">Ofrece</p>
                   <p className="font-medium">Ibuprofeno 200 mg</p>
@@ -127,7 +127,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-y border-line bg-white px-4 py-10">
+      <section className="border-y border-line bg-surface px-4 py-10">
         <div className="mx-auto max-w-6xl">
           <div className="mb-6 max-w-2xl">
             <h2 className="font-display text-2xl sm:text-3xl">La comunidad, en números</h2>
@@ -240,7 +240,7 @@ export default function HomePage() {
           </div>
           <Link
             href="/publicar"
-            className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-brand shadow-sm"
+            className="rounded-full bg-surface px-5 py-3 text-sm font-semibold text-brand shadow-sm"
           >
             Publicar oferta
           </Link>

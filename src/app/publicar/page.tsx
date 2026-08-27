@@ -156,7 +156,7 @@ function Form() {
                   key={item.id}
                   className={cn(
                     "flex items-center gap-2 rounded-2xl border p-2",
-                    on ? "border-brand bg-brand-50" : "border-line bg-white",
+                    on ? "border-brand bg-brand-50" : "border-line bg-surface",
                     errors.items && !on ? "border-rose-300" : "",
                   )}
                 >

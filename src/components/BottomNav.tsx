@@ -22,7 +22,7 @@ export function BottomNav() {
   ).length;
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
       <ul className="mx-auto grid max-w-lg grid-cols-5 items-center px-1 pt-1.5">
         {items.map((item) => {
           const active = path.startsWith(item.href);
@@ -37,7 +37,7 @@ export function BottomNav() {
                 )}
               >
                 {item.center ? (
-                  <span className="relative z-20 -mt-5 grid h-12 w-12 place-items-center rounded-2xl bg-[image:var(--grad)] text-white shadow-lg shadow-brand/30 ring-4 ring-white">
+                  <span className="relative z-20 -mt-5 grid h-12 w-12 place-items-center rounded-2xl bg-[image:var(--grad)] text-white shadow-lg shadow-brand/30 ring-4 ring-surface">
                     <Icon className="h-5 w-5" />
                   </span>
                 ) : (

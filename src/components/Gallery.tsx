@@ -28,7 +28,7 @@ export function Gallery({ photos, alt }: { photos: string[]; alt: string }) {
 
   return (
     <>
-      <div className="relative overflow-hidden rounded-3xl bg-stone-100">
+      <div className="relative overflow-hidden rounded-3xl bg-surface-2">
         <button
           type="button"
           onClick={() => setOpen(true)}
@@ -50,7 +50,7 @@ export function Gallery({ photos, alt }: { photos: string[]; alt: string }) {
             <button
               type="button"
               onClick={() => go(-1)}
-              className="absolute left-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-ink shadow"
+              className="absolute left-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-surface/90 text-ink shadow"
               aria-label="Foto anterior"
             >
               <IconChevron dir="left" className="h-5 w-5" />
@@ -58,7 +58,7 @@ export function Gallery({ photos, alt }: { photos: string[]; alt: string }) {
             <button
               type="button"
               onClick={() => go(1)}
-              className="absolute right-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-ink shadow"
+              className="absolute right-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full bg-surface/90 text-ink shadow"
               aria-label="Foto siguiente"
             >
               <IconChevron dir="right" className="h-5 w-5" />

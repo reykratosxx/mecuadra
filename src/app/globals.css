@@ -1,20 +1,55 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
+  color-scheme: light;
   --background: #faf8ff;
   --foreground: #1c1428;
+  --ink: #1c1428;
+  --mute: #6b6280;
+  --line: #ece6f5;
+  --brand: #7c3aed;
+  --brand-50: #f3e8ff;
+  --brand-100: #e9d5ff;
+  --surface: #ffffff;
+  --surface-2: #f6f4fb;
+  --hover: #f5f0fc;
   --grad: linear-gradient(135deg, #c026d3 0%, #7c3aed 48%, #4338ca 100%);
+  --glow-a: rgba(192, 38, 211, 0.12);
+  --glow-b: rgba(67, 56, 202, 0.1);
+}
+
+.dark {
+  color-scheme: dark;
+  --background: #0c0814;
+  --foreground: #f3e8ff;
+  --ink: #f3e8ff;
+  --mute: #b0a3c4;
+  --line: #3a2d52;
+  --brand: #a78bfa;
+  --brand-50: #2a1848;
+  --brand-100: #3b2260;
+  --surface: #161022;
+  --surface-2: #1e1630;
+  --hover: #241a38;
+  --grad: linear-gradient(135deg, #d946ef 0%, #8b5cf6 48%, #6366f1 100%);
+  --glow-a: rgba(168, 85, 247, 0.22);
+  --glow-b: rgba(99, 102, 241, 0.18);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-brand: #7c3aed;
-  --color-brand-50: #f3e8ff;
-  --color-brand-100: #e9d5ff;
-  --color-ink: #1c1428;
-  --color-mute: #6b6280;
-  --color-line: #ece6f5;
+  --color-brand: var(--brand);
+  --color-brand-50: var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-ink: var(--ink);
+  --color-mute: var(--mute);
+  --color-line: var(--line);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-hover: var(--hover);
   --font-sans: var(--font-body);
   --font-display: var(--font-head);
 }
@@ -25,8 +60,8 @@ html { scroll-behavior: smooth; }
 
 body {
   background:
-    radial-gradient(1200px 500px at 10% -10%, rgba(192, 38, 211, 0.12), transparent 50%),
-    radial-gradient(900px 400px at 100% 0%, rgba(67, 56, 202, 0.1), transparent 45%),
+    radial-gradient(1200px 500px at 10% -10%, var(--glow-a), transparent 50%),
+    radial-gradient(900px 400px at 100% 0%, var(--glow-b), transparent 45%),
     var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
@@ -59,7 +94,7 @@ body {
   gap: 0.4rem;
   border-radius: 999px;
   border: 1px solid var(--color-line);
-  background: white;
+  background: var(--surface);
   color: var(--color-ink);
   font-weight: 600;
   padding: 0.7rem 1.15rem;
@@ -68,7 +103,7 @@ body {
 .btn-ghost:hover { background: var(--color-brand-50); }
 
 .card {
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--color-line);
   border-radius: 1.35rem;
 }
@@ -77,12 +112,14 @@ body {
   width: 100%;
   border-radius: 0.95rem;
   border: 1px solid var(--color-line);
-  background: white;
+  background: var(--surface);
+  color: var(--color-ink);
   padding: 0.7rem 0.9rem;
   font-size: 0.95rem;
   outline: none;
 }
 .input:focus { border-color: var(--color-brand); box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12); }
+.dark .input:focus { box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.2); }
 
 .label {
   display: block;
@@ -95,7 +132,7 @@ body {
 .pill {
   border-radius: 999px;
   border: 1px solid var(--color-line);
-  background: #f6f4fb;
+  background: var(--surface-2);
   padding: 0.45rem 0.85rem;
   font-size: 0.85rem;
   font-weight: 550;
@@ -112,14 +149,14 @@ body {
 
 .docs-root {
   background:
-    radial-gradient(900px 280px at 0% 0%, rgba(192, 38, 211, 0.08), transparent 55%),
+    radial-gradient(900px 280px at 0% 0%, var(--glow-a), transparent 55%),
     repeating-linear-gradient(
       180deg,
       transparent 0,
       transparent 31px,
-      rgba(124, 58, 237, 0.04) 32px
+      color-mix(in srgb, var(--brand) 8%, transparent) 32px
     ),
-    #fbf7ff;
+    var(--background);
 }
 
 .docs-kicker {
@@ -215,7 +252,7 @@ body {
 }
 .docs-flow article {
   border: 1px solid var(--color-line);
-  background: white;
+  background: var(--surface);
   border-radius: 1.1rem;
   padding: 0.9rem;
 }
@@ -225,7 +262,7 @@ body {
 .docs-menu-btn {
   border-radius: 999px;
   border: 1px solid var(--color-line);
-  background: white;
+  background: var(--surface);
   padding: 0.35rem 0.75rem;
   font-size: 0.8rem;
   font-weight: 600;
@@ -238,10 +275,9 @@ body {
   gap: 0.35rem;
   border-radius: 1rem;
   border: 1px solid var(--color-line);
-  background: white;
+  background: var(--surface);
   padding: 0.7rem 0.3rem;
   font-size: 0.72rem;
   font-weight: 650;
 }
 .share-btn:hover { background: var(--color-brand-50); }
-

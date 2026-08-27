@@ -91,7 +91,7 @@ export default function OfertaPage({ params }: { params: Promise<{ id: string }>
             <span className="shrink-0 text-xs text-mute">{timeAgo(offer.createdAt)}</span>
           </div>
 
-          <dl className="mt-4 space-y-1 rounded-2xl bg-stone-50 px-3 py-2.5 text-xs text-mute">
+          <dl className="mt-4 space-y-1 rounded-2xl bg-surface-2 px-3 py-2.5 text-xs text-mute">
             <div className="flex justify-between gap-2">
               <dt>Publicada</dt>
               <dd className="font-medium text-ink">{formatDateTime(offer.createdAt)}</dd>
@@ -106,7 +106,7 @@ export default function OfertaPage({ params }: { params: Promise<{ id: string }>
             ) : null}
           </dl>
 
-          <div className="mt-5 grid grid-cols-[1fr_auto_1fr] items-start gap-2 rounded-2xl bg-stone-50 p-3">
+          <div className="mt-5 grid grid-cols-[1fr_auto_1fr] items-start gap-2 rounded-2xl bg-surface-2 p-3">
             <div>
               <p className="text-[10px] font-semibold uppercase text-mute">Ofrece</p>
               <ul className="mt-1 space-y-1 text-sm font-medium">

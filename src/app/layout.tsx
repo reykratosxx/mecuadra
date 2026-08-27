@@ -3,6 +3,7 @@ import { Outfit, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { AppShell } from "@/components/AppShell";
+import { themeInitScript } from "@/lib/theme-script";
 
 const sans = Source_Sans_3({
   variable: "--font-body",
@@ -27,14 +28,24 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#7c3aed",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#7c3aed" },
+    { media: "(prefers-color-scheme: dark)", color: "#1a1228" },
+  ],
   width: "device-width",
   initialScale: 1,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es-CU" className={`${sans.variable} ${display.variable} h-full antialiased`}>
+    <html
+      lang="es-CU"
+      className={`${sans.variable} ${display.variable} h-full antialiased`}
+      suppressHydrationWarning
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className="flex min-h-full flex-col font-sans text-ink">
         <Providers>
           <AppShell>{children}</AppShell>
