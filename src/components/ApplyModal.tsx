@@ -48,7 +48,7 @@ export function ApplyModal({
         <div className="mb-4 flex items-start justify-between">
           <div>
             <h2 className="flex items-center gap-2 font-display text-xl">
-              <MeCuadraMark size={28} />
+              <MeCuadraMark size={36} />
               MeCuadra
             </h2>
             <p className="text-sm text-mute">

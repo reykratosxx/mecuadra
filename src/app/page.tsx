@@ -98,7 +98,7 @@ export default function HomePage() {
             <div className="absolute -inset-6 rounded-[2.5rem] bg-[image:var(--grad)] opacity-20 blur-2xl" />
             <div className="card relative p-5 shadow-xl shadow-brand/10">
               <div className="mb-4 flex items-center justify-between">
-                <Logo withWord size={32} />
+                <Logo withWord size={40} />
                 <span className="text-xs text-mute">Oferta abierta</span>
               </div>
               <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-2xl bg-surface-2 p-4">

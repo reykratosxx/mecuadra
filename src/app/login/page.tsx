@@ -29,7 +29,7 @@ export default function LoginPage() {
   return (
     <div className="mx-auto max-w-md py-10">
       <div className="mb-6 flex justify-center">
-        <Logo withWord size={48} />
+        <Logo withWord size={56} />
       </div>
       <Suspense fallback={<div className="card p-6 text-sm text-mute">Cargando…</div>}>
         <AuthCard />

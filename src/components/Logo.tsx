@@ -3,7 +3,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 export function Logo({
-  size = 36,
+  size = 42,
   withWord = false,
   className,
   wordClassName,
@@ -14,7 +14,7 @@ export function Logo({
   wordClassName?: string;
 }) {
   return (
-    <Link href="/" className={cn("flex items-center gap-2", className)}>
+    <Link href="/" className={cn("flex items-center gap-2.5", className)}>
       <Image
         src="/logo.png"
         alt="MeCuadra"
@@ -26,7 +26,7 @@ export function Logo({
       {withWord ? (
         <span
           className={cn(
-            "font-[family-name:var(--font-display)] text-[1.2rem] font-semibold tracking-tight text-ink sm:text-[1.35rem]",
+            "font-[family-name:var(--font-display)] text-[1.35rem] font-semibold tracking-tight text-ink sm:text-[1.5rem]",
             wordClassName,
           )}
         >

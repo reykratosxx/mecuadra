@@ -20,7 +20,7 @@ export function DocsShell({ children }: { children: React.ReactNode }) {
     <div className="docs-root min-h-full">
       <header className="sticky top-0 z-40 border-b border-line/80 bg-surface/85 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-[1400px] items-center gap-3 px-4">
-          <Logo withWord size={30} />
+          <Logo withWord size={36} />
           <span className="hidden rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-brand sm:inline">
             Docs
           </span>

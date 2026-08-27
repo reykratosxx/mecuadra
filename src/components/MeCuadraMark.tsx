@@ -35,14 +35,14 @@ export function MeCuadraGlyph({ size = 20, className }: { size?: number; classNa
 }
 
 export function MeCuadraLabel({
-  size = 26,
+  size = 48,
   className,
 }: {
   size?: number;
   className?: string;
 }) {
   return (
-    <span className={cn("inline-flex items-center gap-2", className)}>
+    <span className={cn("inline-flex items-center gap-3 text-xl font-semibold leading-none", className)}>
       <MeCuadraGlyph size={size} />
       MeCuadra
     </span>

@@ -26,7 +26,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-line/80 bg-surface/90 backdrop-blur-xl">
       <div className="mx-auto flex h-14 max-w-6xl items-center gap-2 px-3 sm:h-16 sm:gap-3 sm:px-4">
-        <Logo withWord size={28} className="min-w-0" />
+        <Logo withWord size={36} className="min-w-0" />
 
         <nav className="ml-1 hidden items-center gap-1 md:flex">
           {links.map((l) => (
