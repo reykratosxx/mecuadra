@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { useStore } from "@/lib/store";
 import { Avatar, RequireAuth } from "@/components/ui";
 import { IconChevron, IconSend } from "@/components/icons";
+import { ProfilePeek } from "@/components/ProfilePeek";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
 export default function ChatPage({ params }: { params: Promise<{ id: string }> }) {
@@ -29,6 +30,7 @@ function Thread({ id }: { id: string }) {
     acceptTrade,
     rejectTrade,
     markDelivered,
+    cancelTrade,
     rateTrade,
     loadMessages,
     ready,
@@ -37,6 +39,11 @@ function Thread({ id }: { id: string }) {
   const [text, setText] = useState("");
   const [stars, setStars] = useState(5);
   const [comment, setComment] = useState("");
+  const [showPeek, setShowPeek] = useState(false);
+  const [confirmCancel, setConfirmCancel] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+  const [cancelBusy, setCancelBusy] = useState(false);
+  const [cancelError, setCancelError] = useState("");
   const end = useRef<HTMLDivElement>(null);
   useEffect(() => {
     void loadMessages(id);
@@ -83,14 +90,24 @@ function Thread({ id }: { id: string }) {
         <Link href="/trueques" className="grid h-9 w-9 place-items-center rounded-full hover:bg-hover">
           <IconChevron dir="left" className="h-5 w-5" />
         </Link>
-        <Avatar src={other?.avatar} name={other?.name ?? "?"} />
-        <div>
-          <p className="font-semibold">{other?.name}</p>
-          <p className="text-xs text-mute">
-            {offered[0]?.title ?? "Trueque"} ⇄ {proposed[0]?.title ?? "propuesta"}
-          </p>
-        </div>
+        <button
+          type="button"
+          className="flex min-w-0 items-center gap-3 rounded-2xl px-1 py-1 text-left hover:bg-hover disabled:hover:bg-transparent"
+          onClick={() => setShowPeek(true)}
+          disabled={!other}
+          aria-label={other ? `Ver perfil de ${other.name}` : "Perfil no disponible"}
+        >
+          <Avatar src={other?.avatar} name={other?.name ?? "?"} />
+          <div className="min-w-0">
+            <p className="truncate font-semibold">{other?.name}</p>
+            <p className="truncate text-xs text-mute">
+              {offered[0]?.title ?? "Trueque"} ⇄ {proposed[0]?.title ?? "propuesta"}
+            </p>
+          </div>
+        </button>
       </div>
+
+      {showPeek && other ? <ProfilePeek user={other} onClose={() => setShowPeek(false)} /> : null}
 
       <div className="card mb-3 p-3 text-sm">
         <p className="text-mute">{trade.proposalNote}</p>
@@ -105,16 +122,91 @@ function Thread({ id }: { id: string }) {
           </div>
         ) : null}
         {["aceptado", "entregado"].includes(trade.status) ? (
-          <button
-            type="button"
-            className="btn-primary mt-3 w-full"
-            disabled={iDelivered}
-            onClick={() => void markDelivered(trade.id)}
-          >
-            {iDelivered ? "Esperando confirmación de la otra parte" : "Confirmar que entregué / recibí"}
-          </button>
+          <div className="mt-3 space-y-2">
+            <button
+              type="button"
+              className="btn-primary w-full"
+              disabled={iDelivered}
+              onClick={() => void markDelivered(trade.id)}
+            >
+              {iDelivered ? "Esperando confirmación de la otra parte" : "Confirmar que entregué / recibí"}
+            </button>
+            <button
+              type="button"
+              className="btn-ghost w-full !border-rose-200 !text-rose-600"
+              onClick={() => {
+                setCancelError("");
+                setConfirmCancel(true);
+              }}
+            >
+              No se completó
+            </button>
+          </div>
+        ) : null}
+        {trade.status === "cancelado" ? (
+          <p className="mt-3 rounded-2xl bg-surface-2 px-3 py-2 text-xs leading-5 text-mute">
+            Este trueque se marcó como no completado. La oferta volvió al mercado.
+          </p>
         ) : null}
       </div>
+
+      {confirmCancel ? (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-ink/45 backdrop-blur-sm sm:items-center sm:p-4"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => (cancelBusy ? null : setConfirmCancel(false))}
+        >
+          <div
+            className="card w-full max-w-md rounded-b-none p-5 sm:rounded-b-[1.35rem]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="font-display text-lg">¿Marcar como no completado?</p>
+            <p className="mt-1 text-sm leading-6 text-mute">
+              El trueque se cierra sin valoración y la oferta vuelve a estar disponible
+              públicamente, para que otra persona pueda aplicar. Se avisa a{" "}
+              {other?.name ?? "la otra parte"}.
+            </p>
+            <input
+              className="input mt-3"
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              placeholder="Motivo (opcional): no apareció, cambió de idea…"
+              maxLength={200}
+            />
+            {cancelError ? <p className="mt-2 text-sm text-rose-600">{cancelError}</p> : null}
+            <div className="mt-4 flex gap-2">
+              <button
+                type="button"
+                className="btn-ghost flex-1"
+                disabled={cancelBusy}
+                onClick={() => setConfirmCancel(false)}
+              >
+                Volver
+              </button>
+              <button
+                type="button"
+                className="btn-primary flex-1"
+                disabled={cancelBusy}
+                onClick={async () => {
+                  setCancelBusy(true);
+                  setCancelError("");
+                  const res = await cancelTrade(trade.id, cancelReason);
+                  setCancelBusy(false);
+                  if (res.error) {
+                    setCancelError(res.error);
+                    return;
+                  }
+                  setConfirmCancel(false);
+                  setCancelReason("");
+                }}
+              >
+                {cancelBusy ? "Cancelando…" : "Sí, no se completó"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <div className="card flex min-h-[420px] flex-col p-3">
         <div className="flex-1 space-y-2 overflow-y-auto">

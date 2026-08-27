@@ -90,6 +90,7 @@ type Store = AppState & {
   acceptTrade: (tradeId: string) => Promise<void>;
   rejectTrade: (tradeId: string) => Promise<void>;
   markDelivered: (tradeId: string) => Promise<void>;
+  cancelTrade: (tradeId: string, reason?: string) => Promise<{ error?: string }>;
   sendMessage: (tradeId: string, text: string) => Promise<void>;
   markNotificationsRead: () => Promise<void>;
   rateTrade: (tradeId: string, stars: number, comment: string, tags: string[]) => Promise<void>;
@@ -390,6 +391,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         await bump(trade.applicantId);
       }
       await refresh();
+    },
+    cancelTrade: async (tradeId, reason) => {
+      const res = await fetch(`/api/trades/${tradeId}/cancel`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason: reason ?? "" }),
+      });
+      const json = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) return { error: json.error || "No se pudo cancelar el trueque." };
+      await refresh();
+      return {};
     },
     sendMessage: async (tradeId, text) => {
       if (!text.trim()) return;
