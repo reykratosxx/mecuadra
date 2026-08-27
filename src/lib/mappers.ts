@@ -60,6 +60,7 @@ type OfferRow = {
   featured: boolean;
   views: number;
   created_at: string;
+  updated_at?: string | null;
 };
 
 type TradeRow = {
@@ -151,6 +152,7 @@ export function mapOffer(row: OfferRow): Offer {
     featured: row.featured,
     views: row.views,
     createdAt: row.created_at,
+    updatedAt: row.updated_at || row.created_at,
   };
 }
 

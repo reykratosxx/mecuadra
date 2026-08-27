@@ -255,9 +255,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     },
     updateItem: async (id, patch) => {
       const row: Record<string, unknown> = {};
-      if (patch.status) row.status = patch.status;
-      if (patch.title) row.title = patch.title;
-      if (patch.description) row.description = patch.description;
+      if (patch.status !== undefined) row.status = patch.status;
+      if (patch.title !== undefined) row.title = patch.title;
+      if (patch.description !== undefined) row.description = patch.description;
+      if (patch.category !== undefined) row.category = patch.category;
+      if (patch.condition !== undefined) row.condition = patch.condition;
+      if (patch.photos !== undefined) row.photos = patch.photos;
       const { error } = await createClient().from("items").update(row).eq("id", id);
       if (error) throw error;
       await refresh();
@@ -288,7 +291,15 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     },
     updateOffer: async (id, patch) => {
       const row: Record<string, unknown> = {};
-      if (patch.status) row.status = patch.status;
+      if (patch.status !== undefined) row.status = patch.status;
+      if (patch.itemIds !== undefined) row.item_ids = patch.itemIds;
+      if (patch.wants !== undefined) row.wants = patch.wants;
+      if (patch.openToProposals !== undefined) row.open_to_proposals = patch.openToProposals;
+      if (patch.message !== undefined) row.message = patch.message;
+      if (patch.province !== undefined) row.province = patch.province;
+      if (patch.municipality !== undefined) row.municipality = patch.municipality;
+      if (patch.neighborhood !== undefined) row.neighborhood = patch.neighborhood;
+      if (patch.transport !== undefined) row.transport = patch.transport;
       const { error } = await createClient().from("offers").update(row).eq("id", id);
       if (error) throw error;
       await refresh();

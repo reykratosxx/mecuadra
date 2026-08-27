@@ -113,8 +113,11 @@ create table if not exists public.offers (
   status offer_status_t not null default 'abierta',
   featured boolean not null default false,
   views int not null default 0,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
 );
+
+alter table public.offers add column if not exists updated_at timestamptz not null default now();
 
 create table if not exists public.trades (
   id uuid primary key default gen_random_uuid(),
@@ -290,6 +293,21 @@ drop trigger if exists trades_touch on public.trades;
 create trigger trades_touch
   before update on public.trades
   for each row execute function public.tg_trades_touch();
+
+create or replace function public.tg_offers_touch()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.updated_at := now();
+  return new;
+end;
+$$;
+
+drop trigger if exists offers_touch on public.offers;
+create trigger offers_touch
+  before update on public.offers
+  for each row execute function public.tg_offers_touch();
 
 create or replace function public.tg_on_trade_change()
 returns trigger

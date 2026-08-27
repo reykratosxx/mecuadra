@@ -5,7 +5,7 @@ import { TRANSPORT_LABEL } from "@/lib/cuba";
 import { categoryLabel } from "@/lib/categories";
 import type { Offer } from "@/lib/types";
 import { useStore } from "@/lib/store";
-import { timeAgo } from "@/lib/utils";
+import { formatDateTime, timeAgo, wasEdited } from "@/lib/utils";
 import { Avatar, Badge, Stars } from "./ui";
 import { IconArrows, IconPin, IconShield, IconTruck } from "./icons";
 import { buildOfferShare } from "@/lib/share";
@@ -15,6 +15,7 @@ export function OfferCard({ offer }: { offer: Offer }) {
   const owner = users.find((u) => u.id === offer.userId);
   const offered = items.filter((i) => offer.itemIds.includes(i.id));
   const cover = offered[0]?.photos[0] ?? "/logo.png";
+  const edited = wasEdited(offer.createdAt, offer.updatedAt);
 
   return (
     <article className="card group overflow-hidden transition hover:border-brand/25 hover:shadow-md hover:shadow-brand/5">
@@ -47,7 +48,14 @@ export function OfferCard({ offer }: { offer: Offer }) {
                 <span className="hidden sm:inline">{owner ? <Stars value={owner.ratingAvg} count={owner.ratingCount} /> : null}</span>
               </div>
             </div>
-            <span className="shrink-0 text-[10px] text-mute sm:text-[11px]">{timeAgo(offer.createdAt)}</span>
+            <div className="shrink-0 text-right text-[10px] leading-tight text-mute sm:text-[11px]">
+              <p title={formatDateTime(offer.createdAt)}>{timeAgo(offer.createdAt)}</p>
+              {edited ? (
+                <p className="text-brand/80" title={formatDateTime(offer.updatedAt || offer.createdAt)}>
+                  Editada {timeAgo(offer.updatedAt || offer.createdAt)}
+                </p>
+              ) : null}
+            </div>
           </div>
 
           <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1 sm:gap-2">

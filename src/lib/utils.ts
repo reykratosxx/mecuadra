@@ -26,6 +26,23 @@ export function timeAgo(iso: string) {
   });
 }
 
+/** Fecha y hora legibles (es-CU). */
+export function formatDateTime(iso: string) {
+  return new Date(iso).toLocaleString("es-CU", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+/** true si hubo edición real (más de ~1 min tras crear). */
+export function wasEdited(createdAt: string, updatedAt?: string | null) {
+  if (!updatedAt) return false;
+  return new Date(updatedAt).getTime() - new Date(createdAt).getTime() > 60_000;
+}
+
 export function initials(name: string) {
   return name
     .split(" ")

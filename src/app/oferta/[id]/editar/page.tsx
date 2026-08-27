@@ -1,0 +1,270 @@
+"use client";
+
+import { use, useEffect, useMemo, useState } from "react";
+import { useRouter, notFound } from "next/navigation";
+import Link from "next/link";
+import { CATEGORIES } from "@/lib/categories";
+import { PROVINCES, TRANSPORT_LABEL, municipalitiesOf } from "@/lib/cuba";
+import { useStore } from "@/lib/store";
+import type { CategoryId, Transport, Want } from "@/lib/types";
+import { RequireAuth } from "@/components/ui";
+
+export default function EditarOfertaPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = use(params);
+  return (
+    <RequireAuth>
+      <Form id={id} />
+    </RequireAuth>
+  );
+}
+
+function Form({ id }: { id: string }) {
+  const router = useRouter();
+  const { currentUser, items, offers, updateOffer, ready } = useStore();
+  const offer = offers.find((o) => o.id === id);
+
+  const mine = items.filter(
+    (i) =>
+      i.userId === currentUser?.id &&
+      (i.status === "activo" || offer?.itemIds.includes(i.id)),
+  );
+
+  const [selected, setSelected] = useState<string[]>([]);
+  const [wantTitle, setWantTitle] = useState("");
+  const [wantCat, setWantCat] = useState<CategoryId | "abierto">("abierto");
+  const [wants, setWants] = useState<Want[]>([]);
+  const [openToProposals, setOpenToProposals] = useState(true);
+  const [message, setMessage] = useState("");
+  const [province, setProvince] = useState("La Habana");
+  const [municipality, setMunicipality] = useState("Plaza de la Revolución");
+  const [neighborhood, setNeighborhood] = useState("");
+  const [transport, setTransport] = useState<Transport>("sin");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [hydrated, setHydrated] = useState(false);
+  const munis = useMemo(() => municipalitiesOf(province), [province]);
+
+  useEffect(() => {
+    if (!offer || hydrated) return;
+    setSelected(offer.itemIds);
+    setWants(offer.wants.length ? offer.wants : [{ title: "Escucho propuestas", category: "abierto" }]);
+    setOpenToProposals(offer.openToProposals);
+    setMessage(offer.message);
+    setProvince(offer.province);
+    setMunicipality(offer.municipality);
+    setNeighborhood(offer.neighborhood);
+    setTransport(offer.transport);
+    setHydrated(true);
+  }, [offer, hydrated]);
+
+  if (!ready) return <p className="py-10 text-center text-mute">Cargando…</p>;
+  if (!offer || offer.userId !== currentUser?.id) notFound();
+  if (offer.status === "cancelada" || offer.status === "completada") {
+    return (
+      <div className="mx-auto max-w-xl py-10 text-center">
+        <p className="font-display text-xl">Esta oferta ya no se puede editar.</p>
+        <Link href={`/oferta/${id}`} className="btn-primary mt-4 inline-flex">
+          Volver
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto max-w-xl">
+      <h1 className="font-display text-3xl">Editar oferta</h1>
+      <p className="mt-1 text-sm text-mute">
+        <Link href={`/oferta/${id}`} className="font-semibold text-brand">
+          ← Ver oferta
+        </Link>
+      </p>
+
+      <form
+        className="mt-6 space-y-4"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          if (!selected.length) return;
+          setBusy(true);
+          setError("");
+          try {
+            await updateOffer(id, {
+              itemIds: selected,
+              wants,
+              openToProposals,
+              message,
+              province,
+              municipality,
+              neighborhood,
+              transport,
+              status: offer.status === "pausada" ? "abierta" : offer.status,
+            });
+            router.push(`/oferta/${id}`);
+          } catch (err) {
+            setError(err instanceof Error ? err.message : "No se pudo guardar.");
+            setBusy(false);
+          }
+        }}
+      >
+        <fieldset>
+          <legend className="label">#cambio · artículos</legend>
+          <ul className="grid gap-2">
+            {mine.map((item) => {
+              const on = selected.includes(item.id);
+              return (
+                <li key={item.id}>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setSelected((s) => (on ? s.filter((x) => x !== item.id) : [...s, item.id]))
+                    }
+                    className={`flex w-full items-center gap-3 rounded-2xl border p-2 text-left ${
+                      on ? "border-brand bg-brand-50" : "border-line"
+                    }`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={item.photos[0] || "/logo.png"}
+                      alt=""
+                      className="h-14 w-14 rounded-xl object-cover"
+                    />
+                    <span>
+                      <span className="block font-medium">{item.title}</span>
+                      <span className="text-xs text-mute">{item.status}</span>
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </fieldset>
+
+        <fieldset>
+          <legend className="label">#necesito</legend>
+          <ul className="mb-2 flex flex-wrap gap-2">
+            {wants.map((w) => (
+              <li key={w.title} className="pill">
+                {w.title}
+                <button
+                  type="button"
+                  className="ml-1 text-mute"
+                  onClick={() => setWants((xs) => xs.filter((x) => x.title !== w.title))}
+                >
+                  ×
+                </button>
+              </li>
+            ))}
+          </ul>
+          <div className="flex gap-2">
+            <input
+              className="input"
+              placeholder="Ej: leche en polvo"
+              value={wantTitle}
+              onChange={(e) => setWantTitle(e.target.value)}
+            />
+            <select
+              className="input max-w-[40%]"
+              value={wantCat}
+              onChange={(e) => setWantCat(e.target.value as typeof wantCat)}
+            >
+              <option value="abierto">Abierto</option>
+              {CATEGORIES.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button
+            type="button"
+            className="btn-ghost mt-2"
+            onClick={() => {
+              if (!wantTitle.trim()) return;
+              setWants((xs) => [...xs, { title: wantTitle.trim(), category: wantCat }]);
+              setWantTitle("");
+            }}
+          >
+            Añadir necesidad
+          </button>
+          <label className="mt-3 flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={openToProposals}
+              onChange={(e) => setOpenToProposals(e.target.checked)}
+            />
+            Escucho propuestas
+          </label>
+        </fieldset>
+
+        <div>
+          <label className="label">Nota pública</label>
+          <textarea
+            className="input min-h-24"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <label className="label">Provincia</label>
+            <select
+              className="input"
+              value={province}
+              onChange={(e) => {
+                setProvince(e.target.value);
+                setMunicipality(municipalitiesOf(e.target.value)[0] ?? "");
+              }}
+            >
+              {Object.keys(PROVINCES).map((p) => (
+                <option key={p}>{p}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="label">Municipio</label>
+            <select
+              className="input"
+              value={municipality}
+              onChange={(e) => setMunicipality(e.target.value)}
+            >
+              {munis.map((m) => (
+                <option key={m}>{m}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div>
+          <label className="label">Barrio / zona</label>
+          <input
+            className="input"
+            value={neighborhood}
+            onChange={(e) => setNeighborhood(e.target.value)}
+          />
+        </div>
+        <div>
+          <label className="label">Transporte</label>
+          <select
+            className="input"
+            value={transport}
+            onChange={(e) => setTransport(e.target.value as Transport)}
+          >
+            {Object.entries(TRANSPORT_LABEL).map(([k, v]) => (
+              <option key={k} value={k}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {error ? <p className="text-sm text-rose-600">{error}</p> : null}
+        <button type="submit" className="btn-primary w-full" disabled={busy || !selected.length}>
+          {busy ? "Guardando…" : "Guardar cambios"}
+        </button>
+      </form>
+    </div>
+  );
+}

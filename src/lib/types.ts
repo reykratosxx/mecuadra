@@ -84,6 +84,8 @@ export type Offer = {
   featured: boolean;
   views: number;
   createdAt: string;
+  /** Última edición; si falta, se trata como createdAt. */
+  updatedAt?: string;
 };
 
 export type Trade = {
