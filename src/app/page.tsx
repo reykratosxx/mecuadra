@@ -2,7 +2,15 @@
 
 import Link from "next/link";
 import { OfferCard } from "@/components/OfferCard";
-import { IconArrows, IconCheck, IconChat, IconShield, IconStar } from "@/components/icons";
+import {
+  IconArrows,
+  IconCheck,
+  IconChat,
+  IconShield,
+  IconStar,
+  IconTruck,
+  IconUser,
+} from "@/components/icons";
 import { useStore } from "@/lib/store";
 import { Logo } from "@/components/Logo";
 import { MeCuadraLabel } from "@/components/MeCuadraMark";
@@ -25,13 +33,42 @@ const steps = [
   },
 ];
 
+function formatCount(n: number) {
+  return new Intl.NumberFormat("es-CU").format(n);
+}
+
 export default function HomePage() {
-  const { offers } = useStore();
+  const { offers, users, ready } = useStore();
   const featured = offers.filter((o) => o.status === "abierta").slice(0, 6);
+  const openOffers = offers.filter((o) => o.status === "abierta").length;
+  const registered = users.length;
+  const withTransport = users.filter((u) => u.transport === "tengo").length;
+  const whoCome = users.filter((u) => u.transport === "voy").length;
+
+  const community = [
+    {
+      icon: IconUser,
+      value: ready ? formatCount(registered) : "—",
+      label: registered === 1 ? "persona registrada" : "personas registradas",
+      hint: "Cuentas en MeCuadra",
+    },
+    {
+      icon: IconTruck,
+      value: ready ? formatCount(withTransport) : "—",
+      label: "con transporte",
+      hint: "Marcaron “tengo transporte” en su perfil",
+    },
+    {
+      icon: IconArrows,
+      value: ready ? formatCount(openOffers) : "—",
+      label: openOffers === 1 ? "oferta abierta" : "ofertas abiertas",
+      hint: "Trueques publicados ahora mismo",
+    },
+  ];
 
   return (
     <div className="-mx-4">
-      <section className="relative overflow-hidden px-4 pb-16 pt-8 md:pt-16">
+      <section className="relative overflow-hidden px-4 pb-12 pt-8 md:pb-16 md:pt-16">
         <div className="mx-auto grid max-w-6xl items-center gap-10 md:grid-cols-2">
           <div>
             <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1 text-xs font-semibold text-brand">
@@ -56,18 +93,6 @@ export default function HomePage() {
                 Publicar un trueque
               </Link>
             </div>
-            <dl className="mt-8 grid max-w-md grid-cols-3 gap-3 sm:mt-10 sm:gap-4">
-              {[
-                ["Solo trueque", "Cero efectivo en listados"],
-                ["Municipio", "Nunca un GPS que bloquee"],
-                ["Reputación", "La garantía del encuentro"],
-              ].map(([k, v]) => (
-                <div key={k}>
-                  <dt className="font-display text-sm font-semibold">{k}</dt>
-                  <dd className="text-xs text-mute">{v}</dd>
-                </div>
-              ))}
-            </dl>
           </div>
           <div className="relative">
             <div className="absolute -inset-6 rounded-[2.5rem] bg-[image:var(--grad)] opacity-20 blur-2xl" />
@@ -102,7 +127,44 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-y border-line bg-white px-4 py-14">
+      <section className="border-y border-line bg-white px-4 py-10">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-6 max-w-2xl">
+            <h2 className="font-display text-2xl sm:text-3xl">La comunidad, en números</h2>
+            <p className="mt-2 text-sm text-mute sm:text-base">
+              Datos públicos para que sepas con quién truequeas: cuántas personas hay y cuántas
+              pueden moverse.
+              {whoCome > 0
+                ? ` Además, ${formatCount(whoCome)} ${whoCome === 1 ? "persona marcó" : "personas marcaron"} “voy al lugar”.`
+                : ""}
+            </p>
+          </div>
+          <dl className="grid gap-3 sm:grid-cols-3">
+            {community.map((s) => (
+              <div
+                key={s.label}
+                className="rounded-[1.35rem] border border-line bg-[radial-gradient(120%_80%_at_0%_0%,rgba(124,58,237,0.08),transparent_55%)] p-5"
+              >
+                <s.icon className="h-5 w-5 text-brand" aria-hidden />
+                <dt className="mt-3 font-display text-3xl font-semibold tracking-tight text-ink tabular-nums sm:text-4xl">
+                  {s.value}
+                </dt>
+                <dd className="mt-1 text-sm font-semibold text-ink">{s.label}</dd>
+                <p className="mt-1 text-xs text-mute">{s.hint}</p>
+              </div>
+            ))}
+          </dl>
+          <p className="mt-4 text-xs text-mute">
+            Configura tu transporte en{" "}
+            <Link href="/perfil" className="font-semibold text-brand">
+              tu perfil
+            </Link>{" "}
+            para que la comunidad sepa si puedes ir o si hay que venir a ti.
+          </p>
+        </div>
+      </section>
+
+      <section className="px-4 py-14">
         <div className="mx-auto max-w-6xl">
           <h2 className="font-display text-3xl">Tres pasos para cerrar el trueque</h2>
           <p className="mt-2 max-w-2xl text-mute">
@@ -126,7 +188,9 @@ export default function HomePage() {
           <div className="mb-6 flex items-end justify-between">
             <div>
               <h2 className="font-display text-2xl sm:text-3xl">Mercado P2P</h2>
-              <p className="text-sm text-mute sm:text-base">Ofertas abiertas · #cambio / #necesito / municipio</p>
+              <p className="text-sm text-mute sm:text-base">
+                Ofertas abiertas · #cambio / #necesito / municipio
+              </p>
             </div>
             <Link href="/explorar" className="text-sm font-semibold text-brand">
               Ver todas
@@ -172,9 +236,7 @@ export default function HomePage() {
         >
           <div>
             <p className="font-display text-2xl">¿Tienes algo que ya no usas?</p>
-            <p className="mt-1 text-white/85">
-              Alguien en tu municipio lo está buscando hoy.
-            </p>
+            <p className="mt-1 text-white/85">Alguien en tu municipio lo está buscando hoy.</p>
           </div>
           <Link
             href="/publicar"
