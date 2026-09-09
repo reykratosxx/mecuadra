@@ -10,6 +10,11 @@ import {
 } from "react";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { mapItem, mapNotif, mapOffer, mapRating, mapTrade, mapUser } from "@/lib/mappers";
+import { encryptNip44, decryptNip44, isNip44Payload } from "@/lib/nostr/nip44";
+import { publishOfferToRelays } from "@/lib/nostr/relays";
+import { hasPublishStamp } from "@/lib/cashu/antispam";
+import { issueAttestation } from "@/lib/zk/reputation";
+import { loadIdentity } from "@/lib/nostr/keys";
 import type { CategoryGroupId } from "@/lib/categories";
 import type {
   AppState,
@@ -110,8 +115,32 @@ const defaultFilters: Filters = {
 const Ctx = createContext<Store | null>(null);
 
 function requireSession(userId: string | null): string | null {
-  if (!userId) return "Entra con Telegram para publicar o aplicar.";
+  if (!userId) return "Sign in with a Bitcoin key to publish or apply.";
   return null;
+}
+
+function otherPubkey(users: User[], trade: Trade, me: string) {
+  const oid = trade.ownerId === me ? trade.applicantId : trade.ownerId;
+  return users.find((u) => u.id === oid)?.pubkeyHex || "";
+}
+
+function decryptThread(messages: ChatMessage[], users: User[], me: string, trade: Trade | undefined) {
+  if (!trade) return messages;
+  const their = otherPubkey(users, trade, me);
+  return messages.map((m) => {
+    if (m.text) return m;
+    const payload = m.ciphertext;
+    if (!payload) return m;
+    if (!isNip44Payload(payload) && payload.startsWith("v1.")) {
+      return { ...m, text: "[legacy ciphertext]" };
+    }
+    if (!their) return { ...m, text: "[encrypted]" };
+    try {
+      return { ...m, text: decryptNip44(payload, their) };
+    } catch {
+      return { ...m, text: "[undecipherable]" };
+    }
+  });
 }
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
@@ -194,13 +223,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const res = await fetch(`/api/trades/${tradeId}/messages`);
     if (!res.ok) return;
     const json = (await res.json()) as { messages: ChatMessage[] };
-    setState((s) => ({
-      ...s,
-      messages: [
-        ...s.messages.filter((m) => m.tradeId !== tradeId),
-        ...json.messages,
-      ],
-    }));
+    setState((s) => {
+      const trade = s.trades.find((t) => t.id === tradeId);
+      const decrypted = decryptThread(json.messages, s.users, s.currentUserId || "", trade);
+      return {
+        ...s,
+        messages: [...s.messages.filter((m) => m.tradeId !== tradeId), ...decrypted],
+      };
+    });
   }, []);
 
   const value: Store = {
@@ -238,7 +268,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     createItem: async (input) => {
       const gate = requireSession(state.currentUserId);
       if (gate) throw new Error(gate);
-      if (!state.currentUserId) throw new Error("Entra con Telegram");
+      if (!state.currentUserId) throw new Error("Sign in with a Bitcoin key");
       const { data, error } = await createClient()
         .from("items")
         .insert({
@@ -271,7 +301,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     createOffer: async (input) => {
       const gate = requireSession(state.currentUserId);
       if (gate) throw new Error(gate);
-      if (!state.currentUserId) throw new Error("Entra con Telegram");
+      if (!state.currentUserId) throw new Error("Sign in with a Bitcoin key");
+      if (!hasPublishStamp()) {
+        throw new Error("Mint a Cashu anti-spam token before publishing.");
+      }
       const { data, error } = await createClient()
         .from("offers")
         .insert({
@@ -289,6 +322,21 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         .single();
       if (error) throw error;
       const offer = mapOffer(data);
+      const offered = state.items.filter((i) => offer.itemIds.includes(i.id));
+      try {
+        const eventId = await publishOfferToRelays({
+          id: offer.id,
+          title: offered.map((i) => i.title).join(" · ") || "swap",
+          wants: offer.wants.map((w) => w.title).join(" · "),
+          country: offer.province,
+          city: offer.municipality,
+          authorHint: (loadIdentity()?.pubkey || "anon").slice(0, 8),
+        });
+        await createClient().from("offers").update({ nostr_event_id: eventId }).eq("id", offer.id);
+        offer.nostrEventId = eventId;
+      } catch {
+        /* relays optional */
+      }
       setState((s) => ({ ...s, offers: [offer, ...s.offers] }));
       return offer;
     },
@@ -310,7 +358,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     applyToOffer: async (offerId, proposedItemIds, proposalNote) => {
       const gate = requireSession(state.currentUserId);
       if (gate) return { error: gate };
-      if (!state.currentUserId) return { error: "Entra con Telegram para aplicar." };
+      if (!state.currentUserId) return { error: "Sign in with a Bitcoin key to apply." };
       const offer = state.offers.find((o) => o.id === offerId);
       if (!offer) return { error: "La oferta ya no existe." };
       if (offer.userId === state.currentUserId) return { error: "No puedes aplicar a tu propia oferta." };
@@ -328,10 +376,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       if (error) return { error: error.message };
       const trade = mapTrade(data);
       if (proposalNote.trim()) {
+        const their = otherPubkey(state.users, trade, state.currentUserId);
+        const ciphertext = their ? encryptNip44(proposalNote, their) : proposalNote;
         await fetch(`/api/trades/${trade.id}/messages`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: proposalNote }),
+          body: JSON.stringify({ ciphertext, scheme: their ? "nip44" : "legacy" }),
         });
       }
       await refresh();
@@ -404,13 +454,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     },
     sendMessage: async (tradeId, text) => {
       if (!text.trim()) return;
+      const trade = state.trades.find((t) => t.id === tradeId);
+      const their = trade && state.currentUserId ? otherPubkey(state.users, trade, state.currentUserId) : "";
+      const ciphertext = their ? encryptNip44(text.trim(), their) : text.trim();
       const res = await fetch(`/api/trades/${tradeId}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ ciphertext, scheme: their ? "nip44" : "legacy" }),
       });
       if (!res.ok) return;
       const json = (await res.json()) as { message: ChatMessage };
+      json.message.text = text.trim();
       setState((s) => ({ ...s, messages: [...s.messages, json.message] }));
     },
     markNotificationsRead: async () => {
@@ -431,14 +485,33 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       if (!trade) return;
       const toId = state.currentUserId === trade.ownerId ? trade.applicantId : trade.ownerId;
       const supabase = createClient();
-      await supabase.from("ratings").insert({
+      const me = state.users.find((u) => u.id === state.currentUserId);
+      const them = state.users.find((u) => u.id === toId);
+      const id = loadIdentity();
+      const attestation =
+        id && me?.pubkeyHex && them?.pubkeyHex
+          ? issueAttestation({
+              secretKey: id.secretKey,
+              tradeId,
+              stars,
+              fromPubkey: me.pubkeyHex,
+              toPubkey: them.pubkeyHex,
+            })
+          : null;
+      const row: Record<string, unknown> = {
         trade_id: tradeId,
         from_id: state.currentUserId,
         to_id: toId,
         stars,
         comment,
         tags,
-      });
+      };
+      if (attestation) row.attestation = attestation;
+      const { error } = await supabase.from("ratings").insert(row);
+      if (error && attestation) {
+        delete row.attestation;
+        await supabase.from("ratings").insert(row);
+      }
       const field = trade.ownerId === state.currentUserId ? "owner_rated" : "applicant_rated";
       await supabase.from("trades").update({ [field]: true }).eq("id", tradeId);
       const list = [...state.ratings.filter((r) => r.toId === toId), { stars, toId } as { stars: number; toId: string }];

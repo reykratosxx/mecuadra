@@ -40,4 +40,12 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# circom / BitVM proving artifacts
+/circuits/circomlib/
+/circuits/build/
+*.ptau
+*.zkey
+*.wtns
+
+
 .vercel

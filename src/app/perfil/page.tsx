@@ -5,12 +5,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/lib/store";
 import { Avatar, Badge, RequireAuth, Stars } from "@/components/ui";
-import { PROVINCES, TRANSPORT_LABEL, municipalitiesOf } from "@/lib/cuba";
-import { IconCamera, IconPin, IconShield, IconTruck } from "@/components/icons";
+import { COUNTRIES, citiesOf } from "@/lib/geo";
+import { IconCamera, IconLock, IconPin, IconShield, IconTruck } from "@/components/icons";
 import { OfferCard } from "@/components/OfferCard";
 import { LogoutModal } from "@/components/LogoutModal";
 import { uploadDataUrl } from "@/lib/upload";
 import type { Transport } from "@/lib/types";
+import { useT } from "@/lib/i18n/provider";
+import { loadIdentity } from "@/lib/nostr/keys";
+import { silentPaymentCode } from "@/lib/silent-payments";
+import { proveReputation, loadStoredProof, verifyReputationProof, issueAttestation, loadAttestations } from "@/lib/zk/reputation";
 
 export default function PerfilPage() {
   return (
@@ -21,6 +25,7 @@ export default function PerfilPage() {
 }
 
 function Me() {
+  const t = useT();
   const router = useRouter();
   const { currentUser, updateProfile, logout, offers, items } = useStore();
   const u = currentUser!;
@@ -39,7 +44,7 @@ function Me() {
   const [neighborhood, setNeighborhood] = useState(u.neighborhood);
   const [transport, setTransport] = useState<Transport>(u.transport);
 
-  const munis = useMemo(() => municipalitiesOf(province), [province]);
+  const munis = useMemo(() => citiesOf(province), [province]);
 
   /** El formulario solo existe en modo edición, así que se siembra al abrirlo. */
   function startEdit() {
@@ -129,8 +134,30 @@ function Me() {
             <Stars value={u.ratingAvg} count={u.ratingCount} size="md" />
           </div>
         </div>
-        <p className="mt-3 text-sm text-mute">{u.tradesCompleted} trueques completados</p>
+        <p className="mt-3 text-sm text-mute">{u.tradesCompleted} {t.nav.trades}</p>
       </div>
+
+      <section className="card space-y-3 p-5">
+        <h2 className="font-display text-lg">{t.profile.npub}</h2>
+        <p className="break-all font-mono text-xs text-ink">
+          {u.npub || loadIdentity()?.npub || "—"}
+        </p>
+        <p className="text-xs text-mute">{t.profile.hideNpub}</p>
+        <p className="text-xs font-semibold uppercase tracking-wider text-mute">{t.profile.sp}</p>
+        <p className="break-all font-mono text-[11px] text-ink">
+          {u.silentPaymentCode ||
+            (loadIdentity() ? silentPaymentCode(loadIdentity()!.secretKey) : "—")}
+        </p>
+        <p className="text-xs text-mute">{t.profile.spHint}</p>
+        <div className="rounded-2xl border border-line bg-surface-2 p-3">
+          <p className="flex items-center gap-2 text-sm font-semibold">
+            <IconLock className="h-4 w-4 text-brand" />
+            {t.profile.zkTitle}
+          </p>
+          <p className="mt-1 text-xs text-mute">{t.profile.zkHint}</p>
+          <ZkProveButton />
+        </div>
+      </section>
 
       <section className="card p-5">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
@@ -171,7 +198,7 @@ function Me() {
               <dt className="text-xs font-semibold uppercase tracking-wider text-mute">Transporte</dt>
               <dd className="mt-0.5 flex items-center gap-1.5 text-ink">
                 <IconTruck className="h-4 w-4 shrink-0 text-brand" />
-                {TRANSPORT_LABEL[u.transport] ?? u.transport}
+                {t.transport[u.transport as keyof typeof t.transport] ?? u.transport}
               </dd>
             </div>
           </dl>
@@ -197,22 +224,22 @@ function Me() {
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
-                <label className="label">Provincia</label>
+                <label className="label">{t.profile.country}</label>
                 <select
                   className="input"
                   value={province}
                   onChange={(e) => {
                     setProvince(e.target.value);
-                    setMunicipality(municipalitiesOf(e.target.value)[0] ?? "");
+                    setMunicipality(citiesOf(e.target.value)[0] ?? "");
                   }}
                 >
-                  {Object.keys(PROVINCES).map((p) => (
+                  {Object.keys(COUNTRIES).map((p) => (
                     <option key={p}>{p}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="label">Municipio</label>
+                <label className="label">{t.profile.city}</label>
                 <select
                   className="input"
                   value={municipality}
@@ -225,24 +252,23 @@ function Me() {
               </div>
             </div>
             <div>
-              <label className="label">Barrio</label>
+              <label className="label">{t.publish.neighborhood}</label>
               <input
                 className="input"
                 value={neighborhood}
                 onChange={(e) => setNeighborhood(e.target.value)}
-                placeholder="Vedado, La Víbora…"
               />
             </div>
             <div>
-              <label className="label">Transporte</label>
+              <label className="label">{t.explore.transport}</label>
               <select
                 className="input"
                 value={transport}
                 onChange={(e) => setTransport(e.target.value as Transport)}
               >
-                {Object.entries(TRANSPORT_LABEL).map(([k, v]) => (
+                {(["tengo", "sin", "voy"] as const).map((k) => (
                   <option key={k} value={k}>
-                    {v}
+                    {t.transport[k]}
                   </option>
                 ))}
               </select>
@@ -304,6 +330,54 @@ function Me() {
           }}
         />
       ) : null}
+    </div>
+  );
+}
+
+function ZkProveButton() {
+  const t = useT();
+  const [msg, setMsg] = useState("");
+  const [ok, setOk] = useState(() => {
+    const p = loadStoredProof();
+    return Boolean(p && verifyReputationProof(p));
+  });
+  return (
+    <div className="mt-3">
+      <button
+        type="button"
+        className="btn-primary h-9 px-3 text-sm"
+        onClick={() => {
+          try {
+            const id = loadIdentity();
+            if (!id) {
+              setMsg(t.auth.error);
+              return;
+            }
+            if (loadAttestations().filter((a) => a.toPubkey === id.pubkey).length < 1) {
+              issueAttestation({
+                secretKey: id.secretKey,
+                tradeId: "demo-self",
+                stars: 5,
+                fromPubkey: id.pubkey,
+                toPubkey: id.pubkey,
+              });
+            }
+            const proof = proveReputation(id.secretKey, id.pubkey);
+            void fetch("/api/zk/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(proof),
+            });
+            setOk(true);
+            setMsg(t.zk.ok);
+          } catch {
+            setMsg(t.zk.fail);
+          }
+        }}
+      >
+        {ok ? t.profile.zkVerified : t.profile.zkProve}
+      </button>
+      {msg ? <p className="mt-2 text-xs text-mute">{msg}</p> : null}
     </div>
   );
 }

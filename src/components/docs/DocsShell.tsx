@@ -10,6 +10,7 @@ import { DocsSearch } from "./DocsSearch";
 import { DocsHotkeys } from "./DocsHotkeys";
 import { DocsPager } from "./DocsPager";
 import { useState } from "react";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
 export function DocsShell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
@@ -24,22 +25,25 @@ export function DocsShell({ children }: { children: React.ReactNode }) {
           <span className="hidden rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-brand sm:inline">
             Docs
           </span>
-          <button
-            type="button"
-            data-docs-search
-            className="ml-auto flex h-9 items-center gap-2 rounded-full border border-line bg-surface px-3 text-sm text-mute"
-            onClick={() => setOpen(true)}
-          >
-            <IconSearch className="h-4 w-4" />
-            <span className="hidden sm:inline">Buscar en las docs</span>
-            <kbd className="hidden rounded-md border border-line px-1.5 text-[10px] sm:inline">⌘K</kbd>
-          </button>
-          <button type="button" className="docs-menu-btn lg:hidden" onClick={() => setMenu((v) => !v)}>
-            Índice
-          </button>
-          <Link href="/explorar" className="hidden text-sm font-semibold text-brand sm:inline">
-            Ir al mercado
-          </Link>
+          <div className="ml-auto flex items-center gap-2">
+            <LanguageToggle />
+            <button
+              type="button"
+              data-docs-search
+              className="flex h-9 items-center gap-2 rounded-full border border-line bg-surface px-3 text-sm text-mute"
+              onClick={() => setOpen(true)}
+            >
+              <IconSearch className="h-4 w-4" />
+              <span className="hidden sm:inline">Search docs</span>
+              <kbd className="hidden rounded-md border border-line px-1.5 text-[10px] sm:inline">⌘K</kbd>
+            </button>
+            <button type="button" className="docs-menu-btn lg:hidden" onClick={() => setMenu((v) => !v)}>
+              Index
+            </button>
+            <Link href="/explorar" className="hidden text-sm font-semibold text-brand sm:inline">
+              Market
+            </Link>
+          </div>
         </div>
       </header>
 

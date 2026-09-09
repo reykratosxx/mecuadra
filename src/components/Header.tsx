@@ -6,22 +6,25 @@ import { Logo } from "./Logo";
 import { IconBell, IconPlus } from "./icons";
 import { Avatar } from "./ui";
 import { ThemeToggle } from "./ThemeToggle";
+import { LanguageToggle } from "./LanguageToggle";
 import { useStore } from "@/lib/store";
+import { useT } from "@/lib/i18n/provider";
 import { cn } from "@/lib/utils";
-
-const links = [
-  { href: "/explorar", label: "Explorar" },
-  { href: "/trueques", label: "Trueques" },
-  { href: "/docs", label: "Docs" },
-];
 
 export function Header() {
   const path = usePathname();
+  const t = useT();
   const { currentUser, notifications, ready } = useStore();
   const unread =
     ready && currentUser
       ? notifications.filter((n) => n.userId === currentUser.id && !n.read).length
       : 0;
+
+  const links = [
+    { href: "/explorar", label: t.nav.explore },
+    { href: "/trueques", label: t.nav.trades },
+    { href: "/docs", label: t.nav.docs },
+  ];
 
   return (
     <header className="sticky top-0 z-40 border-b border-line/80 bg-surface/90 backdrop-blur-xl">
@@ -55,7 +58,7 @@ export function Header() {
             <Link
               href="/notificaciones"
               className="relative grid h-8 w-8 place-items-center rounded-full text-mute hover:bg-hover sm:h-9 sm:w-9"
-              aria-label="Notificaciones"
+              aria-label={t.nav.notifications}
             >
               <IconBell className="h-5 w-5" />
               {unread > 0 ? (
@@ -66,6 +69,7 @@ export function Header() {
             </Link>
           ) : null}
 
+          <LanguageToggle />
           <ThemeToggle />
 
           <Link
@@ -73,11 +77,11 @@ export function Header() {
             className="btn-primary hidden h-9 gap-1 px-3 text-sm md:inline-flex"
           >
             <IconPlus className="h-4 w-4" />
-            Publicar
+            {t.nav.publish}
           </Link>
 
           {currentUser ? (
-            <Link href="/perfil" className="rounded-full p-0.5 hover:bg-hover" aria-label="Perfil">
+            <Link href="/perfil" className="rounded-full p-0.5 hover:bg-hover" aria-label={t.nav.profile}>
               <Avatar src={currentUser.avatar} name={currentUser.name} size={32} />
             </Link>
           ) : (
@@ -85,7 +89,7 @@ export function Header() {
               href="/login"
               className="inline-flex h-9 items-center rounded-full border border-line bg-surface px-3 text-sm font-semibold text-ink hover:bg-brand-50"
             >
-              Entrar
+              {t.nav.login}
             </Link>
           )}
         </div>

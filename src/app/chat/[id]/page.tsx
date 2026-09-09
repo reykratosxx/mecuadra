@@ -8,6 +8,8 @@ import { Avatar, RequireAuth } from "@/components/ui";
 import { IconChevron, IconSend } from "@/components/icons";
 import { ProfilePeek } from "@/components/ProfilePeek";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import { useT } from "@/lib/i18n/provider";
+import { IconLock } from "@/components/icons";
 
 export default function ChatPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -19,6 +21,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
 }
 
 function Thread({ id }: { id: string }) {
+  const t = useT();
   const {
     currentUser,
     trades,
@@ -71,7 +74,7 @@ function Thread({ id }: { id: string }) {
     };
   }, [id, loadMessages]);
 
-  if (!ready) return <div className="py-16 text-center text-mute">Cargando chat…</div>;
+  if (!ready) return <div className="py-16 text-center text-mute">{t.chat.loading}</div>;
   if (!trade) notFound();
   const uid = currentUser!.id;
   if (trade.ownerId !== uid && trade.applicantId !== uid) notFound();
@@ -106,6 +109,11 @@ function Thread({ id }: { id: string }) {
           </div>
         </button>
       </div>
+
+      <p className="mb-3 flex items-center gap-2 rounded-2xl border border-brand/20 bg-brand-50 px-3 py-2 text-xs text-ink">
+        <IconLock className="h-4 w-4 shrink-0 text-brand" />
+        {t.chat.e2ee}
+      </p>
 
       {showPeek && other ? <ProfilePeek user={other} onClose={() => setShowPeek(false)} /> : null}
 

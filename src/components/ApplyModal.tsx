@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useStore } from "@/lib/store";
 import { IconX } from "./icons";
 import { MeCuadraLabel, MeCuadraMark } from "./MeCuadraMark";
+import { useT } from "@/lib/i18n/provider";
 
 export function ApplyModal({
   offerId,
@@ -13,6 +14,7 @@ export function ApplyModal({
   offerId: string;
   onClose: () => void;
 }) {
+  const t = useT();
   const router = useRouter();
   const { currentUser, items, applyToOffer, offers } = useStore();
   const offer = offers.find((o) => o.id === offerId);
@@ -29,10 +31,10 @@ export function ApplyModal({
     return (
       <div className="fixed inset-0 z-[80] grid place-items-center bg-brand/20 p-4">
         <div className="card max-w-sm p-6 text-center">
-          <p className="font-display text-lg">Entra con Telegram para aplicar</p>
-          <p className="mt-1 text-sm text-mute">El mercado se ve sin cuenta. Para tocar MeCuadra, usa Telegram.</p>
+          <p className="font-display text-lg">{t.auth.needAuth}</p>
+          <p className="mt-1 text-sm text-mute">{t.auth.needAuthHint}</p>
           <a href={`/login?next=/oferta/${offerId}`} className="btn-primary mt-4">
-            Entrar con Telegram
+            {t.auth.needAuthCta}
           </a>
           <button type="button" className="btn-ghost mt-2 w-full" onClick={onClose}>
             Cerrar

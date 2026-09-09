@@ -1,0 +1,8 @@
+{
+  "identitySecret": "1",
+  "stars": ["5", "4", "5", "3"],
+  "fromPkHash": ["11", "22", "33", "44"],
+  "tradeNonce": ["101", "102", "103", "104"],
+  "threshold": "1",
+  "minRatingX10": "30"
+}

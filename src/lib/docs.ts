@@ -22,7 +22,8 @@ export const DOC_GROUPS: { title: string; items: DocLink[] }[] = [
     title: "Construir",
     items: [
       { href: "/docs/api", title: "API", hint: "Auth, mensajes, tiempo real" },
-      { href: "/docs/seguridad", title: "Seguridad", hint: "RLS, cifrado, Telegram" },
+      { href: "/docs/seguridad", title: "Seguridad", hint: "RLS, NIP-44, ZK" },
+      { href: "/docs/cypherpunk", title: "Cypherpunk", hint: "BOSS Battle architecture" },
       { href: "/docs/desplegar", title: "Desplegar", hint: "Supabase, Vercel, variables" },
     ],
   },

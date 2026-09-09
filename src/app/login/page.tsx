@@ -6,8 +6,11 @@ import Link from "next/link";
 import Script from "next/script";
 import { Logo } from "@/components/Logo";
 import { TelegramLoginButton } from "@/components/TelegramLoginButton";
+import { NostrLogin } from "@/components/NostrLogin";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 import { useStore } from "@/lib/store";
+import { useT } from "@/lib/i18n/provider";
 
 type TelegramWebApp = {
   initData?: string;
@@ -26,12 +29,14 @@ const botUsername = (
 ).replace(/^@/, "");
 
 export default function LoginPage() {
+  const t = useT();
   return (
     <div className="mx-auto max-w-md py-10">
-      <div className="mb-6 flex justify-center">
+      <div className="mb-4 flex items-center justify-center gap-3">
         <Logo withWord size={56} />
+        <LanguageToggle />
       </div>
-      <Suspense fallback={<div className="card p-6 text-sm text-mute">Cargando…</div>}>
+      <Suspense fallback={<div className="card p-6 text-sm text-mute">{t.auth.loading}</div>}>
         <AuthCard />
       </Suspense>
     </div>
@@ -57,6 +62,7 @@ async function requestBotSession(): Promise<BotSession | { error: string }> {
 }
 
 function AuthCard() {
+  const t = useT();
   const router = useRouter();
   const params = useSearchParams();
   const { currentUser, refresh } = useStore();
@@ -267,10 +273,8 @@ function AuthCard() {
   if (!isSupabaseConfigured()) {
     return (
       <div className="card p-6">
-        <h1 className="font-display text-2xl">Falta configurar Supabase</h1>
-        <p className="mt-2 text-sm text-mute">
-          Añade las claves en Vercel y en <code>.env.local</code>.
-        </p>
+        <h1 className="font-display text-2xl">{t.auth.missingSb}</h1>
+        <p className="mt-2 text-sm text-mute">{t.auth.missingSbHint}</p>
       </div>
     );
   }
@@ -284,21 +288,29 @@ function AuthCard() {
         strategy="afterInteractive"
         onReady={onTelegramSdkReady}
       />
-      <div className="overflow-hidden rounded-t-[1.35rem] bg-[linear-gradient(135deg,#229ED9_0%,#7c3aed_100%)] px-6 py-8 text-white">
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/80">MeCuadra</p>
-        <h1 className="mt-2 font-display text-3xl leading-tight">Entra con Telegram</h1>
-        <p className="mt-2 text-sm text-white/90">
-          Telegram te pregunta si quieres iniciar sesión y tú tocas <strong>Sí</strong>. Sin SMS y
-          sin poner tu número.
-        </p>
+      <div className="overflow-hidden rounded-t-[1.35rem] bg-[linear-gradient(135deg,#0a0a0a_0%,#7c3aed_100%)] px-6 py-8 text-white">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/80">Cypherpunk</p>
+        <h1 className="mt-2 font-display text-3xl leading-tight">{t.auth.title}</h1>
+        <p className="mt-2 text-sm text-white/90">{t.auth.lead}</p>
       </div>
 
       <div className="space-y-5 overflow-visible p-5 sm:p-6">
+        <NostrLogin next={safeNext} />
+
+        <ul className="space-y-2 text-sm text-mute">
+          <li>· {t.auth.bullets1}</li>
+          <li>· {t.auth.bullets2}</li>
+          <li>· {t.auth.bullets3}</li>
+        </ul>
+
+        <details className="rounded-2xl border border-line bg-surface-2 px-4 py-3">
+          <summary className="cursor-pointer text-sm font-semibold text-ink">{t.auth.telegramOpt}</summary>
+          <p className="mt-2 text-xs leading-5 text-mute">{t.auth.telegramLead}</p>
         {working ? (
           <div className="flex flex-col items-center gap-3 py-6" role="status">
             <span className="h-9 w-9 animate-spin rounded-full border-[3px] border-brand/25 border-t-brand" />
             <p className="text-center text-sm font-medium text-ink">
-              {miniApp ? "Entrando con tu cuenta de Telegram…" : "Abriendo tu sesión…"}
+              {miniApp ? t.auth.signing : t.auth.signing}
             </p>
           </div>
         ) : (
@@ -308,7 +320,7 @@ function AuthCard() {
               target="_blank"
               rel="noopener noreferrer"
               aria-disabled={!session}
-              className={`btn-primary w-full py-3 text-base ${session ? "" : "pointer-events-none opacity-60"}`}
+              className={`btn-ghost w-full py-3 text-base ${session ? "" : "pointer-events-none opacity-60"}`}
               onClick={() => {
                 if (!session) return;
                 setError("");
@@ -316,95 +328,40 @@ function AuthCard() {
                 startPoll(session.token);
               }}
             >
-              {session ? "Continuar con Telegram" : "Preparando acceso…"}
+              {session ? "Telegram" : "…"}
             </a>
 
             {botPhase === "waiting" ? (
-              <div
-                className="flex flex-col items-center gap-2 rounded-2xl border border-brand/25 bg-brand-50 px-4 py-4"
-                role="status"
-              >
+              <div className="flex flex-col items-center gap-2 rounded-2xl border border-brand/25 bg-brand-50 px-4 py-4" role="status">
                 <span className="h-7 w-7 animate-spin rounded-full border-[3px] border-brand/30 border-t-brand" />
-                <p className="text-center text-sm font-semibold text-ink">
-                  Esperando tu confirmación en Telegram…
-                </p>
-                <p className="text-center text-xs leading-5 text-mute">
-                  En el chat de <span className="font-medium text-ink">@{botUsername}</span> toca{" "}
-                  <strong className="text-ink">Iniciar</strong> y luego{" "}
-                  <strong className="text-ink">✅ Sí, iniciar sesión</strong>. Esta pestaña se abre
-                  sola.
-                </p>
                 {session ? (
-                  <button
-                    type="button"
-                    className="text-xs font-medium text-brand underline"
-                    onClick={() => void finishWithToken(session.token)}
-                  >
-                    Ya confirmé, continuar
+                  <button type="button" className="text-xs font-medium text-brand underline" onClick={() => void finishWithToken(session.token)}>
+                    OK
                   </button>
                 ) : null}
-                <button
-                  type="button"
-                  className="text-xs text-mute underline"
-                  onClick={() => {
-                    stopPoll();
-                    setBotPhase("idle");
-                  }}
-                >
-                  Cancelar
-                </button>
               </div>
-            ) : (
-              <ol className="space-y-1.5 rounded-2xl border border-line bg-surface-2 px-4 py-3 text-xs leading-5 text-mute">
-                <li>1. Toca el botón: se abre el bot oficial de MeCuadra.</li>
-                <li>
-                  2. Pulsa <span className="font-medium text-ink">Iniciar</span>.
-                </li>
-                <li>
-                  3. Telegram te pregunta si quieres entrar → toca{" "}
-                  <span className="font-medium text-ink">Sí, iniciar sesión</span>.
-                </li>
-              </ol>
-            )}
+            ) : null}
 
             {error ? <p className="text-sm text-rose-600">{error}</p> : null}
 
-            <div className="border-t border-line pt-4">
-              {!showWidget ? (
-                <button
-                  type="button"
-                  className="w-full text-center text-sm font-medium text-brand"
-                  onClick={() => setShowWidget(true)}
-                >
-                  Otra opción: botón oficial de Telegram
-                </button>
-              ) : (
-                <div className="space-y-3">
-                  <p className="text-sm font-semibold text-ink">Botón oficial de Telegram</p>
-                  <p className="text-xs leading-5 text-mute">
-                    Este es el widget de <code>oauth.telegram.org</code>. En algunos móviles pide el
-                    número y la confirmación no llega — si te pasa, usa el botón de arriba.
-                  </p>
-                  <TelegramLoginButton
-                    botUsername={botUsername}
-                    onAuth={(u) => void onWidgetAuth(u)}
-                    onError={(msg) => setError(msg)}
-                  />
-                </div>
-              )}
-            </div>
+            {!showWidget ? (
+              <button type="button" className="w-full text-center text-sm font-medium text-brand" onClick={() => setShowWidget(true)}>
+                Telegram widget
+              </button>
+            ) : (
+              <TelegramLoginButton
+                botUsername={botUsername}
+                onAuth={(u) => void onWidgetAuth(u)}
+                onError={(msg) => setError(msg)}
+              />
+            )}
           </>
         )}
-
-        <ul className="space-y-2 text-sm text-mute">
-          <li>· Explorar ofertas: libre, sin registro.</li>
-          <li>· Publicar y aplicar: con Telegram.</li>
-          <li>· Sin Google, sin correo y <strong className="font-semibold text-ink">sin SMS</strong>.</li>
-        </ul>
+        </details>
 
         <p className="text-center text-sm">
           <Link href="/explorar" className="font-semibold text-brand">
-            Ver el mercado sin entrar
+            {t.auth.exploreAnon}
           </Link>
         </p>
       </div>

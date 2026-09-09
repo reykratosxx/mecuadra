@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { AppShell } from "@/components/AppShell";
 import { themeInitScript } from "@/lib/theme-script";
+import { localeInitScript } from "@/lib/i18n/script";
 
 const sans = Source_Sans_3({
   variable: "--font-body",
@@ -19,11 +20,11 @@ const display = Outfit({
 
 export const metadata: Metadata = {
   title: {
-    default: "MeCuadra · Trueque P2P en Cuba",
+    default: "MeCuadra · Private P2P barter",
     template: "%s · MeCuadra",
   },
   description:
-    "Mercado de intercambio entre personas. Publica lo que tienes, aplica a lo que necesitas y cierra el trueque con reputación y chat. Sin depósitos.",
+    "Global barter marketplace. Bitcoin/Nostr keys, NIP-44 chat, ZK reputation. No prices, no payment trail.",
   applicationName: "MeCuadra",
 };
 
@@ -39,12 +40,13 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="es-CU"
+      lang="en"
       className={`${sans.variable} ${display.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <script dangerouslySetInnerHTML={{ __html: localeInitScript }} />
       </head>
       <body className="flex min-h-full flex-col font-sans text-ink">
         <Providers>

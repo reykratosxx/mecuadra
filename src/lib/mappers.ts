@@ -31,6 +31,11 @@ type ProfileRow = {
   trades_completed: number;
   verified: boolean;
   created_at: string;
+  npub?: string | null;
+  pubkey_hex?: string | null;
+  silent_payment_code?: string | null;
+  zk_nullifier?: string | null;
+  zk_proof?: User["zkProof"];
 };
 
 type ItemRow = {
@@ -61,6 +66,7 @@ type OfferRow = {
   views: number;
   created_at: string;
   updated_at?: string | null;
+  nostr_event_id?: string | null;
 };
 
 type TradeRow = {
@@ -119,6 +125,11 @@ export function mapUser(row: ProfileRow, email = ""): User {
     tradesCompleted: row.trades_completed,
     verified: row.verified,
     createdAt: row.created_at,
+    npub: row.npub,
+    pubkeyHex: row.pubkey_hex,
+    silentPaymentCode: row.silent_payment_code,
+    zkNullifier: row.zk_nullifier,
+    zkProof: row.zk_proof,
   };
 }
 
@@ -156,6 +167,7 @@ export function mapOffer(row: OfferRow): Offer {
     views: row.views,
     createdAt: row.created_at,
     updatedAt: row.updated_at || row.created_at,
+    nostrEventId: row.nostr_event_id,
   };
 }
 

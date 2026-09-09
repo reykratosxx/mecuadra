@@ -2,6 +2,7 @@
 
 import { useStore } from "@/lib/store";
 import { cn, initials } from "@/lib/utils";
+import { useT } from "@/lib/i18n/provider";
 
 export function Stars({
   value,
@@ -97,15 +98,16 @@ export function Empty({
 
 export function RequireAuth({ children }: { children: React.ReactNode }) {
   const { currentUser, ready } = useStore();
-  if (!ready) return <p className="py-12 text-center text-sm text-mute">Cargando…</p>;
+  const t = useT();
+  if (!ready) return <p className="py-12 text-center text-sm text-mute">{t.auth.loading}</p>;
   if (!currentUser) {
     return (
       <Empty
-        title="Entra con Telegram para continuar"
-        hint="El mercado es libre. Publicar, aplicar y chatear piden tu cuenta de Telegram."
+        title={t.auth.needAuth}
+        hint={t.auth.needAuthHint}
         action={
           <a href="/login" className="btn-primary">
-            Entrar con Telegram
+            {t.auth.needAuthCta}
           </a>
         }
       />

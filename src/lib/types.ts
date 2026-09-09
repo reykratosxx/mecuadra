@@ -89,6 +89,15 @@ export type CategoryId =
   | "peliculas_libros"
   | "otros_general";
 
+export type ZkProofPublic = {
+  merkleRoot: string;
+  threshold: number;
+  minRatingX10: number;
+  nullifier: string;
+  count: number;
+  avgX10: number;
+};
+
 export type User = {
   id: string;
   username: string;
@@ -107,6 +116,11 @@ export type User = {
   tradesCompleted: number;
   verified: boolean;
   createdAt: string;
+  npub?: string | null;
+  pubkeyHex?: string | null;
+  silentPaymentCode?: string | null;
+  zkNullifier?: string | null;
+  zkProof?: { publicSignals?: ZkProofPublic } | null;
 };
 
 export type Item = {
@@ -144,6 +158,7 @@ export type Offer = {
   createdAt: string;
   /** Última edición; si falta, se trata como createdAt. */
   updatedAt?: string;
+  nostrEventId?: string | null;
 };
 
 export type Trade = {
@@ -168,6 +183,8 @@ export type ChatMessage = {
   senderId: string;
   text: string;
   createdAt: string;
+  scheme?: "nip44" | "legacy";
+  ciphertext?: string;
 };
 
 export type Notification = {

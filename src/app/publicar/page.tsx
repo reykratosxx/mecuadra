@@ -2,13 +2,15 @@
 
 import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { PROVINCES, TRANSPORT_LABEL, municipalitiesOf } from "@/lib/cuba";
+import { COUNTRIES, citiesOf } from "@/lib/geo";
 import { useStore } from "@/lib/store";
 import type { CategoryId, Transport, Want } from "@/lib/types";
 import { Empty, RequireAuth } from "@/components/ui";
 import Link from "next/link";
 import { CategorySelect } from "@/components/CategorySelect";
 import { cn, displayTitle } from "@/lib/utils";
+import { useT } from "@/lib/i18n/provider";
+import { hasPublishStamp, mintPublishStamp } from "@/lib/cashu/antispam";
 
 export default function PublicarPage() {
   return (
@@ -28,27 +30,29 @@ type FieldErrors = {
 };
 
 function Form() {
+  const t = useT();
   const router = useRouter();
   const { currentUser, items, createOffer, updateItem } = useStore();
   const mine = items.filter((i) => i.userId === currentUser?.id && i.status === "activo");
   const [selected, setSelected] = useState<string[]>([]);
   const [wantTitle, setWantTitle] = useState("");
   const [wantCat, setWantCat] = useState<CategoryId | "abierto">("abierto");
-  const [wants, setWants] = useState<Want[]>([{ title: "Escucho propuestas", category: "abierto" }]);
+  const [wants, setWants] = useState<Want[]>([{ title: "Open to proposals", category: "abierto" }]);
   const [openToProposals, setOpenToProposals] = useState(true);
   const [message, setMessage] = useState("");
-  const [province, setProvince] = useState(currentUser?.province ?? "La Habana");
-  const [municipality, setMunicipality] = useState(
-    currentUser?.municipality ?? "Plaza de la Revolución",
-  );
+  const [province, setProvince] = useState(currentUser?.province || "India");
+  const [municipality, setMunicipality] = useState(currentUser?.municipality || "Bengaluru");
   const [neighborhood, setNeighborhood] = useState(currentUser?.neighborhood ?? "");
   const [transport, setTransport] = useState<Transport>(currentUser?.transport ?? "sin");
   const [busyId, setBusyId] = useState<string | null>(null);
   const [publishing, setPublishing] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [cashuBusy, setCashuBusy] = useState(false);
+  const [cashuOk, setCashuOk] = useState(hasPublishStamp());
+  const [cashuMsg, setCashuMsg] = useState("");
   const itemsRef = useRef<HTMLFieldSetElement>(null);
   const wantsRef = useRef<HTMLFieldSetElement>(null);
-  const munis = useMemo(() => municipalitiesOf(province), [province]);
+  const munis = useMemo(() => citiesOf(province), [province]);
 
   async function removeItem(id: string) {
     if (!window.confirm("¿Eliminar este artículo? No aparecerá más en tus ofertas.")) return;
@@ -275,19 +279,42 @@ function Form() {
           />
         </div>
 
+        <div className="rounded-2xl border border-brand/20 bg-brand-50 p-4">
+          <p className="text-sm font-semibold text-ink">{t.publish.cashuTitle}</p>
+          <p className="mt-1 text-xs leading-5 text-mute">{t.publish.cashuHint}</p>
+          <button
+            type="button"
+            className="btn-ghost mt-3"
+            disabled={cashuBusy || cashuOk}
+            onClick={() => {
+              setCashuBusy(true);
+              void mintPublishStamp()
+                .then((s) => {
+                  setCashuOk(true);
+                  setCashuMsg(s.demo ? t.publish.cashuDemo : t.publish.cashuReady);
+                })
+                .catch((err: Error) => setCashuMsg(err.message))
+                .finally(() => setCashuBusy(false));
+            }}
+          >
+            {cashuBusy ? t.publish.cashuBusy : cashuOk ? t.publish.cashuReady : t.publish.cashuBtn}
+          </button>
+          {cashuMsg ? <p className="mt-2 text-xs text-mute">{cashuMsg}</p> : null}
+        </div>
+
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
-            <label className="label">Provincia</label>
+            <label className="label">{t.publish.country}</label>
             <select
               className={cn("input", errors.province ? "border-rose-400 ring-2 ring-rose-200" : "")}
               value={province}
               onChange={(e) => {
                 setProvince(e.target.value);
-                setMunicipality(municipalitiesOf(e.target.value)[0] ?? "");
+                setMunicipality(citiesOf(e.target.value)[0] ?? "");
                 setErrors((er) => ({ ...er, province: undefined, municipality: undefined }));
               }}
             >
-              {Object.keys(PROVINCES).map((p) => (
+              {Object.keys(COUNTRIES).map((p) => (
                 <option key={p}>{p}</option>
               ))}
             </select>
@@ -298,7 +325,7 @@ function Form() {
             ) : null}
           </div>
           <div>
-            <label className="label">Municipio</label>
+            <label className="label">{t.publish.city}</label>
             <select
               className={cn(
                 "input",
@@ -322,16 +349,17 @@ function Form() {
           </div>
         </div>
         <div>
-          <label className="label">Barrio / zona (no comuna)</label>
+          <label className="label">{t.publish.neighborhood}</label>
           <input
             className="input"
             value={neighborhood}
             onChange={(e) => setNeighborhood(e.target.value)}
-            placeholder="Vedado, La Víbora, Casino Deportivo…"
+            placeholder={t.publish.approx}
           />
+          <p className="mt-1 text-xs text-mute">{t.publish.approx}</p>
         </div>
         <div>
-          <label className="label">Transporte</label>
+          <label className="label">{t.explore.transport}</label>
           <select
             className={cn("input", errors.transport ? "border-rose-400 ring-2 ring-rose-200" : "")}
             value={transport}
@@ -340,9 +368,9 @@ function Form() {
               setErrors((er) => ({ ...er, transport: undefined }));
             }}
           >
-            {Object.entries(TRANSPORT_LABEL).map(([k, v]) => (
+            {(["tengo", "sin", "voy"] as const).map((k) => (
               <option key={k} value={k}>
-                {v}
+                {t.transport[k]}
               </option>
             ))}
           </select>

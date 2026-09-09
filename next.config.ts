@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  transpilePackages: ["nostr-tools", "@noble/curves", "@noble/hashes", "@scure/base"],
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },

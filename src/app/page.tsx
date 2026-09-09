@@ -14,55 +14,45 @@ import {
 import { useStore } from "@/lib/store";
 import { Logo } from "@/components/Logo";
 import { MeCuadraLabel } from "@/components/MeCuadraMark";
+import { useI18n } from "@/lib/i18n/provider";
 
-const steps = [
-  {
-    n: "01",
-    title: "Publica lo que tienes",
-    text: "Fotos, municipio y barrio. Sin GPS obligatorio. Pausas, editas o das de baja cuando quieras.",
-  },
-  {
-    n: "02",
-    title: "Alguien toca MeCuadra",
-    text: "Como aplicar a una oferta P2P: propone artículos o escribe lo que puede dar, aunque no esté publicado.",
-  },
-  {
-    n: "03",
-    title: "Chat, encuentro, confirmar",
-    text: "Coordinan el punto. Cada parte marca entregado. Luego se valoran. La reputación es la custodia.",
-  },
-];
-
-function formatCount(n: number) {
-  return new Intl.NumberFormat("es-CU").format(n);
+function formatCount(n: number, locale: string) {
+  return new Intl.NumberFormat(locale === "es" ? "es" : "en").format(n);
 }
 
 export default function HomePage() {
   const { offers, users, ready } = useStore();
+  const { t, locale } = useI18n();
   const featured = offers.filter((o) => o.status === "abierta").slice(0, 6);
   const openOffers = offers.filter((o) => o.status === "abierta").length;
   const registered = users.length;
   const withTransport = users.filter((u) => u.transport === "tengo").length;
   const whoCome = users.filter((u) => u.transport === "voy").length;
 
+  const steps = [
+    { n: "01", title: t.home.step1t, text: t.home.step1d },
+    { n: "02", title: t.home.step2t, text: t.home.step2d },
+    { n: "03", title: t.home.step3t, text: t.home.step3d },
+  ];
+
   const community = [
     {
       icon: IconUser,
-      value: ready ? formatCount(registered) : "—",
-      label: registered === 1 ? "persona registrada" : "personas registradas",
-      hint: "Cuentas en MeCuadra",
+      value: ready ? formatCount(registered, locale) : "—",
+      label: t.home.users,
+      hint: t.home.users,
     },
     {
       icon: IconTruck,
-      value: ready ? formatCount(withTransport) : "—",
-      label: "con transporte",
-      hint: "Marcaron “tengo transporte” en su perfil",
+      value: ready ? formatCount(withTransport, locale) : "—",
+      label: t.home.withTransport,
+      hint: t.home.withTransport,
     },
     {
       icon: IconArrows,
-      value: ready ? formatCount(openOffers) : "—",
-      label: openOffers === 1 ? "oferta abierta" : "ofertas abiertas",
-      hint: "Trueques publicados ahora mismo",
+      value: ready ? formatCount(openOffers, locale) : "—",
+      label: t.home.open,
+      hint: t.home.open,
     },
   ];
 
@@ -72,27 +62,21 @@ export default function HomePage() {
         <div className="mx-auto grid max-w-6xl items-center gap-10 md:grid-cols-2">
           <div>
             <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs font-semibold text-brand">
-              Mercado P2P de bienes · Cuba
+              {t.home.kicker}
             </p>
             <h1 className="font-display text-3xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-4xl md:text-6xl">
-              Si te cuadra,
-              <span className="block bg-[image:var(--grad)] bg-clip-text text-transparent">
-                se cierra el trueque.
-              </span>
+              {t.home.title}
             </h1>
-            <p className="mt-4 max-w-lg text-base leading-7 text-mute sm:mt-5 sm:text-lg">
-              El trueque que ya se hace en grupos, con fotos, municipio y reputación.
-              Publicas lo que tienes, aplicas a lo que necesitas y cierras el trato
-              en el chat. Sin ventas y sin pedir efectivo en el listado.
-            </p>
+            <p className="mt-4 max-w-lg text-base leading-7 text-mute sm:mt-5 sm:text-lg">{t.home.lead}</p>
             <div className="mt-6 flex flex-wrap gap-3 sm:mt-7">
               <Link href="/explorar" className="btn-primary">
-                Explorar ofertas
+                {t.home.ctaExplore}
               </Link>
-              <Link href="/publicar" className="btn-ghost">
-                Publicar un trueque
+              <Link href="/login" className="btn-ghost">
+                {t.home.ctaLogin}
               </Link>
             </div>
+            <p className="mt-4 max-w-lg text-sm leading-6 text-mute">{t.home.privacyBody}</p>
           </div>
           <div className="relative">
             <div className="absolute -inset-6 rounded-[2.5rem] bg-[image:var(--grad)] opacity-20 blur-2xl" />
@@ -105,7 +89,7 @@ export default function HomePage() {
                 <div>
                   <p className="text-[10px] font-semibold uppercase text-mute">Ofrece</p>
                   <p className="font-medium">Ibuprofeno 200 mg</p>
-                  <p className="text-xs text-mute">Plaza · Vedado</p>
+                  <p className="text-xs text-mute">Bengaluru · India</p>
                 </div>
                 <span className="grid h-10 w-10 place-items-center rounded-full bg-[image:var(--grad)] text-white">
                   <IconArrows className="h-5 w-5" />
@@ -137,7 +121,7 @@ export default function HomePage() {
               Datos públicos para que sepas con quién truequeas: cuántas personas hay y cuántas
               pueden moverse.
               {whoCome > 0
-                ? ` Además, ${formatCount(whoCome)} ${whoCome === 1 ? "persona marcó" : "personas marcaron"} “voy al lugar”.`
+                ? ` ${formatCount(whoCome, locale)} ${t.home.willTravel}.`
                 : ""}
             </p>
           </div>

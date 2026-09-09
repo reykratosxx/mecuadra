@@ -10,9 +10,13 @@
     "db:schema": "node scripts/apply-schema.mjs"
   },
   "dependencies": {
+    "@cashu/cashu-ts": "^4.10.1",
+    "@noble/curves": "^2.4.0",
+    "@noble/hashes": "^2.4.0",
     "@supabase/ssr": "^0.12.4",
     "@supabase/supabase-js": "^2.112.3",
     "next": "16.3.1",
+    "nostr-tools": "^2.25.2",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "standardwebhooks": "^1.0.0"

@@ -1,16 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { TRANSPORT_LABEL } from "@/lib/cuba";
 import { categoryLabel } from "@/lib/categories";
 import type { Offer } from "@/lib/types";
 import { useStore } from "@/lib/store";
+import { useT } from "@/lib/i18n/provider";
 import { timeAgo, formatDateTime, wasEdited, displayTitle } from "@/lib/utils";
 import { Avatar, Badge, Stars } from "./ui";
 import { IconArrows, IconPin, IconShield, IconTruck } from "./icons";
 import { buildOfferShare } from "@/lib/share";
 
 export function OfferCard({ offer }: { offer: Offer }) {
+  const t = useT();
   const { users, items } = useStore();
   const owner = users.find((u) => u.id === offer.userId);
   const offered = items.filter((i) => offer.itemIds.includes(i.id));
@@ -29,11 +30,11 @@ export function OfferCard({ offer }: { offer: Offer }) {
           />
           {offer.featured ? (
             <span className="absolute left-2 top-2 rounded-full bg-[image:var(--grad)] px-2 py-0.5 text-[10px] font-semibold text-white sm:left-3 sm:top-3 sm:px-2.5 sm:py-1 sm:text-[11px]">
-              Destacada
+              {offer.featured ? t.offer.featured : null}
             </span>
           ) : null}
           <span className="absolute bottom-2 left-2 rounded-full bg-black/55 px-2 py-0.5 text-[10px] text-white backdrop-blur sm:bottom-3 sm:left-3 sm:px-2.5 sm:py-1 sm:text-[11px]">
-            {offered.length} {offered.length === 1 ? "artículo" : "artículos"}
+            {offered.length} {offered.length === 1 ? t.offer.itemsOne : t.offer.itemsMany}
           </span>
         </div>
         <div className="space-y-1.5 p-2.5 sm:space-y-3 sm:p-4">
@@ -60,7 +61,7 @@ export function OfferCard({ offer }: { offer: Offer }) {
 
           <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1 sm:gap-2">
             <div className="min-w-0">
-              <p className="text-[9px] font-semibold uppercase tracking-wider text-mute sm:text-[10px]">Ofrece</p>
+              <p className="text-[9px] font-semibold uppercase tracking-wider text-mute sm:text-[10px]">{t.offer.offers}</p>
               <p className="line-clamp-2 break-words text-xs font-medium text-ink sm:text-sm">
                 {offered.map((i) => displayTitle(i.title)).join(" · ") || "Sin artículos"}
               </p>
@@ -69,7 +70,7 @@ export function OfferCard({ offer }: { offer: Offer }) {
               <IconArrows className="h-3 w-3 sm:h-4 sm:w-4" />
             </span>
             <div className="min-w-0">
-              <p className="text-[9px] font-semibold uppercase tracking-wider text-mute sm:text-[10px]">Necesita</p>
+              <p className="text-[9px] font-semibold uppercase tracking-wider text-mute sm:text-[10px]">{t.offer.needs}</p>
               <p className="line-clamp-2 break-words text-xs font-medium text-ink sm:text-sm">
                 {offer.wants.map((w) => displayTitle(w.title)).join(" · ")}
               </p>
@@ -77,7 +78,7 @@ export function OfferCard({ offer }: { offer: Offer }) {
           </div>
 
           <div className="flex flex-wrap items-center gap-1 sm:gap-1.5">
-            {offer.openToProposals ? <Badge>Escucha propuestas</Badge> : null}
+            {offer.openToProposals ? <Badge>{t.offer.openTo}</Badge> : null}
             {offered[0] ? <Badge tone="mute">{categoryLabel(offered[0].category)}</Badge> : null}
             <span className="ml-auto inline-flex items-center gap-1 text-[10px] text-mute sm:text-[11px]">
               <IconPin className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
@@ -85,7 +86,7 @@ export function OfferCard({ offer }: { offer: Offer }) {
             </span>
             <span className="inline-flex items-center gap-1 text-[10px] text-mute sm:text-[11px]">
               <IconTruck className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-              {TRANSPORT_LABEL[offer.transport].split("·")[0]}
+              {t.transport[offer.transport].split("·")[0]}
             </span>
           </div>
         </div>
@@ -96,6 +97,7 @@ export function OfferCard({ offer }: { offer: Offer }) {
 }
 
 function ShareStrip({ offer, titles }: { offer: Offer; titles: string[] }) {
+  const t = useT();
   function go(kind: "telegram" | "whatsapp" | "facebook") {
     const origin = window.location.origin;
     const place = [offer.neighborhood, offer.municipality].filter(Boolean).join(", ");
@@ -105,7 +107,7 @@ function ShareStrip({ offer, titles }: { offer: Offer; titles: string[] }) {
       offered: titles,
       wants: offer.wants.map((w) => w.title),
       place,
-      transport: TRANSPORT_LABEL[offer.transport],
+      transport: t.transport[offer.transport],
     });
     window.open(pack[kind], "_blank", "noopener,noreferrer,width=640,height=720");
   }

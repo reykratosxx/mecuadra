@@ -5,22 +5,24 @@ import { usePathname } from "next/navigation";
 import { IconArrows, IconPlus, IconSearch, IconTag, IconUser } from "./icons";
 import { cn } from "@/lib/utils";
 import { useStore } from "@/lib/store";
-
-const items = [
-  { href: "/explorar", label: "Explorar", icon: IconSearch },
-  { href: "/trueques", label: "Trueques", icon: IconArrows, badgeKey: "trades" as const },
-  { href: "/publicar", label: "Publicar", icon: IconPlus, center: true },
-  { href: "/articulos", label: "Artículos", icon: IconTag },
-  { href: "/perfil", label: "Perfil", icon: IconUser },
-];
+import { useT } from "@/lib/i18n/provider";
 
 export function BottomNav() {
   const path = usePathname();
+  const t = useT();
   const { currentUser, trades, ready } = useStore();
   const pending =
     ready && currentUser
-      ? trades.filter((t) => t.ownerId === currentUser.id && t.status === "pendiente").length
+      ? trades.filter((tr) => tr.ownerId === currentUser.id && tr.status === "pendiente").length
       : 0;
+
+  const items = [
+    { href: "/explorar", label: t.nav.explore, icon: IconSearch },
+    { href: "/trueques", label: t.nav.trades, icon: IconArrows, badgeKey: "trades" as const },
+    { href: "/publicar", label: t.nav.publish, icon: IconPlus, center: true },
+    { href: "/articulos", label: t.nav.items, icon: IconTag },
+    { href: "/perfil", label: t.nav.profile, icon: IconUser },
+  ];
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">

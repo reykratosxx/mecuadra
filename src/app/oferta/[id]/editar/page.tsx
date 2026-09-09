@@ -3,7 +3,7 @@
 import { use, useMemo, useState } from "react";
 import { useRouter, notFound } from "next/navigation";
 import Link from "next/link";
-import { PROVINCES, TRANSPORT_LABEL, municipalitiesOf } from "@/lib/cuba";
+import { COUNTRIES, citiesOf } from "@/lib/geo";
 import { useStore } from "@/lib/store";
 import type { CategoryId, Offer, Transport, Want } from "@/lib/types";
 import { RequireAuth } from "@/components/ui";
@@ -68,7 +68,7 @@ function EditForm({ offer }: { offer: Offer }) {
   const [transport, setTransport] = useState<Transport>(offer.transport);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const munis = useMemo(() => municipalitiesOf(province), [province]);
+  const munis = useMemo(() => citiesOf(province), [province]);
 
   return (
     <div className="mx-auto max-w-xl">
@@ -206,10 +206,10 @@ function EditForm({ offer }: { offer: Offer }) {
               value={province}
               onChange={(e) => {
                 setProvince(e.target.value);
-                setMunicipality(municipalitiesOf(e.target.value)[0] ?? "");
+                setMunicipality(citiesOf(e.target.value)[0] ?? "");
               }}
             >
-              {Object.keys(PROVINCES).map((p) => (
+              {Object.keys(COUNTRIES).map((p) => (
                 <option key={p}>{p}</option>
               ))}
             </select>
@@ -242,9 +242,9 @@ function EditForm({ offer }: { offer: Offer }) {
             value={transport}
             onChange={(e) => setTransport(e.target.value as Transport)}
           >
-            {Object.entries(TRANSPORT_LABEL).map(([k, v]) => (
+            {(["tengo", "sin", "voy"] as const).map((k) => (
               <option key={k} value={k}>
-                {v}
+                {k}
               </option>
             ))}
           </select>
