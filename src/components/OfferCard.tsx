@@ -6,7 +6,8 @@ import type { Offer } from "@/lib/types";
 import { useStore } from "@/lib/store";
 import { useI18n, useT } from "@/lib/i18n/provider";
 import { timeAgo, formatDateTime, wasEdited, displayTitle, localizeWantTitle } from "@/lib/utils";
-import { Avatar, Badge, Stars } from "./ui";
+import { Avatar, Badge } from "./ui";
+import { ZkBadge } from "./ZkBadge";
 import { IconArrows, IconPin, IconShield, IconTruck } from "./icons";
 import { buildOfferShare } from "@/lib/share";
 
@@ -46,7 +47,7 @@ export function OfferCard({ offer }: { offer: Offer }) {
                   {owner?.name}
                   {owner?.verified ? <IconShield className="h-3 w-3 shrink-0 text-brand sm:h-3.5 sm:w-3.5" /> : null}
                 </p>
-                <span className="hidden sm:inline">{owner ? <Stars value={owner.ratingAvg} count={owner.ratingCount} /> : null}</span>
+                <span className="hidden sm:inline">{owner ? <ZkBadge user={owner} /> : null}</span>
               </div>
             </div>
             <div className="shrink-0 text-right text-[10px] leading-tight text-mute sm:text-[11px]">

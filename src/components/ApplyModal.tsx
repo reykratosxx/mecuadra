@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useStore } from "@/lib/store";
 import { IconX } from "./icons";
 import { MeCuadraLabel, MeCuadraMark } from "./MeCuadraMark";
+import { ZkBadge } from "./ZkBadge";
 import { useT } from "@/lib/i18n/provider";
 
 export function ApplyModal({
@@ -57,6 +58,9 @@ export function ApplyModal({
               {t.apply.propose}
               {wants ? ` · ${t.apply.looking}: ${wants}` : ""}.
             </p>
+            <div className="mt-2">
+              <ZkBadge user={currentUser} />
+            </div>
           </div>
           <button type="button" onClick={onClose} aria-label={t.common.close}>
             <IconX className="h-5 w-5" />

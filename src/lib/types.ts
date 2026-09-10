@@ -90,12 +90,11 @@ export type CategoryId =
   | "otros_general";
 
 export type ZkProofPublic = {
-  merkleRoot: string;
+  aggregate: string;
   threshold: number;
-  minRatingX10: number;
+  minRating: number;
   nullifier: string;
   count: number;
-  avgX10: number;
 };
 
 export type User = {

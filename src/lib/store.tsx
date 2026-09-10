@@ -156,12 +156,16 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       data: { user: authUser },
     } = await supabase.auth.getUser();
 
+    const ratingsQuery = authUser
+      ? supabase.from("ratings").select("*").or(`from_id.eq.${authUser.id},to_id.eq.${authUser.id}`)
+      : Promise.resolve({ data: [] as never[] });
+
     const [{ data: profiles }, { data: items }, { data: offers }, { data: ratings }] =
       await Promise.all([
         supabase.from("profiles").select("*"),
         supabase.from("items").select("*"),
         supabase.from("offers").select("*").order("created_at", { ascending: false }),
-        supabase.from("ratings").select("*"),
+        ratingsQuery,
       ]);
 
     let trades: Trade[] = [];
@@ -514,11 +518,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       }
       const field = trade.ownerId === state.currentUserId ? "owner_rated" : "applicant_rated";
       await supabase.from("trades").update({ [field]: true }).eq("id", tradeId);
-      const list = [...state.ratings.filter((r) => r.toId === toId), { stars, toId } as { stars: number; toId: string }];
-      const avg = list.reduce((a, r) => a + r.stars, 0) / list.length;
+      const { data: theirs } = await supabase.from("ratings").select("stars").eq("to_id", toId);
+      const list = theirs ?? [];
+      const avg = list.length ? list.reduce((a, r) => a + Number(r.stars), 0) / list.length : stars;
       await supabase
         .from("profiles")
-        .update({ rating_avg: Math.round(avg * 10) / 10, rating_count: list.length })
+        .update({ rating_avg: Math.round(avg * 10) / 10, rating_count: list.length || 1 })
         .eq("id", toId);
       await refresh();
     },

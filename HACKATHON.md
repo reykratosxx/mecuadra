@@ -43,16 +43,18 @@ Full writeup in the app: `/docs/cypherpunk`.
 
 ## Does ZK make it stronger?
 
-Yes — if we stay honest. Without ZK, a “private” marketplace still publishes a **graph** (who rated whom). That clusters like a payment history. The badge is trust without a dossier.
+Yes — if the **public** surface is the badge, not a public star list. Public 1–5 bulletins rebuild a meeting graph on Bitcoin keys. The job of ZK here is identity-adjacent: prove *this secp256k1 key* collected enough good swaps, without hanging the guest list on the profile.
+
+Live check: `/docs/zk` (two throwaway keys, Bruno rates Ana, this browser verifies, BitVM-shaped `out_1` / `out_2`).
 
 Two layers:
 
 | Layer | What it is | What it is not |
 | --- | --- | --- |
-| **Runtime** (`src/lib/zk/reputation.ts`) | Pedersen + OR range proofs, verified in the browser | Not Bitcoin Script |
+| **Runtime** (`src/lib/zk/reputation.ts`) | Pedersen + OR range proofs, **re-verified in the visitor’s browser** | Not Bitcoin Script |
 | **SNARK** (`circuits/reputation.circom`) | Circom → fflonk → two public SHA256-split outputs, same interface as [BitVM/bitvm-circom-example](https://github.com/BitVM/bitvm-circom-example) | We do **not** run BitVM’s ~GB Script verifier |
 
-We do not fake L1 Groth16 verify. ZK’s impact is product: reputation stops being a public graph. The circuit is real and cut to BitVM’s interface for later — not theater.
+Self-stars do not count. The market UI no longer shows other people’s averages. We do not fake L1 Groth16 verify.
 
 ## How it fits Cypherpunk
 

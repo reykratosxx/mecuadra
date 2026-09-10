@@ -5,7 +5,8 @@ import Link from "next/link";
 import { notFound, useRouter } from "next/navigation";
 import { ApplyModal } from "@/components/ApplyModal";
 import { Gallery } from "@/components/Gallery";
-import { Avatar, Badge, Stars } from "@/components/ui";
+import { Avatar, Badge } from "@/components/ui";
+import { ZkBadge } from "@/components/ZkBadge";
 import { categoryLabel } from "@/lib/categories";
 import { useStore } from "@/lib/store";
 import { formatDateTime, timeAgo, wasEdited, displayTitle, localizeWantTitle } from "@/lib/utils";
@@ -86,7 +87,7 @@ export default function OfertaPage({ params }: { params: Promise<{ id: string }>
                   {owner?.name}
                   {owner?.verified ? <IconShield className="h-4 w-4 text-brand" /> : null}
                 </p>
-                <Stars value={owner?.ratingAvg ?? 0} count={owner?.ratingCount} />
+                <ZkBadge user={owner} />
               </div>
             </Link>
             <span className="shrink-0 text-xs text-mute">{timeAgo(offer.createdAt, locale)}</span>

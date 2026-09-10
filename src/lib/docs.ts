@@ -27,6 +27,7 @@ export function getDocGroups(t: Messages): { title: string; items: DocLink[] }[]
         { href: "/docs/api", title: t.docs.api, hint: t.docs.apiHint },
         { href: "/docs/seguridad", title: t.docs.security, hint: t.docs.securityHint },
         { href: "/docs/cypherpunk", title: t.docs.cypherpunk, hint: t.docs.cypherpunkHint },
+        { href: "/docs/zk", title: t.docs.zkPage, hint: t.docs.zkPageHint },
         { href: "/docs/desplegar", title: t.docs.deploy, hint: t.docs.deployHint },
       ],
     },

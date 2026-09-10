@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/lib/store";
 import { Avatar, Badge, RequireAuth, Stars } from "@/components/ui";
+import { ZkBadge } from "@/components/ZkBadge";
 import { COUNTRIES, citiesOf } from "@/lib/geo";
 import { IconCamera, IconLock, IconPin, IconShield, IconTruck } from "@/components/icons";
 import { OfferCard } from "@/components/OfferCard";
@@ -14,7 +15,7 @@ import type { Transport } from "@/lib/types";
 import { useT } from "@/lib/i18n/provider";
 import { loadIdentity } from "@/lib/nostr/keys";
 import { silentPaymentCode } from "@/lib/silent-payments";
-import { proveReputation, loadStoredProof, verifyReputationProof, issueAttestation, loadAttestations } from "@/lib/zk/reputation";
+import { proveReputation, loadStoredProof, verifyReputationProof, loadAttestations } from "@/lib/zk/reputation";
 
 export default function PerfilPage() {
   return (
@@ -132,6 +133,10 @@ function Me() {
             </p>
             <p className="text-sm text-mute">@{u.username}</p>
             <Stars value={u.ratingAvg} count={u.ratingCount} size="md" />
+            <p className="mt-1 text-xs text-mute">{t.zk.privateAvg}</p>
+            <div className="mt-2">
+              <ZkBadge user={u} size="md" />
+            </div>
           </div>
         </div>
         <p className="mt-3 text-sm text-mute">{u.tradesCompleted} {t.nav.trades}</p>
@@ -336,7 +341,9 @@ function Me() {
 
 function ZkProveButton() {
   const t = useT();
+  const { refresh } = useStore();
   const [msg, setMsg] = useState("");
+  const [busy, setBusy] = useState(false);
   const [ok, setOk] = useState(() => {
     const p = loadStoredProof();
     return Boolean(p && verifyReputationProof(p));
@@ -346,38 +353,51 @@ function ZkProveButton() {
       <button
         type="button"
         className="btn-primary h-9 px-3 text-sm"
+        disabled={busy}
         onClick={() => {
-          try {
-            const id = loadIdentity();
-            if (!id) {
-              setMsg(t.auth.error);
-              return;
-            }
-            if (loadAttestations().filter((a) => a.toPubkey === id.pubkey).length < 1) {
-              issueAttestation({
-                secretKey: id.secretKey,
-                tradeId: "demo-self",
-                stars: 5,
-                fromPubkey: id.pubkey,
-                toPubkey: id.pubkey,
+          void (async () => {
+            setBusy(true);
+            setMsg("");
+            try {
+              const id = loadIdentity();
+              if (!id) {
+                setMsg(t.auth.error);
+                return;
+              }
+              const others = loadAttestations().filter((a) => a.toPubkey === id.pubkey && a.fromPubkey !== id.pubkey);
+              if (others.length < 1) {
+                setMsg(t.zk.needOther);
+                return;
+              }
+              const proof = proveReputation(id.secretKey, id.pubkey);
+              const res = await fetch("/api/zk/verify", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(proof),
               });
+              if (!res.ok) {
+                setMsg(t.zk.postFail);
+                return;
+              }
+              setOk(true);
+              setMsg(t.zk.posted);
+              await refresh();
+            } catch {
+              setMsg(t.zk.fail);
+            } finally {
+              setBusy(false);
             }
-            const proof = proveReputation(id.secretKey, id.pubkey);
-            void fetch("/api/zk/verify", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(proof),
-            });
-            setOk(true);
-            setMsg(t.zk.ok);
-          } catch {
-            setMsg(t.zk.fail);
-          }
+          })();
         }}
       >
-        {ok ? t.profile.zkVerified : t.profile.zkProve}
+        {busy ? t.zk.proving : ok ? t.profile.zkVerified : t.profile.zkProve}
       </button>
       {msg ? <p className="mt-2 text-xs text-mute">{msg}</p> : null}
+      <p className="mt-2 text-xs text-mute">
+        <a href="/docs/zk" className="font-semibold text-brand">
+          {t.docs.zkPage}
+        </a>
+      </p>
     </div>
   );
 }

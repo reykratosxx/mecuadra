@@ -3,7 +3,8 @@
 import { use } from "react";
 import { notFound } from "next/navigation";
 import { useStore } from "@/lib/store";
-import { Avatar, Stars } from "@/components/ui";
+import { Avatar } from "@/components/ui";
+import { ZkBadge } from "@/components/ZkBadge";
 import { OfferCard } from "@/components/OfferCard";
 import { IconShield } from "@/components/icons";
 import { useT } from "@/lib/i18n/provider";
@@ -29,7 +30,7 @@ export default function PublicProfile({ params }: { params: Promise<{ id: string
           <p className="text-sm text-mute">
             @{user.username} · {user.neighborhood || user.municipality}, {user.province}
           </p>
-          <Stars value={user.ratingAvg} count={user.ratingCount} size="md" />
+          <ZkBadge user={user} size="md" />
           <p className="mt-1 text-xs text-mute">
             {user.tradesCompleted} {user.tradesCompleted === 1 ? t.profile.tradesDoneOne : t.profile.tradesDoneMany}
             {user.bio ? ` · ${user.bio}` : ""}

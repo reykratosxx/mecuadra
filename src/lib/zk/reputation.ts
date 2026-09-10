@@ -126,7 +126,7 @@ export function saveAttestations(list: Attestation[]) {
   localStorage.setItem(ATTEST_KEY, JSON.stringify(list));
 }
 
-export function issueAttestation(input: {
+export function buildAttestation(input: {
   secretKey: Uint8Array;
   tradeId: string;
   stars: number;
@@ -136,7 +136,7 @@ export function issueAttestation(input: {
   const nonce = bytesToHex(randomBytes(16));
   const msg = hexToBytes(poseidonish(input.tradeId, String(input.stars), input.fromPubkey, input.toPubkey, nonce));
   const signature = bytesToHex(schnorr.sign(msg, input.secretKey));
-  const att: Attestation = {
+  return {
     tradeId: input.tradeId,
     stars: input.stars,
     fromPubkey: input.fromPubkey,
@@ -145,6 +145,16 @@ export function issueAttestation(input: {
     signature,
     createdAt: new Date().toISOString(),
   };
+}
+
+export function issueAttestation(input: {
+  secretKey: Uint8Array;
+  tradeId: string;
+  stars: number;
+  fromPubkey: string;
+  toPubkey: string;
+}): Attestation {
+  const att = buildAttestation(input);
   const next = [...loadAttestations().filter((a) => a.tradeId !== att.tradeId), att];
   saveAttestations(next);
   return att;
@@ -239,14 +249,17 @@ function verifyRange(proof: RangeProof, kLo: number, kHi: number) {
   return cSum === transcript;
 }
 
-export function proveReputation(
+export function proveFromAttestations(
   secretKey: Uint8Array,
   pubkeyHex: string,
-  opts?: { threshold?: number; minRating?: number },
+  attestations: Attestation[],
+  opts?: { threshold?: number; minRating?: number; persist?: boolean },
 ): ReputationProof {
   const threshold = opts?.threshold ?? DEFAULT_THRESHOLD;
   const minRating = opts?.minRating ?? DEFAULT_MIN_RATING;
-  const mine = loadAttestations().filter((a) => a.toPubkey === pubkeyHex && a.stars >= minRating && a.stars <= 5);
+  const mine = attestations.filter(
+    (a) => a.toPubkey === pubkeyHex && a.fromPubkey !== pubkeyHex && a.stars >= minRating && a.stars <= 5,
+  );
   if (mine.length < threshold) {
     throw new Error("INSUFFICIENT_ATTESTATIONS");
   }
@@ -278,7 +291,26 @@ export function proveReputation(
     rangeProofs,
     createdAt: new Date().toISOString(),
   };
-  localStorage.setItem(PROOF_KEY, JSON.stringify(proof));
+  if (opts?.persist !== false) {
+    localStorage.setItem(PROOF_KEY, JSON.stringify(proof));
+  }
+  return proof;
+}
+
+export function proveReputation(
+  secretKey: Uint8Array,
+  pubkeyHex: string,
+  opts?: { threshold?: number; minRating?: number },
+): ReputationProof {
+  return proveFromAttestations(secretKey, pubkeyHex, loadAttestations(), opts);
+}
+
+export function parseReputationProof(raw: unknown): ReputationProof | null {
+  if (!raw || typeof raw !== "object") return null;
+  const proof = raw as ReputationProof;
+  if (proof.protocol !== PROTOCOL || !Array.isArray(proof.rangeProofs) || !proof.publicSignals) {
+    return null;
+  }
   return proof;
 }
 

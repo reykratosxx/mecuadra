@@ -107,6 +107,11 @@ export default function CypherpunkDocsPage() {
           reputación deja de ser un grafo público. El circuito existe y está recortado a la
           interfaz de BitVM para el día en que ese verificador sea usable — no para teatro.
         </Callout>
+        <p>
+          <Link href="/docs/zk" className="font-semibold text-brand">
+            {t.docs.zkPage} — figuras, BitVM y verificación en vivo →
+          </Link>
+        </p>
 
         <h2>Lo que no es dinero</h2>
         <p>
@@ -221,6 +226,11 @@ export default function CypherpunkDocsPage() {
         public graph. The circuit is real and cut to BitVM’s interface for the day that verifier
         is usable — not for theater.
       </Callout>
+      <p>
+        <Link href="/docs/zk" className="font-semibold text-brand">
+          {t.docs.zkPage} — figures, BitVM, and live verification →
+        </Link>
+      </p>
 
       <h2>What is not money</h2>
       <p>

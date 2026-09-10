@@ -2,7 +2,8 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { Avatar, Stars } from "./ui";
+import { Avatar } from "./ui";
+import { ZkBadge } from "./ZkBadge";
 import { IconPin, IconShield, IconTruck, IconX } from "./icons";
 import type { User } from "@/lib/types";
 import { useT } from "@/lib/i18n/provider";
@@ -40,7 +41,7 @@ export function ProfilePeek({ user, onClose }: { user: User; onClose: () => void
               {user.verified ? <IconShield className="h-4 w-4 shrink-0 text-brand" /> : null}
             </p>
             <p className="truncate text-sm text-mute">@{user.username}</p>
-            <Stars value={user.ratingAvg} count={user.ratingCount} />
+            <ZkBadge user={user} size="md" />
           </div>
           <button
             type="button"

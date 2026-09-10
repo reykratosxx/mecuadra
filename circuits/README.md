@@ -1,6 +1,6 @@
 # ZK circuits — BitVM fflonk path
 
-Runtime reputation in the app is **client-side validation** (Pedersen commitments + OR range proofs). Bitcoin Script does not run that.
+Runtime reputation in the app is **client-side validation** (Pedersen commitments + OR range proofs), re-checked in the visitor’s browser. Bitcoin Script does not run that. Live demo: `/docs/zk`.
 
 The SNARK path follows [BitVM/bitvm-circom-example](https://github.com/BitVM/bitvm-circom-example) exactly: Circom → witness → **fflonk** (not Groth16) → `public.json` with **two** field elements.
 
