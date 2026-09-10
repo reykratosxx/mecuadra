@@ -282,7 +282,7 @@ function AuthCard() {
   const working = busyWidget || miniApp || botPhase === "finishing";
 
   return (
-    <div className="card overflow-visible p-0">
+    <div className="card overflow-hidden p-0">
       <Script
         src="https://telegram.org/js/telegram-web-app.js"
         strategy="afterInteractive"
@@ -294,7 +294,7 @@ function AuthCard() {
         <p className="mt-2 text-sm text-white/90">{t.auth.lead}</p>
       </div>
 
-      <div className="space-y-5 overflow-visible p-5 sm:p-6">
+      <div className="min-w-0 space-y-5 overflow-hidden p-5 sm:p-6">
         <NostrLogin next={safeNext} />
 
         <ul className="space-y-2 text-sm text-mute">

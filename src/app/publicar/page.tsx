@@ -37,11 +37,11 @@ function Form() {
   const [selected, setSelected] = useState<string[]>([]);
   const [wantTitle, setWantTitle] = useState("");
   const [wantCat, setWantCat] = useState<CategoryId | "abierto">("abierto");
-  const [wants, setWants] = useState<Want[]>([{ title: "Open to proposals", category: "abierto" }]);
+  const [wants, setWants] = useState<Want[]>([{ title: t.offer.openTo, category: "abierto" }]);
   const [openToProposals, setOpenToProposals] = useState(true);
   const [message, setMessage] = useState("");
-  const [province, setProvince] = useState(currentUser?.province || "India");
-  const [municipality, setMunicipality] = useState(currentUser?.municipality || "Bengaluru");
+  const [province, setProvince] = useState(currentUser?.province || "Portugal");
+  const [municipality, setMunicipality] = useState(currentUser?.municipality || "Lisbon");
   const [neighborhood, setNeighborhood] = useState(currentUser?.neighborhood ?? "");
   const [transport, setTransport] = useState<Transport>(currentUser?.transport ?? "sin");
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -55,7 +55,7 @@ function Form() {
   const munis = useMemo(() => citiesOf(province), [province]);
 
   async function removeItem(id: string) {
-    if (!window.confirm("¿Eliminar este artículo? No aparecerá más en tus ofertas.")) return;
+    if (!window.confirm(t.publish.confirmDeleteItem)) return;
     setBusyId(id);
     try {
       await updateItem(id, { status: "canjeado" });
@@ -68,14 +68,14 @@ function Form() {
   function validate(): FieldErrors {
     const next: FieldErrors = {};
     if (!selected.length) {
-      next.items = "Elige al menos un artículo tocándolo (queda marcado en morado).";
+      next.items = t.publish.errItems;
     }
     if (!wants.length && !openToProposals) {
-      next.wants = "Añade qué necesitas o marca “Escucho propuestas”.";
+      next.wants = t.publish.errWants;
     }
-    if (!province.trim()) next.province = "Elige la provincia.";
-    if (!municipality.trim()) next.municipality = "Elige el municipio.";
-    if (!transport) next.transport = "Elige cómo se mueve el trueque.";
+    if (!province.trim()) next.province = t.publish.errCountry;
+    if (!municipality.trim()) next.municipality = t.publish.errCity;
+    if (!transport) next.transport = t.publish.errTransport;
     return next;
   }
 
@@ -93,7 +93,7 @@ function Form() {
     try {
       const offer = await createOffer({
         itemIds: selected,
-        wants: wants.length ? wants : [{ title: "Escucho propuestas", category: "abierto" }],
+        wants: wants.length ? wants : [{ title: t.offer.openTo, category: "abierto" }],
         openToProposals,
         message,
         province,
@@ -104,7 +104,7 @@ function Form() {
       router.push(`/oferta/${offer.id}`);
     } catch (err) {
       setErrors({
-        form: err instanceof Error ? err.message : "No se pudo publicar. Inténtalo de nuevo.",
+        form: err instanceof Error ? err.message : t.publish.fail,
       });
       setPublishing(false);
     }
@@ -113,11 +113,11 @@ function Form() {
   if (mine.length === 0) {
     return (
       <Empty
-        title="Primero publica un artículo"
-        hint="El trueque parte de algo concreto que ofreces. Luego dices qué necesitas."
+        title={t.publish.emptyTitle}
+        hint={t.publish.emptyHint}
         action={
           <Link href="/articulos/nuevo" className="btn-primary">
-            Añadir artículo
+            {t.publish.addFirst}
           </Link>
         }
       />
@@ -126,11 +126,8 @@ function Form() {
 
   return (
     <div className="mx-auto max-w-xl">
-      <h1 className="font-display text-3xl">Publicar oferta</h1>
-      <p className="mt-1 text-sm text-mute">
-        Formato de Telegram, con fotos: lo que cambias, lo que necesitas, municipio y transporte.
-        No se admite pedir efectivo.
-      </p>
+      <h1 className="font-display text-3xl">{t.publish.title}</h1>
+      <p className="mt-1 text-sm text-mute">{t.publish.lead}</p>
 
       <form className="mt-6 space-y-4" onSubmit={(e) => void onPublish(e)}>
         <fieldset
@@ -140,11 +137,11 @@ function Form() {
             errors.items ? "ring-2 ring-rose-400 ring-offset-2" : "",
           )}
         >
-          <legend className="label">#cambio · artículos que ofreces</legend>
+          <legend className="label">{t.publish.itemsLegend}</legend>
           <p className="mb-2 text-xs text-mute">
-            Toca un artículo para incluirlo en la oferta (debe quedar morado).{" "}
+            {t.publish.itemsHint}{" "}
             <Link href="/articulos" className="font-semibold text-brand">
-              Ver mis artículos
+              {t.publish.myItems}
             </Link>
           </p>
           {errors.items ? (
@@ -183,15 +180,15 @@ function Form() {
                         {displayTitle(item.title)}
                       </span>
                       <span className="text-xs text-mute">
-                        {item.condition}
-                        {on ? " · en esta oferta" : " · toca para elegir"}
+                        {t.conditions[item.condition]}
+                        {on ? ` · ${t.publish.inOffer}` : ` · ${t.publish.tapToPick}`}
                       </span>
                     </span>
                   </button>
                   <button
                     type="button"
                     className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-lg text-rose-600 hover:bg-rose-50"
-                    aria-label={`Eliminar ${item.title}`}
+                    aria-label={`${t.common.delete} ${item.title}`}
                     disabled={busyId === item.id}
                     onClick={() => void removeItem(item.id)}
                   >
@@ -202,7 +199,7 @@ function Form() {
             })}
           </ul>
           <Link href="/articulos/nuevo" className="btn-ghost mt-2 w-full">
-            + Otro artículo
+            {t.publish.addItem}
           </Link>
         </fieldset>
 
@@ -210,7 +207,7 @@ function Form() {
           ref={wantsRef}
           className={cn(errors.wants ? "rounded-2xl ring-2 ring-rose-400 ring-offset-2" : "")}
         >
-          <legend className="label">#necesito</legend>
+          <legend className="label">{t.publish.needLegend}</legend>
           {errors.wants ? (
             <p className="mb-2 rounded-xl bg-rose-50 px-3 py-2 text-sm text-rose-700" role="alert">
               {errors.wants}
@@ -233,7 +230,7 @@ function Form() {
           <div className="flex gap-2">
             <input
               className="input"
-              placeholder="Ej: leche en polvo"
+              placeholder={t.publish.wantPlaceholder}
               value={wantTitle}
               onChange={(e) => setWantTitle(e.target.value)}
             />
@@ -254,7 +251,7 @@ function Form() {
               setErrors((er) => ({ ...er, wants: undefined }));
             }}
           >
-            Añadir necesidad
+            {t.publish.addNeed}
           </button>
           <label className="mt-3 flex items-center gap-2 text-sm">
             <input
@@ -265,17 +262,17 @@ function Form() {
                 setErrors((er) => ({ ...er, wants: undefined }));
               }}
             />
-            Escucho propuestas (recomendado)
+            {t.publish.openToCheck}
           </label>
         </fieldset>
 
         <div>
-          <label className="label">Nota pública</label>
+          <label className="label">{t.publish.note}</label>
           <textarea
             className="input min-h-24"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Sin precios ni CUP. Ej: sin transporte, debe venir a casa."
+            placeholder={t.publish.notePlaceholder}
           />
         </div>
 
@@ -389,12 +386,12 @@ function Form() {
 
         {!selected.length ? (
           <p className="text-center text-xs text-mute">
-            Para publicar, toca al menos un artículo arriba hasta que quede marcado.
+            {t.publish.pickItems}
           </p>
         ) : null}
 
         <button type="submit" className="btn-primary w-full" disabled={publishing}>
-          {publishing ? "Publicando…" : "Publicar oferta"}
+          {publishing ? t.publish.publishing : t.publish.submit}
         </button>
       </form>
     </div>

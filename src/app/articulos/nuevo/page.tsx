@@ -9,6 +9,7 @@ import { RequireAuth } from "@/components/ui";
 import { IconCamera } from "@/components/icons";
 import { uploadDataUrl } from "@/lib/upload";
 import { CategorySelect } from "@/components/CategorySelect";
+import { useT } from "@/lib/i18n/provider";
 
 const SAMPLES = [
   "https://images.unsplash.com/photo-1563453392212-326f5e854473?auto=format&fit=crop&w=800&q=70",
@@ -28,18 +29,19 @@ export default function NuevoArticuloPage() {
 }
 
 function Form() {
+  const t = useT();
   const router = useRouter();
   const { createItem } = useStore();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState<CategoryId>("alimentos_bebidas");
+  const [category, setCategory] = useState<CategoryId>("bicicletas");
   const [condition, setCondition] = useState<Condition>("sellado");
   const [photos, setPhotos] = useState<string[]>([]);
 
   return (
     <div className="mx-auto max-w-xl">
-      <h1 className="font-display text-3xl">Nuevo artículo</h1>
-      <p className="text-sm text-mute">Varias fotos. Luego las recorres sin cerrar la galería.</p>
+      <h1 className="font-display text-3xl">{t.items.newTitle}</h1>
+      <p className="text-sm text-mute">{t.items.newLead}</p>
       <form
         className="mt-6 space-y-4"
         onSubmit={async (e) => {
@@ -52,7 +54,7 @@ function Form() {
         }}
       >
         <div>
-          <label className="label">Fotos</label>
+          <label className="label">{t.items.photos}</label>
           <div className="flex flex-wrap gap-2">
             {photos.map((p) => (
               // eslint-disable-next-line @next/next/no-img-element
@@ -78,7 +80,7 @@ function Form() {
               />
             </label>
           </div>
-          <p className="mt-2 text-xs text-mute">O elige una foto de ejemplo (demo):</p>
+          <p className="mt-2 text-xs text-mute">{t.items.sample}</p>
           <div className="mt-1 flex gap-2 overflow-x-auto">
             {SAMPLES.map((s) => (
               <button
@@ -93,25 +95,25 @@ function Form() {
           </div>
         </div>
         <div>
-          <label className="label">Título</label>
+          <label className="label">{t.items.fieldTitle}</label>
           <input className="input" required value={title} onChange={(e) => setTitle(e.target.value)} />
         </div>
         <div>
-          <label className="label">Descripción</label>
+          <label className="label">{t.items.description}</label>
           <textarea
             className="input min-h-24"
             required
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Marca, cantidad, si está sellado. Sin precios."
+            placeholder={t.items.descPlaceholder}
           />
         </div>
         <div>
-          <label className="label">Categoría</label>
+          <label className="label">{t.items.category}</label>
           <CategorySelect value={category} onChange={(v) => setCategory(v as CategoryId)} />
         </div>
         <div>
-          <label className="label">Condición</label>
+          <label className="label">{t.items.condition}</label>
           <div className="flex flex-wrap gap-2">
             {CONDITIONS.map((c) => (
               <button
@@ -120,13 +122,13 @@ function Form() {
                 className={`pill ${condition === c.id ? "pill-on" : ""}`}
                 onClick={() => setCondition(c.id)}
               >
-                {c.label}
+                {t.conditions[c.id]}
               </button>
             ))}
           </div>
         </div>
         <button type="submit" className="btn-primary w-full" disabled={!title.trim()}>
-          Guardar artículo
+          {t.items.saveItem}
         </button>
       </form>
     </div>

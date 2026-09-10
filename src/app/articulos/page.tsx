@@ -7,12 +7,7 @@ import { Badge, Empty, RequireAuth } from "@/components/ui";
 import { categoryLabel } from "@/lib/categories";
 import type { ItemStatus } from "@/lib/types";
 import { displayTitle } from "@/lib/utils";
-
-const STATUS_LABEL: Record<ItemStatus, string> = {
-  activo: "Activo",
-  pausado: "Pausado",
-  canjeado: "Eliminado",
-};
+import { useI18n } from "@/lib/i18n/provider";
 
 export default function ArticulosPage() {
   return (
@@ -23,6 +18,7 @@ export default function ArticulosPage() {
 }
 
 function List() {
+  const { t, locale } = useI18n();
   const { currentUser, items, updateItem } = useStore();
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -40,7 +36,7 @@ function List() {
     try {
       await updateItem(id, { status });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "No se pudo actualizar el artículo.");
+      setError(e instanceof Error ? e.message : t.items.updateFail);
     } finally {
       setBusyId(null);
     }
@@ -50,11 +46,11 @@ function List() {
     <div>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl sm:text-3xl">Mis artículos</h1>
-          <p className="text-sm text-mute">Edita, pausa o elimina lo que ya no ofreces.</p>
+          <h1 className="font-display text-2xl sm:text-3xl">{t.items.title}</h1>
+          <p className="text-sm text-mute">{t.items.lead}</p>
         </div>
         <Link href="/articulos/nuevo" className="btn-primary">
-          Nuevo
+          {t.items.new}
         </Link>
       </div>
 
@@ -66,7 +62,7 @@ function List() {
           }`}
           onClick={() => setShowGone(false)}
         >
-          En inventario ({mine.length - goneCount})
+          {t.items.inventory} ({mine.length - goneCount})
         </button>
         <button
           type="button"
@@ -75,7 +71,7 @@ function List() {
           }`}
           onClick={() => setShowGone(true)}
         >
-          Eliminados ({goneCount})
+          {t.items.removed} ({goneCount})
         </button>
       </div>
 
@@ -83,16 +79,12 @@ function List() {
 
       {visible.length === 0 ? (
         <Empty
-          title={showGone ? "No hay eliminados" : "Todavía no tienes artículos"}
-          hint={
-            showGone
-              ? "Los artículos que elimines aparecen aquí por si quieres reactivarlos."
-              : "Publica lo que puedes cambiar. Luego arma la oferta."
-          }
+          title={showGone ? t.items.emptyGone : t.items.empty}
+          hint={showGone ? t.items.emptyGoneHint : t.items.emptyHint}
           action={
             showGone ? undefined : (
               <Link href="/articulos/nuevo" className="btn-primary">
-                Añadir artículo
+                {t.items.add}
               </Link>
             )
           }
@@ -112,16 +104,20 @@ function List() {
                   {displayTitle(item.title)}
                 </p>
                 <div className="mt-1 flex flex-wrap gap-1">
-                  <Badge>{categoryLabel(item.category)}</Badge>
+                  <Badge>{categoryLabel(item.category, locale)}</Badge>
                   <Badge tone={item.status === "activo" ? "ok" : "mute"}>
-                    {STATUS_LABEL[item.status]}
+                    {item.status === "activo"
+                      ? t.items.statusActive
+                      : item.status === "pausado"
+                        ? t.items.statusPaused
+                        : t.items.statusGone}
                   </Badge>
                 </div>
                 <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs font-semibold">
                   {item.status !== "canjeado" ? (
                     <>
                       <Link href={`/articulos/${item.id}/editar`} className="text-brand">
-                        Editar
+                        {t.common.edit}
                       </Link>
                       <button
                         type="button"
@@ -134,24 +130,20 @@ function List() {
                           )
                         }
                       >
-                        {item.status === "activo" ? "Pausar" : "Reactivar"}
+                        {item.status === "activo" ? t.items.pause : t.items.resume}
                       </button>
                       <button
                         type="button"
                         className="text-rose-600 disabled:opacity-50"
                         disabled={busyId === item.id}
                         onClick={() => {
-                          if (
-                            !window.confirm(
-                              "¿Eliminar este artículo? Deja de aparecer al publicar ofertas.",
-                            )
-                          ) {
+                          if (!window.confirm(t.items.confirmDelete)) {
                             return;
                           }
                           void setStatus(item.id, "canjeado");
                         }}
                       >
-                        {busyId === item.id ? "…" : "Eliminar"}
+                        {busyId === item.id ? "…" : t.common.delete}
                       </button>
                     </>
                   ) : (
@@ -161,7 +153,7 @@ function List() {
                       disabled={busyId === item.id}
                       onClick={() => void setStatus(item.id, "activo")}
                     >
-                      Restaurar
+                      {t.items.restore}
                     </button>
                   )}
                 </div>

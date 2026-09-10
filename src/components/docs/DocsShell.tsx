@@ -4,15 +4,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/Logo";
 import { IconSearch } from "@/components/icons";
-import { DOC_GROUPS } from "@/lib/docs";
+import { getDocGroups } from "@/lib/docs";
 import { cn } from "@/lib/utils";
 import { DocsSearch } from "./DocsSearch";
 import { DocsHotkeys } from "./DocsHotkeys";
 import { DocsPager } from "./DocsPager";
 import { useState } from "react";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { useT } from "@/lib/i18n/provider";
 
 export function DocsShell({ children }: { children: React.ReactNode }) {
+  const t = useT();
+  const groups = getDocGroups(t);
   const path = usePathname();
   const [open, setOpen] = useState(false);
   const [menu, setMenu] = useState(false);
@@ -34,14 +37,14 @@ export function DocsShell({ children }: { children: React.ReactNode }) {
               onClick={() => setOpen(true)}
             >
               <IconSearch className="h-4 w-4" />
-              <span className="hidden sm:inline">Search docs</span>
+              <span className="hidden sm:inline">{t.docs.search}</span>
               <kbd className="hidden rounded-md border border-line px-1.5 text-[10px] sm:inline">⌘K</kbd>
             </button>
             <button type="button" className="docs-menu-btn lg:hidden" onClick={() => setMenu((v) => !v)}>
-              Index
+              {t.docs.index}
             </button>
             <Link href="/explorar" className="hidden text-sm font-semibold text-brand sm:inline">
-              Market
+              {t.docs.market}
             </Link>
           </div>
         </div>
@@ -54,7 +57,7 @@ export function DocsShell({ children }: { children: React.ReactNode }) {
             menu ? "block border-b bg-surface px-4 py-4" : "hidden px-4 py-6 lg:block",
           )}
         >
-          {DOC_GROUPS.map((g) => (
+          {groups.map((g) => (
             <div key={g.title} className="mb-6">
               <p className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-mute">
                 {g.title}

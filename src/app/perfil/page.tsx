@@ -67,7 +67,7 @@ function Me() {
   async function saveProfile(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim()) {
-      setError("El nombre no puede estar vacío.");
+      setError(t.profile.nameRequired);
       return;
     }
     setSaving(true);
@@ -82,10 +82,10 @@ function Me() {
         transport,
       });
       setEditing(false);
-      setSavedMsg("Perfil actualizado.");
+      setSavedMsg(t.profile.saved);
       window.setTimeout(() => setSavedMsg(""), 3000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo guardar.");
+      setError(err instanceof Error ? err.message : t.profile.saveFail);
     } finally {
       setSaving(false);
     }
@@ -161,10 +161,10 @@ function Me() {
 
       <section className="card p-5">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-          <h2 className="font-display text-lg">Datos del perfil</h2>
+          <h2 className="font-display text-lg">{t.profile.data}</h2>
           {!editing ? (
             <button type="button" className="btn-ghost h-9 px-3 text-sm" onClick={startEdit}>
-              Editar perfil
+              {t.profile.edit}
             </button>
           ) : null}
         </div>
@@ -178,24 +178,24 @@ function Me() {
         {!editing ? (
           <dl className="space-y-3 text-sm">
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wider text-mute">Nombre</dt>
+              <dt className="text-xs font-semibold uppercase tracking-wider text-mute">{t.profile.name}</dt>
               <dd className="mt-0.5 font-medium text-ink">{u.name}</dd>
             </div>
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wider text-mute">Bio</dt>
+              <dt className="text-xs font-semibold uppercase tracking-wider text-mute">{t.profile.bio}</dt>
               <dd className="mt-0.5 whitespace-pre-wrap text-ink">
-                {u.bio?.trim() ? u.bio : <span className="text-mute">Sin bio todavía.</span>}
+                {u.bio?.trim() ? u.bio : <span className="text-mute">{t.profile.noBio}</span>}
               </dd>
             </div>
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wider text-mute">Ubicación</dt>
+              <dt className="text-xs font-semibold uppercase tracking-wider text-mute">{t.profile.location}</dt>
               <dd className="mt-0.5 flex items-start gap-1.5 text-ink">
                 <IconPin className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
-                {place || "Sin ubicación"}
+                {place || t.profile.noLocation}
               </dd>
             </div>
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wider text-mute">Transporte</dt>
+              <dt className="text-xs font-semibold uppercase tracking-wider text-mute">{t.explore.transport}</dt>
               <dd className="mt-0.5 flex items-center gap-1.5 text-ink">
                 <IconTruck className="h-4 w-4 shrink-0 text-brand" />
                 {t.transport[u.transport as keyof typeof t.transport] ?? u.transport}
@@ -205,7 +205,7 @@ function Me() {
         ) : (
           <form className="space-y-3" onSubmit={(e) => void saveProfile(e)}>
             <div>
-              <label className="label">Nombre</label>
+              <label className="label">{t.profile.name}</label>
               <input
                 className="input"
                 value={name}
@@ -214,12 +214,12 @@ function Me() {
               />
             </div>
             <div>
-              <label className="label">Bio</label>
+              <label className="label">{t.profile.bio}</label>
               <textarea
                 className="input min-h-20"
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
-                placeholder="Qué truequeas, en qué zona te mueves…"
+                placeholder={t.profile.bioPlaceholder}
               />
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -282,7 +282,7 @@ function Me() {
 
             <div className="flex flex-wrap gap-2 pt-1">
               <button type="submit" className="btn-primary" disabled={saving}>
-                {saving ? "Guardando…" : "Guardar"}
+                {saving ? t.common.saving : t.common.save}
               </button>
               <button
                 type="button"
@@ -290,7 +290,7 @@ function Me() {
                 disabled={saving}
                 onClick={cancelEdit}
               >
-                Cancelar
+                {t.common.cancel}
               </button>
             </div>
           </form>
@@ -299,12 +299,12 @@ function Me() {
 
       <section>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-display text-xl">Mis ofertas</h2>
-          <Badge tone="mute">{myItems.length} artículos activos</Badge>
+          <h2 className="font-display text-xl">{t.profile.myOffers}</h2>
+          <Badge tone="mute">{myItems.length} {t.profile.activeItems}</Badge>
         </div>
         {mine.length === 0 ? (
           <Link href="/publicar" className="btn-ghost">
-            Crear oferta
+            {t.profile.createOffer}
           </Link>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2">
@@ -316,7 +316,7 @@ function Me() {
       </section>
 
       <button type="button" className="text-sm text-rose-600" onClick={() => setLogoutOpen(true)}>
-        Cerrar sesión
+        {t.profile.logout}
       </button>
       {logoutOpen ? (
         <LogoutModal

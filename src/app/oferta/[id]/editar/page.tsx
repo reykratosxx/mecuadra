@@ -8,6 +8,7 @@ import { useStore } from "@/lib/store";
 import type { CategoryId, Offer, Transport, Want } from "@/lib/types";
 import { RequireAuth } from "@/components/ui";
 import { CategorySelect } from "@/components/CategorySelect";
+import { useT } from "@/lib/i18n/provider";
 
 export default function EditarOfertaPage({
   params,
@@ -23,17 +24,18 @@ export default function EditarOfertaPage({
 }
 
 function Form({ id }: { id: string }) {
+  const t = useT();
   const { currentUser, offers, ready } = useStore();
   const offer = offers.find((o) => o.id === id);
 
-  if (!ready) return <p className="py-10 text-center text-mute">Cargando…</p>;
+  if (!ready) return <p className="py-10 text-center text-mute">{t.common.loading}</p>;
   if (!offer || offer.userId !== currentUser?.id) notFound();
   if (offer.status === "cancelada" || offer.status === "completada") {
     return (
       <div className="mx-auto max-w-xl py-10 text-center">
         <p className="font-display text-xl">Esta oferta ya no se puede editar.</p>
         <Link href={`/oferta/${id}`} className="btn-primary mt-4 inline-flex">
-          Volver
+          {t.common.back}
         </Link>
       </div>
     );
@@ -44,6 +46,7 @@ function Form({ id }: { id: string }) {
 
 /** Se monta ya con la oferta cargada, así el formulario nace con sus valores. */
 function EditForm({ offer }: { offer: Offer }) {
+  const t = useT();
   const router = useRouter();
   const { currentUser, items, updateOffer } = useStore();
   const id = offer.id;
@@ -58,7 +61,7 @@ function EditForm({ offer }: { offer: Offer }) {
   const [wantTitle, setWantTitle] = useState("");
   const [wantCat, setWantCat] = useState<CategoryId | "abierto">("abierto");
   const [wants, setWants] = useState<Want[]>(
-    offer.wants.length ? offer.wants : [{ title: "Escucho propuestas", category: "abierto" }],
+    offer.wants.length ? offer.wants : [{ title: t.offer.openTo, category: "abierto" }],
   );
   const [openToProposals, setOpenToProposals] = useState(offer.openToProposals);
   const [message, setMessage] = useState(offer.message);
@@ -72,7 +75,7 @@ function EditForm({ offer }: { offer: Offer }) {
 
   return (
     <div className="mx-auto max-w-xl">
-      <h1 className="font-display text-3xl">Editar oferta</h1>
+      <h1 className="font-display text-3xl">{t.common.edit}</h1>
       <p className="mt-1 text-sm text-mute">
         <Link href={`/oferta/${id}`} className="font-semibold text-brand">
           ← Ver oferta
@@ -177,7 +180,7 @@ function EditForm({ offer }: { offer: Offer }) {
               setWantTitle("");
             }}
           >
-            Añadir necesidad
+            {t.publish.addNeed}
           </button>
           <label className="mt-3 flex items-center gap-2 text-sm">
             <input
@@ -185,7 +188,7 @@ function EditForm({ offer }: { offer: Offer }) {
               checked={openToProposals}
               onChange={(e) => setOpenToProposals(e.target.checked)}
             />
-            Escucho propuestas
+            {t.publish.openToCheck}
           </label>
         </fieldset>
 
@@ -252,7 +255,7 @@ function EditForm({ offer }: { offer: Offer }) {
 
         {error ? <p className="text-sm text-rose-600">{error}</p> : null}
         <button type="submit" className="btn-primary w-full" disabled={busy || !selected.length}>
-          {busy ? "Guardando…" : "Guardar cambios"}
+          {busy ? t.common.saving : t.common.save}
         </button>
       </form>
     </div>

@@ -6,16 +6,17 @@ import { notFound, useRouter } from "next/navigation";
 import { ApplyModal } from "@/components/ApplyModal";
 import { Gallery } from "@/components/Gallery";
 import { Avatar, Badge, Stars } from "@/components/ui";
-import { TRANSPORT_LABEL } from "@/lib/cuba";
 import { categoryLabel } from "@/lib/categories";
 import { useStore } from "@/lib/store";
-import { formatDateTime, timeAgo, wasEdited, displayTitle } from "@/lib/utils";
+import { formatDateTime, timeAgo, wasEdited, displayTitle, localizeWantTitle } from "@/lib/utils";
 import { IconArrows, IconPin, IconShield, IconTruck } from "@/components/icons";
 import { ShareOffer } from "@/components/ShareOffer";
 import { MeCuadraLabel } from "@/components/MeCuadraMark";
+import { useI18n } from "@/lib/i18n/provider";
 
 export default function OfertaPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const { t, locale } = useI18n();
   const router = useRouter();
   const { offers, items, users, currentUser, trades, ready, updateOffer } = useStore();
   const offer = offers.find((o) => o.id === id);
@@ -23,7 +24,7 @@ export default function OfertaPage({ params }: { params: Promise<{ id: string }>
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
-  if (!ready) return <div className="py-16 text-center text-mute">Cargando oferta…</div>;
+  if (!ready) return <div className="py-16 text-center text-mute">{t.offer.loading}</div>;
   if (!offer) notFound();
 
   const owner = users.find((u) => u.id === offer.userId);
@@ -41,7 +42,7 @@ export default function OfertaPage({ params }: { params: Promise<{ id: string }>
   async function removeOffer() {
     if (
       !window.confirm(
-        "¿Eliminar esta oferta del mercado? Quienes ya aplicaron verán que ya no está abierta.",
+        t.offer.confirmDelete,
       )
     ) {
       return;
@@ -52,7 +53,7 @@ export default function OfertaPage({ params }: { params: Promise<{ id: string }>
       await updateOffer(offer!.id, { status: "cancelada" });
       router.push("/explorar");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "No se pudo eliminar.");
+      setError(e instanceof Error ? e.message : t.offer.deleteFail);
       setBusy(false);
     }
   }
@@ -60,14 +61,14 @@ export default function OfertaPage({ params }: { params: Promise<{ id: string }>
   return (
     <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
       <div>
-        <Gallery photos={photos} alt={offered[0]?.title ?? "Oferta"} />
+        <Gallery photos={photos} alt={offered[0]?.title ?? t.offer.offers} />
         <div className="mt-5 space-y-4">
           {offered.map((item) => (
             <article key={item.id} className="card p-4">
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="break-words font-display text-xl">{displayTitle(item.title)}</h2>
-                <Badge>{categoryLabel(item.category)}</Badge>
-                <Badge tone="mute">{item.condition}</Badge>
+                <Badge>{categoryLabel(item.category, locale)}</Badge>
+                <Badge tone="mute">{t.conditions[item.condition]}</Badge>
               </div>
               <p className="mt-2 text-sm leading-6 text-mute">{item.description}</p>
             </article>
@@ -88,19 +89,19 @@ export default function OfertaPage({ params }: { params: Promise<{ id: string }>
                 <Stars value={owner?.ratingAvg ?? 0} count={owner?.ratingCount} />
               </div>
             </Link>
-            <span className="shrink-0 text-xs text-mute">{timeAgo(offer.createdAt)}</span>
+            <span className="shrink-0 text-xs text-mute">{timeAgo(offer.createdAt, locale)}</span>
           </div>
 
           <dl className="mt-4 space-y-1 rounded-2xl bg-surface-2 px-3 py-2.5 text-xs text-mute">
             <div className="flex justify-between gap-2">
-              <dt>Publicada</dt>
-              <dd className="font-medium text-ink">{formatDateTime(offer.createdAt)}</dd>
+              <dt>{t.offer.published}</dt>
+              <dd className="font-medium text-ink">{formatDateTime(offer.createdAt, locale)}</dd>
             </div>
             {edited ? (
               <div className="flex justify-between gap-2">
-                <dt>Última edición</dt>
+                <dt>{t.offer.lastEdit}</dt>
                 <dd className="font-medium text-ink">
-                  {formatDateTime(offer.updatedAt || offer.createdAt)}
+                  {formatDateTime(offer.updatedAt || offer.createdAt, locale)}
                 </dd>
               </div>
             ) : null}
@@ -108,7 +109,7 @@ export default function OfertaPage({ params }: { params: Promise<{ id: string }>
 
           <div className="mt-5 grid grid-cols-[1fr_auto_1fr] items-start gap-2 rounded-2xl bg-surface-2 p-3">
             <div>
-              <p className="text-[10px] font-semibold uppercase text-mute">Ofrece</p>
+              <p className="text-[10px] font-semibold uppercase text-mute">{t.offer.offers}</p>
               <ul className="mt-1 space-y-1 text-sm font-medium">
                 {offered.map((i) => (
                   <li key={i.id} className="break-words">
@@ -121,11 +122,11 @@ export default function OfertaPage({ params }: { params: Promise<{ id: string }>
               <IconArrows className="h-4 w-4" />
             </span>
             <div>
-              <p className="text-[10px] font-semibold uppercase text-mute">Necesita</p>
+              <p className="text-[10px] font-semibold uppercase text-mute">{t.offer.needs}</p>
               <ul className="mt-1 space-y-1 text-sm font-medium">
                 {offer.wants.map((w) => (
                   <li key={w.title} className="break-words">
-                    {displayTitle(w.title)}
+                    {localizeWantTitle(w.title, t.offer.openTo)}
                   </li>
                 ))}
               </ul>
@@ -144,28 +145,26 @@ export default function OfertaPage({ params }: { params: Promise<{ id: string }>
             </span>
             <span className="inline-flex items-center gap-1">
               <IconTruck className="h-4 w-4" />
-              {TRANSPORT_LABEL[offer.transport]}
+              {t.transport[offer.transport]}
             </span>
           </div>
 
           {offer.openToProposals ? (
-            <p className="mt-3 text-xs text-brand">
-              Esta persona escucha propuestas distintas a lo listado.
-            </p>
+            <p className="mt-3 text-xs text-brand">{t.offer.listens}</p>
           ) : null}
 
           {error ? <p className="mt-3 text-sm text-rose-600">{error}</p> : null}
 
           {mine ? (
             <div className="mt-5 space-y-2">
-              <p className="rounded-2xl bg-brand-50 p-3 text-sm text-brand">Esta es tu oferta.</p>
+              <p className="rounded-2xl bg-brand-50 p-3 text-sm text-brand">{t.offer.yours}</p>
               {offer.status === "abierta" || offer.status === "pausada" ? (
                 <div className="flex flex-col gap-2 sm:flex-row">
                   <Link
                     href={`/oferta/${offer.id}/editar`}
                     className="btn-primary flex-1 text-center"
                   >
-                    Editar
+                    {t.common.edit}
                   </Link>
                   <button
                     type="button"
@@ -173,16 +172,16 @@ export default function OfertaPage({ params }: { params: Promise<{ id: string }>
                     disabled={busy}
                     onClick={() => void removeOffer()}
                   >
-                    {busy ? "Eliminando…" : "Eliminar"}
+                    {busy ? t.common.deleting : t.common.delete}
                   </button>
                 </div>
               ) : (
-                <p className="text-sm text-mute">Estado: {offer.status}</p>
+                <p className="text-sm text-mute">{t.offer.status}: {offer.status}</p>
               )}
             </div>
           ) : existing ? (
             <Link href={`/chat/${existing.id}`} className="btn-primary mt-5 w-full">
-              Abrir chat
+              {t.offer.openChat}
             </Link>
           ) : offer.status === "abierta" ? (
             <div className="mt-5 flex w-full justify-center">
@@ -191,7 +190,7 @@ export default function OfertaPage({ params }: { params: Promise<{ id: string }>
               </button>
             </div>
           ) : (
-            <p className="mt-5 text-sm text-mute">Esta oferta ya no está abierta.</p>
+            <p className="mt-5 text-sm text-mute">{t.offer.notOpen}</p>
           )}
         </div>
         <ShareOffer offer={offer} offeredTitles={offered.map((i) => i.title)} />

@@ -15,153 +15,170 @@ export type CategoryGroupId =
 export type CategoryGroup = {
   id: CategoryGroupId;
   label: string;
+  labelEs: string;
   emoji: string;
-  categories: { id: CategoryId; label: string; hint?: string }[];
+  categories: { id: CategoryId; label: string; labelEs: string; hint?: string }[];
 };
 
-/** Taxonomía al estilo Revolico: grupo → subcategorías concretas. */
+export function localizedName(
+  item: { label: string; labelEs: string },
+  locale: string,
+) {
+  return locale === "es" ? item.labelEs : item.label;
+}
+
+/** Revolico-style taxonomy: group → concrete subcategories. */
 export const CATEGORY_GROUPS: CategoryGroup[] = [
   {
     id: "vehiculos",
-    label: "Vehículos",
+    label: "Vehicles",
+    labelEs: "Vehículos",
     emoji: "🚗",
     categories: [
-      { id: "motos_electricas", label: "Motos Eléctricas y Triciclos" },
-      { id: "motos_combustion", label: "Motos de Combustión" },
-      { id: "repuestos_motos", label: "Repuestos y Accesorios de Motos" },
-      { id: "carros", label: "Carros" },
-      { id: "repuestos_carros", label: "Repuestos y Accesorios de Carros" },
-      { id: "bicicletas", label: "Bicicletas" },
-      { id: "alquiler_carros", label: "Alquiler de Carros" },
-      { id: "otros_vehiculos", label: "Otros · Vehículos" },
+      { id: "motos_electricas", label: "E-bikes & trikes", labelEs: "Motos eléctricas y triciclos" },
+      { id: "motos_combustion", label: "Gas motorcycles", labelEs: "Motos de combustión" },
+      { id: "repuestos_motos", label: "Motorcycle parts", labelEs: "Repuestos de motos" },
+      { id: "carros", label: "Cars", labelEs: "Carros" },
+      { id: "repuestos_carros", label: "Car parts", labelEs: "Repuestos de carros" },
+      { id: "bicicletas", label: "Bicycles", labelEs: "Bicicletas" },
+      { id: "alquiler_carros", label: "Car rental", labelEs: "Alquiler de carros" },
+      { id: "otros_vehiculos", label: "Other · Vehicles", labelEs: "Otros · Vehículos" },
     ],
   },
   {
     id: "inmobiliaria",
-    label: "Inmobiliaria",
+    label: "Housing",
+    labelEs: "Inmobiliaria",
     emoji: "🏢",
     categories: [
-      { id: "casas", label: "Casas" },
-      { id: "alquiler_cubanos", label: "Alquiler a Cubanos" },
-      { id: "alquiler_extranjeros", label: "Alquiler a Extranjeros" },
-      { id: "alquiler_vacacional", label: "Alquiler Vacacional" },
-      { id: "permutas", label: "Permutas" },
-      { id: "otros_inmobiliaria", label: "Otros · Inmobiliaria" },
+      { id: "casas", label: "Homes", labelEs: "Casas" },
+      { id: "alquiler_cubanos", label: "Long-term rental", labelEs: "Alquiler de larga duración" },
+      { id: "alquiler_extranjeros", label: "Rental for visitors", labelEs: "Alquiler a visitantes" },
+      { id: "alquiler_vacacional", label: "Vacation rental", labelEs: "Alquiler vacacional" },
+      { id: "permutas", label: "Home swaps", labelEs: "Permutas" },
+      { id: "otros_inmobiliaria", label: "Other · Housing", labelEs: "Otros · Inmobiliaria" },
     ],
   },
   {
     id: "tecnologia",
-    label: "Tecnología",
+    label: "Tech",
+    labelEs: "Tecnología",
     emoji: "💻",
     categories: [
-      { id: "celulares", label: "Celulares y Accesorios" },
-      { id: "televisores", label: "Televisores e Imagen" },
-      { id: "computadoras", label: "Computadoras y Tablets" },
-      { id: "accesorios_pc", label: "Accesorios de Computadoras" },
-      { id: "consolas", label: "Consolas y Videojuegos" },
-      { id: "audio", label: "Audífonos, Bocinas y Sonido" },
-      { id: "camaras", label: "Cámaras y Fotografía" },
-      { id: "otros_tecnologia", label: "Otros · Tecnología" },
+      { id: "celulares", label: "Phones & accessories", labelEs: "Celulares y accesorios" },
+      { id: "televisores", label: "TVs", labelEs: "Televisores e imagen" },
+      { id: "computadoras", label: "Computers & tablets", labelEs: "Computadoras y tablets" },
+      { id: "accesorios_pc", label: "PC accessories", labelEs: "Accesorios de computadoras" },
+      { id: "consolas", label: "Consoles & games", labelEs: "Consolas y videojuegos" },
+      { id: "audio", label: "Headphones & audio", labelEs: "Audífonos, bocinas y sonido" },
+      { id: "camaras", label: "Cameras", labelEs: "Cámaras y fotografía" },
+      { id: "otros_tecnologia", label: "Other · Tech", labelEs: "Otros · Tecnología" },
     ],
   },
   {
     id: "empleos",
-    label: "Empleos",
+    label: "Jobs",
+    labelEs: "Empleos",
     emoji: "💼",
     categories: [
-      { id: "ofertas_empleo", label: "Ofertas de Empleo" },
-      { id: "busco_empleo", label: "Busco Empleo" },
+      { id: "ofertas_empleo", label: "Job offers", labelEs: "Ofertas de empleo" },
+      { id: "busco_empleo", label: "Looking for work", labelEs: "Busco empleo" },
     ],
   },
   {
     id: "ropa",
-    label: "Ropa y Accesorios",
+    label: "Clothes & accessories",
+    labelEs: "Ropa y accesorios",
     emoji: "👕",
     categories: [
-      { id: "ropa_mujer", label: "Ropa de Mujer" },
-      { id: "zapatos_mujer", label: "Zapatos de Mujer" },
-      { id: "ropa_hombre", label: "Ropa de Hombre" },
-      { id: "zapatos_hombre", label: "Zapatos de Hombre" },
-      { id: "relojes_joyas", label: "Relojes, Joyas y Accesorios" },
-      { id: "belleza_maquillaje", label: "Belleza, Maquillaje y Perfumes" },
-      { id: "otros_ropa", label: "Otros · Ropa y Accesorios" },
+      { id: "ropa_mujer", label: "Women’s clothing", labelEs: "Ropa de mujer" },
+      { id: "zapatos_mujer", label: "Women’s shoes", labelEs: "Zapatos de mujer" },
+      { id: "ropa_hombre", label: "Men’s clothing", labelEs: "Ropa de hombre" },
+      { id: "zapatos_hombre", label: "Men’s shoes", labelEs: "Zapatos de hombre" },
+      { id: "relojes_joyas", label: "Watches & jewelry", labelEs: "Relojes, joyas y accesorios" },
+      { id: "belleza_maquillaje", label: "Beauty & perfume", labelEs: "Belleza, maquillaje y perfumes" },
+      { id: "otros_ropa", label: "Other · Clothes", labelEs: "Otros · Ropa y accesorios" },
     ],
   },
   {
     id: "servicios",
-    label: "Servicios",
+    label: "Services",
+    labelEs: "Servicios",
     emoji: "🔧",
     categories: [
-      { id: "construccion_mantenimiento", label: "Construcción y Mantenimiento" },
-      { id: "catering", label: "Catering y Comida a Domicilio" },
-      { id: "belleza_salud_servicio", label: "Belleza, Salud y Cuidado Personal" },
-      { id: "talleres", label: "Talleres y Reparaciones" },
-      { id: "eventos", label: "Eventos y Entretenimiento" },
-      { id: "limpieza", label: "Limpieza y Cuidado" },
-      { id: "clases", label: "Clases y Cursos" },
-      { id: "informatica_marketing", label: "Informática, Creatividad y Marketing" },
-      { id: "transporte_logistica", label: "Transporte y Logística" },
-      { id: "otros_servicios", label: "Otros · Servicios" },
+      { id: "construccion_mantenimiento", label: "Building & maintenance", labelEs: "Construcción y mantenimiento" },
+      { id: "catering", label: "Catering & food delivery", labelEs: "Catering y comida a domicilio" },
+      { id: "belleza_salud_servicio", label: "Beauty & personal care", labelEs: "Belleza, salud y cuidado personal" },
+      { id: "talleres", label: "Workshops & repairs", labelEs: "Talleres y reparaciones" },
+      { id: "eventos", label: "Events & entertainment", labelEs: "Eventos y entretenimiento" },
+      { id: "limpieza", label: "Cleaning", labelEs: "Limpieza y cuidado" },
+      { id: "clases", label: "Classes & courses", labelEs: "Clases y cursos" },
+      { id: "informatica_marketing", label: "IT, design & marketing", labelEs: "Informática, creatividad y marketing" },
+      { id: "transporte_logistica", label: "Transport & logistics", labelEs: "Transporte y logística" },
+      { id: "otros_servicios", label: "Other · Services", labelEs: "Otros · Servicios" },
     ],
   },
   {
     id: "electrodomesticos",
-    label: "Electrodomésticos",
+    label: "Appliances",
+    labelEs: "Electrodomésticos",
     emoji: "📺",
     categories: [
-      { id: "refrigeradores", label: "Refrigeradores y Neveras" },
-      { id: "lavadoras", label: "Lavadoras y Secadoras" },
-      { id: "cocinas", label: "Cocinas y Hornos" },
-      { id: "ventiladores", label: "Ventiladores" },
-      { id: "aire_acondicionado", label: "Aire Acondicionado" },
-      { id: "pequeno_electro", label: "Pequeño Electrodoméstico" },
-      { id: "otros_electro", label: "Otros · Electrodomésticos" },
+      { id: "refrigeradores", label: "Fridges", labelEs: "Refrigeradores y neveras" },
+      { id: "lavadoras", label: "Washers & dryers", labelEs: "Lavadoras y secadoras" },
+      { id: "cocinas", label: "Stoves & ovens", labelEs: "Cocinas y hornos" },
+      { id: "ventiladores", label: "Fans", labelEs: "Ventiladores" },
+      { id: "aire_acondicionado", label: "Air conditioning", labelEs: "Aire acondicionado" },
+      { id: "pequeno_electro", label: "Small appliances", labelEs: "Pequeño electrodoméstico" },
+      { id: "otros_electro", label: "Other · Appliances", labelEs: "Otros · Electrodomésticos" },
     ],
   },
   {
     id: "hogar",
-    label: "Hogar",
+    label: "Home",
+    labelEs: "Hogar",
     emoji: "🏠",
     categories: [
-      { id: "muebles", label: "Muebles" },
-      { id: "arte_antiguedades", label: "Arte, Antigüedades y Colección" },
-      { id: "plantas_energia", label: "Plantas y Estaciones de Energía" },
-      { id: "materiales_construccion", label: "Materiales de Construcción" },
-      { id: "ferreteria", label: "Ferretería y Herramientas" },
-      { id: "articulos_hogar", label: "Artículos del Hogar" },
-      { id: "otros_hogar", label: "Otros · Hogar" },
+      { id: "muebles", label: "Furniture", labelEs: "Muebles" },
+      { id: "arte_antiguedades", label: "Art & collectibles", labelEs: "Arte, antigüedades y colección" },
+      { id: "plantas_energia", label: "Power stations", labelEs: "Plantas y estaciones de energía" },
+      { id: "materiales_construccion", label: "Building materials", labelEs: "Materiales de construcción" },
+      { id: "ferreteria", label: "Tools & hardware", labelEs: "Ferretería y herramientas" },
+      { id: "articulos_hogar", label: "Household goods", labelEs: "Artículos del hogar" },
+      { id: "otros_hogar", label: "Other · Home", labelEs: "Otros · Hogar" },
     ],
   },
   {
     id: "familia",
-    label: "Familia",
+    label: "Family",
+    labelEs: "Familia",
     emoji: "👨‍👩‍👧‍👦",
     categories: [
-      { id: "salud_bienestar", label: "Salud y Bienestar" },
-      { id: "alimentos_bebidas", label: "Alimentos y Bebidas" },
-      { id: "ropa_ninos", label: "Ropa y Zapatos de Niños" },
-      { id: "articulos_bebe", label: "Artículos de Bebé" },
-      { id: "juguetes", label: "Juguetes" },
-      { id: "utiles_escolares", label: "Útiles Escolares y Mochilas" },
-      { id: "otros_familia", label: "Otros · Familia" },
+      { id: "salud_bienestar", label: "Health & wellness", labelEs: "Salud y bienestar" },
+      { id: "alimentos_bebidas", label: "Food & drinks", labelEs: "Alimentos y bebidas" },
+      { id: "ropa_ninos", label: "Kids’ clothes", labelEs: "Ropa y zapatos de niños" },
+      { id: "articulos_bebe", label: "Baby gear", labelEs: "Artículos de bebé" },
+      { id: "juguetes", label: "Toys", labelEs: "Juguetes" },
+      { id: "utiles_escolares", label: "School supplies", labelEs: "Útiles escolares y mochilas" },
+      { id: "otros_familia", label: "Other · Family", labelEs: "Otros · Familia" },
     ],
   },
   {
     id: "general",
     label: "General",
+    labelEs: "General",
     emoji: "🛒",
     categories: [
-      { id: "mascotas", label: "Productos para Mascotas" },
-      { id: "instrumentos", label: "Instrumentos Musicales" },
-      { id: "deportes", label: "Artículos Deportivos" },
-      { id: "suplementos", label: "Suplementos y Nutrición Deportiva" },
-      { id: "peliculas_libros", label: "Películas, Música y Libros" },
-      { id: "otros_general", label: "Otros · General" },
+      { id: "mascotas", label: "Pet supplies", labelEs: "Productos para mascotas" },
+      { id: "instrumentos", label: "Musical instruments", labelEs: "Instrumentos musicales" },
+      { id: "deportes", label: "Sports gear", labelEs: "Artículos deportivos" },
+      { id: "suplementos", label: "Sports nutrition", labelEs: "Suplementos y nutrición deportiva" },
+      { id: "peliculas_libros", label: "Movies, music & books", labelEs: "Películas, música y libros" },
+      { id: "otros_general", label: "Other · General", labelEs: "Otros · General" },
     ],
   },
 ];
 
-/** Lista plana de subcategorías (formularios y etiquetas). */
 export const CATEGORIES = CATEGORY_GROUPS.flatMap((g) =>
   g.categories.map((c) => ({
     ...c,
@@ -171,7 +188,6 @@ export const CATEGORIES = CATEGORY_GROUPS.flatMap((g) =>
   })),
 );
 
-/** Categorías antiguas → nuevas (datos previos / seed). */
 export const LEGACY_CATEGORY_MAP: Record<string, CategoryId> = {
   alimentos: "alimentos_bebidas",
   aseo: "articulos_hogar",
@@ -185,10 +201,10 @@ export const LEGACY_CATEGORY_MAP: Record<string, CategoryId> = {
   otros: "otros_general",
 };
 
-export const CONDITIONS: { id: import("./types").Condition; label: string }[] = [
-  { id: "nuevo", label: "Nuevo" },
-  { id: "usado", label: "Usado" },
-  { id: "sellado", label: "Sellado" },
+export const CONDITIONS: { id: import("./types").Condition; label: string; labelEs: string }[] = [
+  { id: "nuevo", label: "New", labelEs: "Nuevo" },
+  { id: "usado", label: "Used", labelEs: "Usado" },
+  { id: "sellado", label: "Sealed", labelEs: "Sellado" },
 ];
 
 export function normalizeCategoryId(raw: string): CategoryId {
@@ -196,12 +212,15 @@ export function normalizeCategoryId(raw: string): CategoryId {
   return LEGACY_CATEGORY_MAP[raw] ?? "otros_general";
 }
 
-export function categoryLabel(id: CategoryId | "abierto" | string) {
-  if (id === "abierto") return "Escucho propuestas";
+export function categoryLabel(id: CategoryId | "abierto" | string, locale: string = "en") {
+  if (id === "abierto") return locale === "es" ? "Escucho propuestas" : "Open to proposals";
   const modern = CATEGORIES.find((c) => c.id === id);
-  if (modern) return modern.label;
+  if (modern) return localizedName(modern, locale);
   const mapped = LEGACY_CATEGORY_MAP[id];
-  if (mapped) return CATEGORIES.find((c) => c.id === mapped)?.label ?? id;
+  if (mapped) {
+    const found = CATEGORIES.find((c) => c.id === mapped);
+    return found ? localizedName(found, locale) : id;
+  }
   return id;
 }
 

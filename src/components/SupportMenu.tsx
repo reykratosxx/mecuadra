@@ -3,8 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { COMMUNITY_TELEGRAM, SUPPORT_TELEGRAM } from "@/lib/support";
 import { cn } from "@/lib/utils";
+import { useT } from "@/lib/i18n/provider";
 
 export function SupportMenu() {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -32,7 +34,7 @@ export function SupportMenu() {
       {open ? (
         <div className="mb-2 w-56 overflow-hidden rounded-2xl border border-line bg-surface shadow-xl shadow-brand/10">
           <p className="border-b border-line px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-mute">
-            Ayuda MeCuadra
+            {t.footer.helpTitle}
           </p>
           <a
             href={SUPPORT_TELEGRAM}
@@ -41,7 +43,7 @@ export function SupportMenu() {
             className="block px-3 py-2.5 text-sm font-medium text-ink hover:bg-hover"
             onClick={() => setOpen(false)}
           >
-            Soporte en Telegram
+            {t.footer.helpSupport}
             <span className="mt-0.5 block text-xs font-normal text-mute">@alainleonids</span>
           </a>
           <a
@@ -51,7 +53,7 @@ export function SupportMenu() {
             className="block border-t border-line px-3 py-2.5 text-sm font-medium text-ink hover:bg-hover"
             onClick={() => setOpen(false)}
           >
-            Grupo de la comunidad
+            {t.footer.helpCommunity}
             <span className="mt-0.5 block text-xs font-normal text-mute">t.me/mecuadrachat</span>
           </a>
         </div>
@@ -65,10 +67,10 @@ export function SupportMenu() {
           "bg-[image:var(--grad)]",
         )}
         aria-expanded={open}
-        aria-label={open ? "Cerrar menú de ayuda" : "Abrir menú de ayuda"}
+        aria-label={open ? t.footer.helpClose : t.footer.helpOpen}
       >
         <TelegramGlyph className="h-4 w-4" />
-        Ayuda
+        {t.footer.help}
       </button>
     </div>
   );

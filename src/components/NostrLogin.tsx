@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { finalizeEvent, type EventTemplate } from "nostr-tools/pure";
 import { bytesToHex, randomBytes } from "@noble/hashes/utils.js";
 import { useT } from "@/lib/i18n/provider";
@@ -11,6 +11,7 @@ import {
   identityFromSecret,
   parseNsec,
   saveIdentity,
+  shortNpub,
   type LocalNostrIdentity,
 } from "@/lib/nostr/keys";
 import { silentPaymentCode } from "@/lib/silent-payments";
@@ -40,7 +41,12 @@ export function NostrLogin({ next }: { next: string }) {
   const [fresh, setFresh] = useState<LocalNostrIdentity | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<"nsec" | "npub" | "">("");
+  const [hasExt, setHasExt] = useState(false);
+
+  useEffect(() => {
+    setHasExt(Boolean(window.nostr));
+  }, []);
 
   const finish = useCallback(
     async (id: LocalNostrIdentity | null) => {
@@ -49,9 +55,6 @@ export function NostrLogin({ next }: { next: string }) {
       try {
         const event = await signedLoginEvent(id);
         if (id) saveIdentity(id);
-        else if (window.nostr) {
-          /* NIP-07: nsec stays in the extension */
-        }
         const sp = id ? silentPaymentCode(id.secretKey) : undefined;
         const res = await fetch("/api/auth/nostr", {
           method: "POST",
@@ -76,7 +79,7 @@ export function NostrLogin({ next }: { next: string }) {
   );
 
   return (
-    <div className="space-y-4">
+    <div className="min-w-0 space-y-4">
       {busy ? (
         <div className="flex flex-col items-center gap-3 py-6" role="status">
           <span className="h-9 w-9 animate-spin rounded-full border-[3px] border-brand/25 border-t-brand" />
@@ -84,56 +87,76 @@ export function NostrLogin({ next }: { next: string }) {
         </div>
       ) : (
         <>
-          <button type="button" className="btn-primary w-full py-3 text-base" onClick={() => void finish(null)}>
-            {t.auth.nip07}
-          </button>
           <button
             type="button"
-            className="btn-ghost w-full py-3"
+            className="btn-primary w-full py-3 text-base"
             onClick={() => {
+              setError("");
               const id = createIdentity();
               setFresh(id);
+              setCopied("");
             }}
           >
             {t.auth.generate}
           </button>
 
           {fresh ? (
-            <div className="rounded-2xl border border-brand/25 bg-brand-50 px-4 py-3 text-sm">
-              <p className="font-semibold text-ink">{fresh.npub}</p>
-              <p className="mt-2 text-xs leading-5 text-mute">{t.auth.backupWarn}</p>
-              <code className="mt-2 block break-all rounded-xl bg-surface px-3 py-2 text-[11px]">{fresh.nsec}</code>
-              <div className="mt-3 flex gap-2">
+            <div className="min-w-0 overflow-hidden rounded-2xl border border-brand/25 bg-brand-50 p-3 sm:p-4">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-mute">{t.auth.backupTitle}</p>
+              <p className="mt-1 break-all font-mono text-[11px] leading-5 text-ink sm:text-xs" title={fresh.npub}>
+                {shortNpub(fresh.npub)}
+              </p>
+              <p className="mt-3 text-xs leading-5 text-mute">{t.auth.backupWarn}</p>
+              <p className="mt-3 text-[10px] font-semibold uppercase tracking-wider text-mute">{t.auth.secretLabel}</p>
+              <code className="mt-1 block max-h-24 overflow-y-auto break-all rounded-xl bg-surface px-3 py-2 font-mono text-[11px] leading-5 text-ink">
+                {fresh.nsec}
+              </code>
+              <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <button
                   type="button"
-                  className="btn-ghost flex-1 text-xs"
+                  className="btn-ghost w-full text-xs"
                   onClick={() => {
                     void navigator.clipboard.writeText(fresh.nsec);
-                    setCopied(true);
+                    setCopied("nsec");
                   }}
                 >
-                  {copied ? t.auth.copied : t.auth.copyNsec}
+                  {copied === "nsec" ? t.auth.copied : t.auth.copyNsec}
                 </button>
-                <button type="button" className="btn-primary flex-1 text-xs" onClick={() => void finish(fresh)}>
+                <button
+                  type="button"
+                  className="btn-primary w-full text-xs"
+                  onClick={() => void finish(fresh)}
+                >
                   {t.auth.continue}
                 </button>
               </div>
             </div>
           ) : null}
 
+          {hasExt ? (
+            <>
+              <p className="text-center text-xs text-mute">{t.auth.hasExt}</p>
+              <button type="button" className="btn-ghost w-full py-3" onClick={() => void finish(null)}>
+                {t.auth.nip07}
+              </button>
+            </>
+          ) : null}
+
           <label className="label">{t.auth.pasteNsec}</label>
           <input
-            className="input"
+            className="input min-w-0"
             placeholder={t.auth.placeholder}
             value={nsecInput}
             onChange={(e) => setNsecInput(e.target.value)}
             autoComplete="off"
+            spellCheck={false}
           />
           <button
             type="button"
             className="btn-ghost w-full"
             onClick={() => {
               try {
+                setError("");
                 void finish(identityFromSecret(parseNsec(nsecInput)));
               } catch {
                 setError(t.auth.error);
@@ -144,13 +167,7 @@ export function NostrLogin({ next }: { next: string }) {
           </button>
         </>
       )}
-      {error ? <p className="text-sm text-rose-600">{error}</p> : null}
+      {error ? <p className="break-words text-sm text-rose-600">{error}</p> : null}
     </div>
   );
-}
-
-export function LoginNext() {
-  const params = useSearchParams();
-  const next = params.get("next");
-  return next && next.startsWith("/") ? next : "/explorar";
 }

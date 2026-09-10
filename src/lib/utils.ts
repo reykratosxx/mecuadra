@@ -34,26 +34,30 @@ function havanaParts(iso: string) {
   };
 }
 
-export function timeAgo(iso: string) {
+const MONTHS_EN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+export function timeAgo(iso: string, locale: string = "en") {
+  const es = locale === "es";
+  const months = es ? MONTHS_ES : MONTHS_EN;
   const diff = Date.now() - new Date(iso).getTime();
   const min = Math.floor(diff / 60000);
-  if (min < 1) return "Ahora";
-  if (min < 60) return `Hace ${min} min`;
+  if (min < 1) return es ? "Ahora" : "Now";
+  if (min < 60) return es ? `Hace ${min} min` : `${min} min ago`;
   const h = Math.floor(min / 60);
-  if (h < 24) return `Hace ${h} h`;
+  if (h < 24) return es ? `Hace ${h} h` : `${h} h ago`;
   const d = Math.floor(h / 24);
-  if (d === 1) return "Ayer";
-  if (d < 7) return `Hace ${d} días`;
+  if (d === 1) return es ? "Ayer" : "Yesterday";
+  if (d < 7) return es ? `Hace ${d} días` : `${d} days ago`;
   const { day, month } = havanaParts(iso);
-  return `${day} ${MONTHS_ES[month - 1]}`;
+  return `${day} ${months[month - 1]}`;
 }
 
-/** Fecha y hora en zona de Cuba, sin depender del locale del servidor. */
-export function formatDateTime(iso: string) {
+export function formatDateTime(iso: string, locale: string = "en") {
+  const months = locale === "es" ? MONTHS_ES : MONTHS_EN;
   const { day, month, year, hour, minute } = havanaParts(iso);
   const hh = String(hour).padStart(2, "0");
   const mm = String(minute).padStart(2, "0");
-  return `${day} ${MONTHS_ES[month - 1]} ${year}, ${hh}:${mm}`;
+  return `${day} ${months[month - 1]} ${year}, ${hh}:${mm}`;
 }
 
 /** true si hubo edición real (más de ~1 min tras crear). */
@@ -84,4 +88,15 @@ export function displayTitle(raw: string) {
   if (upper / letters.length < 0.65) return t;
   const lower = t.toLocaleLowerCase("es");
   return lower.charAt(0).toLocaleUpperCase("es") + lower.slice(1);
+}
+
+const OPEN_TO_ALIASES = new Set([
+  "escucho propuestas",
+  "open to proposals",
+  "abierto / escucho propuestas",
+]);
+
+export function localizeWantTitle(raw: string, openToLabel: string) {
+  if (OPEN_TO_ALIASES.has(raw.trim().toLowerCase())) return openToLabel;
+  return displayTitle(raw);
 }

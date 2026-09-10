@@ -4,11 +4,12 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { Avatar, Stars } from "./ui";
 import { IconPin, IconShield, IconTruck, IconX } from "./icons";
-import { TRANSPORT_LABEL } from "@/lib/cuba";
 import type { User } from "@/lib/types";
+import { useT } from "@/lib/i18n/provider";
 
 /** Ficha rápida de una persona, sin salir del chat. */
 export function ProfilePeek({ user, onClose }: { user: User; onClose: () => void }) {
+  const t = useT();
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -24,7 +25,7 @@ export function ProfilePeek({ user, onClose }: { user: User; onClose: () => void
       className="fixed inset-0 z-[80] flex items-end justify-center bg-ink/45 p-0 backdrop-blur-sm sm:items-center sm:p-4"
       role="dialog"
       aria-modal="true"
-      aria-label={`Perfil de ${user.name}`}
+      aria-label={`${t.nav.profile} ${user.name}`}
       onClick={onClose}
     >
       <div
@@ -45,7 +46,7 @@ export function ProfilePeek({ user, onClose }: { user: User; onClose: () => void
             type="button"
             onClick={onClose}
             className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-mute hover:bg-hover"
-            aria-label="Cerrar"
+            aria-label={t.common.close}
           >
             <IconX className="h-4 w-4" />
           </button>
@@ -54,16 +55,17 @@ export function ProfilePeek({ user, onClose }: { user: User; onClose: () => void
         <dl className="mt-4 space-y-2 rounded-2xl bg-surface-2 px-3 py-3 text-sm">
           <div className="flex items-start gap-2">
             <IconPin className="mt-0.5 h-4 w-4 shrink-0 text-mute" />
-            <dd>{place || "Sin ubicación declarada"}</dd>
+            <dd>{place || t.profile.noLocation}</dd>
           </div>
           <div className="flex items-start gap-2">
             <IconTruck className="mt-0.5 h-4 w-4 shrink-0 text-mute" />
-            <dd>{TRANSPORT_LABEL[user.transport] ?? "Transporte sin declarar"}</dd>
+            <dd>{t.transport[user.transport as keyof typeof t.transport] ?? t.explore.transport}</dd>
           </div>
           <div className="flex items-start gap-2">
             <span className="mt-0.5 w-4 shrink-0 text-center text-xs text-mute">✓</span>
             <dd>
-              {user.tradesCompleted} {user.tradesCompleted === 1 ? "trueque" : "trueques"} completados
+              {user.tradesCompleted}{" "}
+              {user.tradesCompleted === 1 ? t.profile.tradesDoneOne : t.profile.tradesDoneMany}
             </dd>
           </div>
         </dl>
@@ -73,7 +75,7 @@ export function ProfilePeek({ user, onClose }: { user: User; onClose: () => void
         ) : null}
 
         <Link href={`/perfil/${user.id}`} className="btn-primary mt-4 w-full" onClick={onClose}>
-          Ver perfil y sus ofertas
+          {t.profile.viewOffers}
         </Link>
       </div>
     </div>

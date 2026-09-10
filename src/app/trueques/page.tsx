@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useStore } from "@/lib/store";
 import { Avatar, Badge, Empty, RequireAuth } from "@/components/ui";
 import { timeAgo } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/provider";
 
 const TABS = [
   { id: "aceptados", label: "Aceptados" },
@@ -21,9 +22,16 @@ export default function TruequesPage() {
 }
 
 function Board() {
+  const { t, locale } = useI18n();
   const { currentUser, trades, offers, items, users } = useStore();
   const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("aceptados");
   const uid = currentUser!.id;
+
+  const tabs = [
+    { id: "aceptados" as const, label: t.trades.accepted },
+    { id: "recibidos" as const, label: t.trades.received },
+    { id: "enviados" as const, label: t.trades.sent },
+  ];
 
   const filtered = trades.filter((t) => {
     if (tab === "aceptados") {
@@ -38,69 +46,70 @@ function Board() {
 
   return (
     <div>
-      <h1 className="font-display text-3xl">Mis trueques</h1>
-      <p className="text-mute">Aceptados, recibidos y enviados — el flujo P2P completo.</p>
+      <h1 className="font-display text-3xl">{t.trades.title}</h1>
+      <p className="text-mute">{t.trades.lead}</p>
       <div className="mt-5 flex rounded-2xl bg-surface-2 p-1">
-        {TABS.map((t) => (
+        {tabs.map((tabItem) => (
           <button
-            key={t.id}
+            key={tabItem.id}
             type="button"
-            onClick={() => setTab(t.id)}
+            onClick={() => setTab(tabItem.id)}
             className={`flex-1 rounded-xl py-2 text-sm font-semibold ${
-              tab === t.id ? "bg-surface text-brand shadow-sm" : "text-mute"
+              tab === tabItem.id ? "bg-surface text-brand shadow-sm" : "text-mute"
             }`}
           >
-            {t.label}
+            {tabItem.label}
           </button>
         ))}
       </div>
       <ul className="mt-4 space-y-3">
         {filtered.length === 0 ? (
-          <Empty title="Nada en esta bandeja" hint="Cuando alguien toque MeCuadra, aparece aquí." />
+          <Empty title={t.trades.empty} hint={t.trades.emptyHint} />
         ) : (
-          filtered.map((t) => {
-            const otherId = t.ownerId === uid ? t.applicantId : t.ownerId;
+          filtered.map((tr) => {
+            const otherId = tr.ownerId === uid ? tr.applicantId : tr.ownerId;
             const other = users.find((u) => u.id === otherId);
-            const offer = offers.find((o) => o.id === t.offerId);
+            const offer = offers.find((o) => o.id === tr.offerId);
             const offered = items.filter((i) => offer?.itemIds.includes(i.id));
-            const proposed = items.filter((i) => t.proposedItemIds.includes(i.id));
+            const proposed = items.filter((i) => tr.proposedItemIds.includes(i.id));
+            const statusLabel = t.trades[tr.status as keyof typeof t.trades] ?? tr.status;
             return (
-              <li key={t.id} className="card p-4">
+              <li key={tr.id} className="card p-4">
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <Avatar src={other?.avatar} name={other?.name ?? "?"} size={40} />
                     <div>
                       <p className="font-semibold">{other?.name}</p>
-                      <p className="text-xs text-mute">{timeAgo(t.updatedAt)}</p>
+                      <p className="text-xs text-mute">{timeAgo(tr.updatedAt, locale)}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge
                       tone={
-                        t.status === "completado"
+                        tr.status === "completado"
                           ? "ok"
-                          : t.status === "rechazado" || t.status === "cancelado"
+                          : tr.status === "rechazado" || tr.status === "cancelado"
                             ? "warn"
                             : "brand"
                       }
                     >
-                      {t.status}
+                      {statusLabel}
                     </Badge>
-                    <Link href={`/chat/${t.id}`} className="btn-primary !py-1.5 !px-3 text-xs">
+                    <Link href={`/chat/${tr.id}`} className="btn-primary !py-1.5 !px-3 text-xs">
                       Chat
                     </Link>
                   </div>
                 </div>
                 <div className="mt-3 grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-sm">
                   <div>
-                    <p className="text-[10px] uppercase text-mute">Quiere</p>
-                    <p className="font-medium">{offered.map((i) => i.title).join(" · ") || "Oferta"}</p>
+                    <p className="text-[10px] uppercase text-mute">{t.trades.wants}</p>
+                    <p className="font-medium">{offered.map((i) => i.title).join(" · ") || t.trades.offerFallback}</p>
                   </div>
                   <span className="text-brand">⇄</span>
                   <div>
-                    <p className="text-[10px] uppercase text-mute">Ofrece</p>
+                    <p className="text-[10px] uppercase text-mute">{t.trades.offers}</p>
                     <p className="font-medium">
-                      {proposed.map((i) => i.title).join(" · ") || t.proposalNote || "Propuesta"}
+                      {proposed.map((i) => i.title).join(" · ") || tr.proposalNote || t.trades.proposal}
                     </p>
                   </div>
                 </div>

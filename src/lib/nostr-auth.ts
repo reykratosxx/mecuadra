@@ -1,3 +1,4 @@
+import { createHmac } from "crypto";
 import { verifyEvent, type Event } from "nostr-tools/pure";
 import { npubEncode } from "nostr-tools/nip19";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -14,10 +15,19 @@ export function assertLoginEvent(event: Event, origin: string) {
   const challenge = event.tags.find((t) => t[0] === "challenge")?.[1];
   if (!challenge || challenge.length < 16) return "Missing challenge tag.";
   const originTag = event.tags.find((t) => t[0] === "origin")?.[1];
-  if (originTag && origin && !originTag.startsWith(origin) && originTag !== origin) {
+  if (originTag && origin && originTag !== origin && !origin.startsWith(originTag) && !originTag.startsWith(origin)) {
     return "Origin mismatch.";
   }
   return null;
+}
+
+function nostrPassword(pubkeyHex: string) {
+  const secret =
+    process.env.CASHU_DEMO_SECRET ||
+    process.env.MESSAGE_ENCRYPTION_KEY ||
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    "mecuadra-nostr";
+  return createHmac("sha256", secret).update(`nostr:${pubkeyHex.toLowerCase()}`).digest("hex");
 }
 
 export async function establishNostrSession(pubkeyHex: string, silentPayment?: string) {
@@ -26,41 +36,40 @@ export async function establishNostrSession(pubkeyHex: string, silentPayment?: s
   const npub = npubEncode(pubkeyHex);
   const username = `npub${pubkeyHex.slice(0, 10)}`.toLowerCase();
   const name = `${npub.slice(0, 12)}…${npub.slice(-4)}`;
+  const password = nostrPassword(pubkeyHex);
 
-  const { data: existing } = await admin
-    .from("profiles")
-    .select("id")
-    .eq("npub", npub)
-    .maybeSingle();
+  const { data: created, error: createErr } = await admin.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: {
+      npub,
+      pubkey: pubkeyHex,
+      full_name: name,
+      name,
+      user_name: username,
+    },
+  });
 
-  if (!existing) {
-    const { data: byEmail } = await admin.auth.admin.listUsers();
-    const found = byEmail.users.find((u) => u.email === email);
-    if (!found) {
-      await admin.auth.admin.createUser({
-        email,
-        email_confirm: true,
-        user_metadata: {
-          npub,
-          pubkey: pubkeyHex,
-          full_name: name,
-          name,
-          user_name: username,
-        },
-      });
+  let userId = created?.user?.id;
+  if (createErr || !userId) {
+    const { data: link, error: linkErr } = await admin.auth.admin.generateLink({
+      type: "magiclink",
+      email,
+    });
+    userId = link.user?.id;
+    if (!userId) {
+      return { error: createErr?.message || linkErr?.message || "Could not open session.", status: 500 as const };
+    }
+    const { error: updErr } = await admin.auth.admin.updateUserById(userId, {
+      password,
+      email_confirm: true,
+    });
+    if (updErr) {
+      return { error: updErr.message, status: 500 as const };
     }
   }
 
-  const { data: link, error: linkErr } = await admin.auth.admin.generateLink({
-    type: "magiclink",
-    email,
-  });
-
-  if (linkErr || !link.properties?.hashed_token || !link.user?.id) {
-    return { error: linkErr?.message || "Could not open session.", status: 500 as const };
-  }
-
-  const userId = link.user.id;
   const patch: Record<string, unknown> = {
     npub,
     pubkey_hex: pubkeyHex,
@@ -68,11 +77,14 @@ export async function establishNostrSession(pubkeyHex: string, silentPayment?: s
   };
   if (silentPayment) patch.silent_payment_code = silentPayment;
 
-  await admin.from("profiles").update(patch).eq("id", userId);
+  const { error: updateErr } = await admin.from("profiles").update(patch).eq("id", userId);
+  if (updateErr) {
+    return { error: updateErr.message, status: 500 as const };
+  }
 
   const { data: profile } = await admin.from("profiles").select("id").eq("id", userId).maybeSingle();
   if (!profile) {
-    await admin.from("profiles").insert({
+    const { error: insertErr } = await admin.from("profiles").insert({
       id: userId,
       username: username.slice(0, 24),
       name,
@@ -83,14 +95,13 @@ export async function establishNostrSession(pubkeyHex: string, silentPayment?: s
       municipality: "",
       verified: true,
     });
+    if (insertErr) {
+      return { error: insertErr.message, status: 500 as const };
+    }
   }
 
   const supabase = await createClient();
-  const { error: sessionErr } = await supabase.auth.verifyOtp({
-    type: "email",
-    token_hash: link.properties.hashed_token,
-  });
-
+  const { error: sessionErr } = await supabase.auth.signInWithPassword({ email, password });
   if (sessionErr) {
     return { error: sessionErr.message, status: 500 as const };
   }

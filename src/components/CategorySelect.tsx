@@ -1,15 +1,15 @@
 "use client";
 
-import { CATEGORY_GROUPS } from "@/lib/categories";
+import { CATEGORY_GROUPS, localizedName } from "@/lib/categories";
 import type { CategoryId } from "@/lib/types";
+import { useI18n } from "@/lib/i18n/provider";
 
-/** Select de subcategorías agrupadas (estilo Revolico). */
 export function CategorySelect({
   value,
   onChange,
   allowOpen,
   allowEmpty,
-  emptyLabel = "Todas las categorías",
+  emptyLabel,
   id,
   className = "input",
 }: {
@@ -21,6 +21,7 @@ export function CategorySelect({
   id?: string;
   className?: string;
 }) {
+  const { locale, t } = useI18n();
   return (
     <select
       id={id}
@@ -28,13 +29,13 @@ export function CategorySelect({
       value={value}
       onChange={(e) => onChange(e.target.value as CategoryId | "abierto" | "")}
     >
-      {allowEmpty ? <option value="">{emptyLabel}</option> : null}
-      {allowOpen ? <option value="abierto">Abierto / escucho propuestas</option> : null}
+      {allowEmpty ? <option value="">{emptyLabel ?? t.explore.all}</option> : null}
+      {allowOpen ? <option value="abierto">{t.offer.openTo}</option> : null}
       {CATEGORY_GROUPS.map((g) => (
-        <optgroup key={g.id} label={`${g.emoji} ${g.label}`}>
+        <optgroup key={g.id} label={`${g.emoji} ${localizedName(g, locale)}`}>
           {g.categories.map((c) => (
             <option key={c.id} value={c.id}>
-              {c.label}
+              {localizedName(c, locale)}
             </option>
           ))}
         </optgroup>

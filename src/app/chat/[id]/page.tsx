@@ -98,13 +98,13 @@ function Thread({ id }: { id: string }) {
           className="flex min-w-0 items-center gap-3 rounded-2xl px-1 py-1 text-left hover:bg-hover disabled:hover:bg-transparent"
           onClick={() => setShowPeek(true)}
           disabled={!other}
-          aria-label={other ? `Ver perfil de ${other.name}` : "Perfil no disponible"}
+          aria-label={other ? `${t.chat.viewProfile} ${other.name}` : t.chat.noProfile}
         >
           <Avatar src={other?.avatar} name={other?.name ?? "?"} />
           <div className="min-w-0">
             <p className="truncate font-semibold">{other?.name}</p>
             <p className="truncate text-xs text-mute">
-              {offered[0]?.title ?? "Trueque"} ⇄ {proposed[0]?.title ?? "propuesta"}
+              {offered[0]?.title ?? t.chat.trade} ⇄ {proposed[0]?.title ?? t.chat.proposal}
             </p>
           </div>
         </button>
@@ -122,10 +122,10 @@ function Thread({ id }: { id: string }) {
         {trade.status === "pendiente" && trade.ownerId === uid ? (
           <div className="mt-3 flex gap-2">
             <button type="button" className="btn-primary flex-1" onClick={() => void acceptTrade(trade.id)}>
-              Aceptar
+              {t.chat.accept}
             </button>
             <button type="button" className="btn-ghost flex-1" onClick={() => void rejectTrade(trade.id)}>
-              Rechazar
+              {t.chat.reject}
             </button>
           </div>
         ) : null}
@@ -137,7 +137,7 @@ function Thread({ id }: { id: string }) {
               disabled={iDelivered}
               onClick={() => void markDelivered(trade.id)}
             >
-              {iDelivered ? "Esperando confirmación de la otra parte" : "Confirmar que entregué / recibí"}
+              {iDelivered ? t.chat.waitingOther : t.chat.confirmDelivery}
             </button>
             <button
               type="button"
@@ -147,13 +147,13 @@ function Thread({ id }: { id: string }) {
                 setConfirmCancel(true);
               }}
             >
-              No se completó
+              {t.chat.notCompleted}
             </button>
           </div>
         ) : null}
         {trade.status === "cancelado" ? (
           <p className="mt-3 rounded-2xl bg-surface-2 px-3 py-2 text-xs leading-5 text-mute">
-            Este trueque se marcó como no completado. La oferta volvió al mercado.
+            {t.chat.cancelled}
           </p>
         ) : null}
       </div>
@@ -169,17 +169,15 @@ function Thread({ id }: { id: string }) {
             className="card w-full max-w-md rounded-b-none p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:rounded-b-[1.35rem] sm:pb-5"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="font-display text-lg">¿Marcar como no completado?</p>
+            <p className="font-display text-lg">{t.chat.notCompletedTitle}</p>
             <p className="mt-1 text-sm leading-6 text-mute">
-              El trueque se cierra sin valoración y la oferta vuelve a estar disponible
-              públicamente, para que otra persona pueda aplicar. Se avisa a{" "}
-              {other?.name ?? "la otra parte"}.
+              {t.chat.notCompletedBody} {other?.name ?? ""}.
             </p>
             <input
               className="input mt-3"
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
-              placeholder="Motivo (opcional): no apareció, cambió de idea…"
+              placeholder={t.chat.notCompletedHint}
               maxLength={200}
             />
             {cancelError ? <p className="mt-2 text-sm text-rose-600">{cancelError}</p> : null}
@@ -190,7 +188,7 @@ function Thread({ id }: { id: string }) {
                 disabled={cancelBusy}
                 onClick={() => setConfirmCancel(false)}
               >
-                Volver
+                {t.common.back}
               </button>
               <button
                 type="button"
@@ -209,7 +207,7 @@ function Thread({ id }: { id: string }) {
                   setCancelReason("");
                 }}
               >
-                {cancelBusy ? "Cancelando…" : "Sí, no se completó"}
+                {cancelBusy ? t.chat.cancelling : t.chat.yesNotDone}
               </button>
             </div>
           </div>
@@ -248,14 +246,14 @@ function Thread({ id }: { id: string }) {
               className="input"
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="Escribe… puedes ofrecer otro artículo no publicado"
+              placeholder={t.chat.placeholder}
             />
-            <button type="submit" className="btn-primary !px-3" aria-label="Enviar">
+            <button type="submit" className="btn-primary !px-3" aria-label={t.common.send}>
               <IconSend className="h-5 w-5" />
             </button>
           </form>
         ) : (
-          <p className="mt-3 text-center text-xs text-mute">Este trueque está {trade.status}.</p>
+          <p className="mt-3 text-center text-xs text-mute">{t.chat.closed}</p>
         )}
       </div>
 
@@ -267,7 +265,7 @@ function Thread({ id }: { id: string }) {
             void rateTrade(trade.id, stars, comment, []);
           }}
         >
-          <p className="font-display text-lg">Valorar a {other?.name}</p>
+          <p className="font-display text-lg">{t.chat.rate} {other?.name}</p>
           <div className="my-2 flex gap-1">
             {[1, 2, 3, 4, 5].map((n) => (
               <button key={n} type="button" onClick={() => setStars(n)} className="text-2xl text-amber-500">
@@ -279,10 +277,10 @@ function Thread({ id }: { id: string }) {
             className="input mb-2"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            placeholder="¿Puntual? ¿Tal como lo describió?"
+            placeholder={t.chat.ratePlaceholder}
           />
           <button type="submit" className="btn-primary w-full">
-            Enviar valoración
+            {t.chat.sendRating}
           </button>
         </form>
       ) : null}

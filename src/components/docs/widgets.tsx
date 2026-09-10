@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { useT } from "@/lib/i18n/provider";
+
 export function CodeBlock({
   code,
   label = "bash",
@@ -9,6 +11,7 @@ export function CodeBlock({
   code: string;
   label?: string;
 }) {
+  const t = useT();
   const [ok, setOk] = useState(false);
   return (
     <div className="docs-code">
@@ -22,7 +25,7 @@ export function CodeBlock({
             setTimeout(() => setOk(false), 1200);
           }}
         >
-          {ok ? "Copiado" : "Copiar"}
+          {ok ? t.docs.copied : t.docs.copy}
         </button>
       </div>
       <pre>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { buildOfferShare } from "@/lib/share";
 import type { Offer } from "@/lib/types";
-import { TRANSPORT_LABEL } from "@/lib/cuba";
+import { useT } from "@/lib/i18n/provider";
 
 export function ShareOffer({
   offer,
@@ -12,6 +12,7 @@ export function ShareOffer({
   offer: Offer;
   offeredTitles: string[];
 }) {
+  const t = useT();
   const [copied, setCopied] = useState(false);
 
   function pack() {
@@ -22,7 +23,7 @@ export function ShareOffer({
       offered: offeredTitles,
       wants: offer.wants.map((w) => w.title),
       place,
-      transport: TRANSPORT_LABEL[offer.transport],
+      transport: t.transport[offer.transport],
     });
   }
 
@@ -51,11 +52,8 @@ export function ShareOffer({
 
   return (
     <div className="card p-4">
-      <p className="font-display text-base">Compartir en grupos</p>
-      <p className="mt-1 text-xs leading-5 text-mute">
-        Se abre Telegram, WhatsApp o Facebook y tú eliges el grupo — el de Intercambio y
-        Trueque, el del barrio, o un chat.
-      </p>
+      <p className="font-display text-base">{t.offer.share}</p>
+      <p className="mt-1 text-xs leading-5 text-mute">{t.offer.shareHint}</p>
       <div className="mt-3 grid grid-cols-3 gap-2">
         <button type="button" className="share-btn" onClick={() => open("telegram")}>
           <TelegramIcon />
@@ -72,10 +70,10 @@ export function ShareOffer({
       </div>
       <div className="mt-2 grid grid-cols-2 gap-2">
         <button type="button" className="btn-ghost !py-2 text-xs" onClick={() => void nativeShare()}>
-          Más apps
+          {t.offer.moreApps}
         </button>
         <button type="button" className="btn-ghost !py-2 text-xs" onClick={() => void copy()}>
-          {copied ? "Copiado" : "Copiar texto"}
+          {copied ? t.auth.copied : t.offer.copyText}
         </button>
       </div>
     </div>

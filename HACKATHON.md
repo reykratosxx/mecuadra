@@ -27,6 +27,33 @@ The private path is the default:
    - Runtime: Pedersen commitments + OR range proofs (client-side validation — Bitcoin Script does not check this). Counterparties and exact stars stay off the profile.
    - SNARK path: [BitVM/bitvm-circom-example](https://github.com/BitVM/bitvm-circom-example) — Circom + **fflonk**, **two** public outputs (SHA256 split). See `circuits/README.md`. We do not run BitVM's gigabyte Script verifier in the app.
 
+## Worked example (Lisbon)
+
+Ana has a folding bike she no longer uses. She wants a 35mm film camera. She does **not** want a euro or sats price.
+
+1. **Sign in with a Bitcoin key.** The browser derives nsec/npub (secp256k1). MeCuadra never sees the nsec. The account is the npub.
+2. **Mint a Cashu stamp and publish.** Offer: folding bike ↔ camera, city Lisbon. No KYC. The stamp is anti-spam, not the price of the bike. The offer can also hit Nostr relays (kind 31112).
+3. **Bruno applies** from Porto: he taps MeCuadra and proposes his Olympus. No Lightning “to make up the difference”.
+4. **NIP-44 chat.** They pick a café near Cais do Sodré. The server stores ciphertext only.
+5. **Meet, confirm, rate.** Each marks delivered. They rate 5 stars. A **ZK badge** can show “enough good swaps” without publishing that Ana traded with Bruno.
+
+If she had *sold* the bike for sats, the ledger would keep a clusterable payment forever. Here there is **no payment**. Line for the video: *no payment trail because there is no payment*.
+
+Full writeup in the app: `/docs/cypherpunk`.
+
+## Does ZK make it stronger?
+
+Yes — if we stay honest. Without ZK, a “private” marketplace still publishes a **graph** (who rated whom). That clusters like a payment history. The badge is trust without a dossier.
+
+Two layers:
+
+| Layer | What it is | What it is not |
+| --- | --- | --- |
+| **Runtime** (`src/lib/zk/reputation.ts`) | Pedersen + OR range proofs, verified in the browser | Not Bitcoin Script |
+| **SNARK** (`circuits/reputation.circom`) | Circom → fflonk → two public SHA256-split outputs, same interface as [BitVM/bitvm-circom-example](https://github.com/BitVM/bitvm-circom-example) | We do **not** run BitVM’s ~GB Script verifier |
+
+We do not fake L1 Groth16 verify. ZK’s impact is product: reputation stops being a public graph. The circuit is real and cut to BitVM’s interface for later — not theater.
+
 ## How it fits Cypherpunk
 
 *Make Bitcoin private in practice* and *make the private path the easy path*: the easy signup is a key, not Cubacel SMS; the easy chat is E2EE; the easy reputation is a badge, not a sold trade graph; the easy commerce is barter so there is no on-chain payment trail at all.

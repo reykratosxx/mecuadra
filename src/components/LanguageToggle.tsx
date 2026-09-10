@@ -5,7 +5,7 @@ import { IconGlobe } from "./icons";
 
 export function LanguageToggle() {
   const { locale, toggle, t } = useI18n();
-  const next = locale === "en" ? "ES" : "EN";
+  const shown = locale === "en" ? "EN" : "ES";
 
   return (
     <button
@@ -16,7 +16,7 @@ export function LanguageToggle() {
       title={`${t.nav.language}: ${t.langOther}`}
     >
       <IconGlobe className="h-4 w-4" />
-      <span>{next}</span>
+      <span>{shown}</span>
     </button>
   );
 }

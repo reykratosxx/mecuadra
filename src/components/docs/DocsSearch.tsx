@@ -2,22 +2,25 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { DOC_SEARCH } from "@/lib/docs";
+import { flattenDocs } from "@/lib/docs";
 import { IconSearch, IconX } from "@/components/icons";
+import { useT } from "@/lib/i18n/provider";
 
 export function DocsSearch({ onClose }: { onClose: () => void }) {
+  const t = useT();
+  const catalog = flattenDocs(t);
   const [q, setQ] = useState("");
   const router = useRouter();
   const results = useMemo(() => {
     const s = q.trim().toLowerCase();
-    if (!s) return DOC_SEARCH;
-    return DOC_SEARCH.filter(
+    if (!s) return catalog;
+    return catalog.filter(
       (d) =>
         d.title.toLowerCase().includes(s) ||
         d.hint.toLowerCase().includes(s) ||
         d.group.toLowerCase().includes(s),
     );
-  }, [q]);
+  }, [q, catalog]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -38,17 +41,17 @@ export function DocsSearch({ onClose }: { onClose: () => void }) {
           <input
             autoFocus
             className="h-12 flex-1 bg-transparent text-sm outline-none"
-            placeholder="Busca trueque, correo, cifrado, API…"
+            placeholder={t.docs.searchPlaceholder}
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
-          <button type="button" onClick={onClose} aria-label="Cerrar">
+          <button type="button" onClick={onClose} aria-label={t.common.close}>
             <IconX className="h-4 w-4" />
           </button>
         </div>
         <ul className="max-h-80 overflow-y-auto p-2">
           {results.length === 0 ? (
-            <li className="px-3 py-6 text-center text-sm text-mute">Nada con esa palabra.</li>
+            <li className="px-3 py-6 text-center text-sm text-mute">{t.docs.emptySearch}</li>
           ) : (
             results.map((r) => (
               <li key={r.href}>

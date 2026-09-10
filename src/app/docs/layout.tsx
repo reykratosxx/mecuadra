@@ -1,7 +1,7 @@
 import { DocsShell } from "@/components/docs/DocsShell";
 
 export const metadata = {
-  title: { default: "Documentación", template: "%s · Docs MeCuadra" },
+  title: { default: "Docs", template: "%s · MeCuadra Docs" },
 };
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {

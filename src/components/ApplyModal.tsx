@@ -37,7 +37,7 @@ export function ApplyModal({
             {t.auth.needAuthCta}
           </a>
           <button type="button" className="btn-ghost mt-2 w-full" onClick={onClose}>
-            Cerrar
+            {t.common.close}
           </button>
         </div>
       </div>
@@ -54,20 +54,21 @@ export function ApplyModal({
               MeCuadra
             </h2>
             <p className="text-sm text-mute">
-              Propón qué das a cambio{wants ? ` · busca: ${wants}` : ""}.
+              {t.apply.propose}
+              {wants ? ` · ${t.apply.looking}: ${wants}` : ""}.
             </p>
           </div>
-          <button type="button" onClick={onClose} aria-label="Cerrar">
+          <button type="button" onClick={onClose} aria-label={t.common.close}>
             <IconX className="h-5 w-5" />
           </button>
         </div>
 
-        <p className="label">Tus artículos</p>
+        <p className="label">{t.apply.yourItems}</p>
         {mine.length === 0 ? (
           <p className="mb-3 rounded-2xl bg-surface-2 p-3 text-sm text-mute">
-            Aún no tienes artículos. Puedes describir la propuesta abajo o{" "}
+            {t.apply.noItems}{" "}
             <a className="text-brand underline" href="/articulos/nuevo">
-              publicar uno
+              {t.apply.publishOne}
             </a>
             .
           </p>
@@ -92,7 +93,7 @@ export function ApplyModal({
                     <img src={item.photos[0]} alt="" className="h-12 w-12 rounded-xl object-cover" />
                     <span>
                       <span className="block text-sm font-medium">{item.title}</span>
-                      <span className="text-xs text-mute">{item.condition}</span>
+                      <span className="text-xs text-mute">{t.conditions[item.condition]}</span>
                     </span>
                   </button>
                 </li>
@@ -101,10 +102,10 @@ export function ApplyModal({
           </ul>
         )}
 
-        <label className="label">Mensaje (puedes ofrecer algo que no está publicado)</label>
+        <label className="label">{t.apply.message}</label>
         <textarea
           className="input min-h-24 mb-3"
-          placeholder="Ej: Te ofrezco aceite sellado y puedo ir a Vedado mañana a las 5."
+          placeholder={t.apply.messagePlaceholder}
           value={note}
           onChange={(e) => setNote(e.target.value)}
         />
@@ -128,7 +129,7 @@ export function ApplyModal({
             <MeCuadraLabel />
           </button>
           <p className="mt-2 text-center text-xs text-mute">
-            No hay dinero en custodia. El trato se confirma entre las dos partes.
+            {t.apply.noEscrow}
           </p>
         </div>
       </div>

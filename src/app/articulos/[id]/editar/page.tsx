@@ -11,6 +11,7 @@ import { RequireAuth } from "@/components/ui";
 import { IconCamera } from "@/components/icons";
 import { uploadDataUrl } from "@/lib/upload";
 import { CategorySelect } from "@/components/CategorySelect";
+import { useT } from "@/lib/i18n/provider";
 
 export default function EditarArticuloPage({
   params,
@@ -26,10 +27,11 @@ export default function EditarArticuloPage({
 }
 
 function Form({ id }: { id: string }) {
+  const t = useT();
   const { currentUser, items, ready } = useStore();
   const item = items.find((i) => i.id === id);
 
-  if (!ready) return <p className="py-10 text-center text-mute">Cargando…</p>;
+  if (!ready) return <p className="py-10 text-center text-mute">{t.common.loading}</p>;
   if (!item || item.userId !== currentUser?.id) notFound();
 
   return <EditForm item={item} />;
@@ -37,6 +39,7 @@ function Form({ id }: { id: string }) {
 
 /** Se monta ya con el artículo cargado, así el formulario nace con sus valores. */
 function EditForm({ item }: { item: Item }) {
+  const t = useT();
   const router = useRouter();
   const { updateItem } = useStore();
 
@@ -146,14 +149,14 @@ function EditForm({ item }: { item: Item }) {
                 className={`pill ${condition === c.id ? "pill-on" : ""}`}
                 onClick={() => setCondition(c.id)}
               >
-                {c.label}
+                {t.conditions[c.id]}
               </button>
             ))}
           </div>
         </div>
         {error ? <p className="text-sm text-rose-600">{error}</p> : null}
         <button type="submit" className="btn-primary w-full" disabled={busy || !title.trim()}>
-          {busy ? "Guardando…" : "Guardar cambios"}
+          {busy ? t.common.saving : t.common.save}
         </button>
       </form>
     </div>

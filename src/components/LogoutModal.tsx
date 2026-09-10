@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { IconX } from "./icons";
+import { useT } from "@/lib/i18n/provider";
 
 export function LogoutModal({
   onClose,
@@ -12,6 +13,7 @@ export function LogoutModal({
   onClose: () => void;
   onDone: () => Promise<void>;
 }) {
+  const t = useT();
   const [busy, setBusy] = useState(false);
 
   async function salir() {
@@ -25,20 +27,18 @@ export function LogoutModal({
       <div className="card w-full max-w-md p-5">
         <div className="mb-3 flex items-start justify-between">
           <div>
-            <h2 className="font-display text-xl">Cerrar sesión</h2>
-            <p className="text-sm text-mute">
-              Sales de esta cuenta en este teléfono. No hace falta otro código.
-            </p>
+            <h2 className="font-display text-xl">{t.profile.logoutTitle}</h2>
+            <p className="text-sm text-mute">{t.profile.logoutBody}</p>
           </div>
-          <button type="button" onClick={onClose} aria-label="Cerrar">
+          <button type="button" onClick={onClose} aria-label={t.common.close}>
             <IconX className="h-5 w-5" />
           </button>
         </div>
         <button type="button" className="btn-primary w-full" disabled={busy} onClick={() => void salir()}>
-          Sí, salir
+          {t.profile.logoutYes}
         </button>
         <button type="button" className="btn-ghost mt-2 w-full" disabled={busy} onClick={onClose}>
-          Cancelar
+          {t.common.cancel}
         </button>
       </div>
     </div>

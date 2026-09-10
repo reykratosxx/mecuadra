@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useStore } from "@/lib/store";
 import { Empty, RequireAuth } from "@/components/ui";
 import { timeAgo } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/provider";
 
 export default function NotificacionesPage() {
   return (
@@ -15,6 +16,7 @@ export default function NotificacionesPage() {
 }
 
 function List() {
+  const { t, locale } = useI18n();
   const { currentUser, notifications, markNotificationsRead } = useStore();
   const mine = notifications.filter((n) => n.userId === currentUser?.id);
 
@@ -25,10 +27,10 @@ function List() {
 
   return (
     <div className="mx-auto max-w-xl">
-      <h1 className="font-display text-3xl">Notificaciones</h1>
+      <h1 className="font-display text-3xl">{t.notifications.title}</h1>
       <ul className="mt-5 space-y-2">
         {mine.length === 0 ? (
-          <Empty title="Sin avisos" hint="Cuando alguien aplique o acepte, llega aquí." />
+          <Empty title={t.notifications.empty} hint={t.notifications.emptyHint} />
         ) : (
           mine.map((n) => (
             <li key={n.id}>
@@ -38,7 +40,7 @@ function List() {
               >
                 <p className="font-semibold">{n.title}</p>
                 <p className="text-sm text-mute">{n.body}</p>
-                <p className="mt-1 text-xs text-mute">{timeAgo(n.createdAt)}</p>
+                <p className="mt-1 text-xs text-mute">{timeAgo(n.createdAt, locale)}</p>
               </Link>
             </li>
           ))

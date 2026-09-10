@@ -40,20 +40,23 @@ export default function HomePage() {
       icon: IconUser,
       value: ready ? formatCount(registered, locale) : "—",
       label: t.home.users,
-      hint: t.home.users,
     },
     {
       icon: IconTruck,
       value: ready ? formatCount(withTransport, locale) : "—",
       label: t.home.withTransport,
-      hint: t.home.withTransport,
     },
     {
       icon: IconArrows,
       value: ready ? formatCount(openOffers, locale) : "—",
       label: t.home.open,
-      hint: t.home.open,
     },
+  ];
+
+  const pillars = [
+    { icon: IconShield, title: t.home.trustTitle, body: t.home.trustBody },
+    { icon: IconChat, title: t.home.chatTitle, body: t.home.chatBody },
+    { icon: IconStar, title: t.home.ruleTitle, body: t.home.ruleBody },
   ];
 
   return (
@@ -80,33 +83,31 @@ export default function HomePage() {
           </div>
           <div className="relative">
             <div className="absolute -inset-6 rounded-[2.5rem] bg-[image:var(--grad)] opacity-20 blur-2xl" />
-            <div className="card relative p-5 shadow-xl shadow-brand/10">
-              <div className="mb-4 flex items-center justify-between">
+            <div className="card relative min-w-0 p-5 shadow-xl shadow-brand/10">
+              <div className="mb-4 flex items-center justify-between gap-2">
                 <Logo withWord size={48} />
-                <span className="text-xs text-mute">Oferta abierta</span>
+                <span className="shrink-0 text-xs text-mute">{t.home.demoOpen}</span>
               </div>
               <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-2xl bg-surface-2 p-4">
-                <div>
-                  <p className="text-[10px] font-semibold uppercase text-mute">Ofrece</p>
-                  <p className="font-medium">Ibuprofeno 200 mg</p>
-                  <p className="text-xs text-mute">Bengaluru · India</p>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-semibold uppercase text-mute">{t.home.demoOffers}</p>
+                  <p className="font-medium">{t.home.demoItem}</p>
+                  <p className="text-xs text-mute">{t.home.demoPlace}</p>
                 </div>
-                <span className="grid h-10 w-10 place-items-center rounded-full bg-[image:var(--grad)] text-white">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[image:var(--grad)] text-white">
                   <IconArrows className="h-5 w-5" />
                 </span>
-                <div>
-                  <p className="text-[10px] font-semibold uppercase text-mute">Necesita</p>
-                  <p className="font-medium">Alimentos o aseo</p>
-                  <p className="text-xs text-mute">Voy al lugar</p>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-semibold uppercase text-mute">{t.home.demoNeeds}</p>
+                  <p className="font-medium">{t.home.demoWant}</p>
+                  <p className="text-xs text-mute">{t.home.demoTravel}</p>
                 </div>
               </div>
               <div className="mt-4 flex w-full flex-col items-center">
-                <button className="btn-primary pointer-events-none">
+                <button type="button" className="btn-primary pointer-events-none">
                   <MeCuadraLabel />
                 </button>
-                <p className="mt-3 text-center text-xs text-mute">
-                  Un toque. Propones. Se abre el chat.
-                </p>
+                <p className="mt-3 text-center text-xs text-mute">{t.home.demoTap}</p>
               </div>
             </div>
           </div>
@@ -116,13 +117,10 @@ export default function HomePage() {
       <section className="border-y border-line bg-surface px-4 py-10">
         <div className="mx-auto max-w-6xl">
           <div className="mb-6 max-w-2xl">
-            <h2 className="font-display text-2xl sm:text-3xl">La comunidad, en números</h2>
+            <h2 className="font-display text-2xl sm:text-3xl">{t.home.communityTitle}</h2>
             <p className="mt-2 text-sm text-mute sm:text-base">
-              Datos públicos para que sepas con quién truequeas: cuántas personas hay y cuántas
-              pueden moverse.
-              {whoCome > 0
-                ? ` ${formatCount(whoCome, locale)} ${t.home.willTravel}.`
-                : ""}
+              {t.home.communityLead}
+              {whoCome > 0 ? ` ${formatCount(whoCome, locale)} ${t.home.willTravel}.` : ""}
             </p>
           </div>
           <dl className="grid gap-3 sm:grid-cols-3">
@@ -136,27 +134,23 @@ export default function HomePage() {
                   {s.value}
                 </dt>
                 <dd className="mt-1 text-sm font-semibold text-ink">{s.label}</dd>
-                <p className="mt-1 text-xs text-mute">{s.hint}</p>
               </div>
             ))}
           </dl>
           <p className="mt-4 text-xs text-mute">
-            Configura tu transporte en{" "}
+            {t.home.communityHintBefore}{" "}
             <Link href="/perfil" className="font-semibold text-brand">
-              tu perfil
+              {t.home.communityHintLink}
             </Link>{" "}
-            para que la comunidad sepa si puedes ir o si hay que venir a ti.
+            {t.home.communityHintAfter}
           </p>
         </div>
       </section>
 
       <section className="px-4 py-14">
         <div className="mx-auto max-w-6xl">
-          <h2 className="font-display text-3xl">Tres pasos para cerrar el trueque</h2>
-          <p className="mt-2 max-w-2xl text-mute">
-            Publicas. Alguien toca MeCuadra y propone qué da a cambio. Coordinan en el
-            chat, confirman la entrega y se valoran. La reputación queda en el perfil.
-          </p>
+          <h2 className="font-display text-3xl">{t.home.stepsTitle}</h2>
+          <p className="mt-2 max-w-2xl text-mute">{t.home.stepsLead}</p>
           <div className="mt-8 grid gap-4 md:grid-cols-3">
             {steps.map((s) => (
               <article key={s.n} className="card p-5">
@@ -173,13 +167,11 @@ export default function HomePage() {
         <div className="mx-auto max-w-6xl">
           <div className="mb-6 flex items-end justify-between">
             <div>
-              <h2 className="font-display text-2xl sm:text-3xl">Mercado P2P</h2>
-              <p className="text-sm text-mute sm:text-base">
-                Ofertas abiertas · #cambio / #necesito / municipio
-              </p>
+              <h2 className="font-display text-2xl sm:text-3xl">{t.home.marketTitle}</h2>
+              <p className="text-sm text-mute sm:text-base">{t.home.marketLead}</p>
             </div>
             <Link href="/explorar" className="text-sm font-semibold text-brand">
-              Ver todas
+              {t.home.seeAll}
             </Link>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
@@ -192,27 +184,11 @@ export default function HomePage() {
 
       <section className="px-4 pb-16">
         <div className="mx-auto grid max-w-6xl gap-4 md:grid-cols-3">
-          {[
-            {
-              icon: IconShield,
-              t: "Confianza, no escrow de dinero",
-              d: "Perfiles verificables, historial de trueques y valoración 1–5. La reputación es lo que custodia el trato.",
-            },
-            {
-              icon: IconChat,
-              t: "Chat del trueque",
-              d: "Puedes aclarar, ofrecer otro artículo no publicado o coordinar el punto. Solo las dos partes ven el hilo.",
-            },
-            {
-              icon: IconStar,
-              t: "Regla de oro",
-              d: "Si pides efectivo, no es MeCuadra. Revolico y Facebook cubren la venta. Aquí el trueque se defiende.",
-            },
-          ].map((b) => (
-            <article key={b.t} className="card p-5">
+          {pillars.map((b) => (
+            <article key={b.title} className="card p-5">
               <b.icon className="h-6 w-6 text-brand" />
-              <h3 className="mt-3 font-display text-lg">{b.t}</h3>
-              <p className="mt-2 text-sm leading-6 text-mute">{b.d}</p>
+              <h3 className="mt-3 font-display text-lg">{b.title}</h3>
+              <p className="mt-2 text-sm leading-6 text-mute">{b.body}</p>
             </article>
           ))}
         </div>
@@ -221,19 +197,19 @@ export default function HomePage() {
           style={{ background: "var(--grad)" }}
         >
           <div>
-            <p className="font-display text-2xl">¿Tienes algo que ya no usas?</p>
-            <p className="mt-1 text-white/85">Alguien en tu municipio lo está buscando hoy.</p>
+            <p className="font-display text-2xl">{t.home.ctaTitle}</p>
+            <p className="mt-1 text-white/85">{t.home.ctaBody}</p>
           </div>
           <Link
             href="/publicar"
             className="rounded-full bg-surface px-5 py-3 text-sm font-semibold text-brand shadow-sm"
           >
-            Publicar oferta
+            {t.home.ctaPublish}
           </Link>
         </div>
         <p className="mx-auto mt-6 flex max-w-6xl items-center gap-2 text-xs text-mute">
           <IconCheck className="h-4 w-4 text-brand" />
-          Explorar no pide ubicación. El municipio es un filtro, nunca un muro.
+          {t.home.geoHint}
         </p>
       </section>
     </div>

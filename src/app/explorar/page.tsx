@@ -6,12 +6,15 @@ import {
   CATEGORY_GROUPS,
   categoriesInGroup,
   categoryLabel,
+  localizedName,
   type CategoryGroupId,
 } from "@/lib/categories";
 import { useStore } from "@/lib/store";
 import { Empty } from "@/components/ui";
+import { useI18n } from "@/lib/i18n/provider";
 
 export default function ExplorarPage() {
+  const { t, locale } = useI18n();
   const { offers, items, users, filters, setFilters } = useStore();
   const q = filters.q.trim().toLowerCase();
   const groupCats = filters.categoryGroup
@@ -65,8 +68,8 @@ export default function ExplorarPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="font-display text-2xl sm:text-3xl">Ofertas</h1>
-        <p className="text-sm text-mute">Mercado P2P de trueque. El municipio es opcional.</p>
+        <h1 className="font-display text-2xl sm:text-3xl">{t.explore.title}</h1>
+        <p className="text-sm text-mute">{t.home.marketLead}</p>
       </div>
       <FilterBar />
 
@@ -76,7 +79,7 @@ export default function ExplorarPage() {
           onClick={() => setFilters({ categoryGroup: "", category: "" })}
           className={`pill shrink-0 ${!filters.categoryGroup && !filters.category ? "pill-on" : ""}`}
         >
-          Todas
+          {t.explore.all}
         </button>
         {CATEGORY_GROUPS.map((g) => (
           <button
@@ -93,7 +96,7 @@ export default function ExplorarPage() {
             <span className="mr-1" aria-hidden>
               {g.emoji}
             </span>
-            {g.label}
+            {t.cats[g.id as keyof typeof t.cats] ?? g.label}
           </button>
         ))}
       </div>
@@ -112,25 +115,25 @@ export default function ExplorarPage() {
               }
               className={`pill shrink-0 text-xs ${filters.category === c.id ? "pill-on" : ""}`}
             >
-              {c.label}
+              {localizedName(c, locale)}
             </button>
           ))}
         </div>
       ) : null}
 
       <p className="mt-4 text-sm text-mute">
-        {list.length} {list.length === 1 ? "oferta" : "ofertas"}
+        {list.length} {t.home.open}
         {filters.category
-          ? ` · ${categoryLabel(filters.category)}`
+          ? ` · ${categoryLabel(filters.category, locale)}`
           : filters.categoryGroup
-            ? ` · ${activeGroup?.label}`
+            ? ` · ${t.cats[activeGroup?.id as keyof typeof t.cats] ?? activeGroup?.label}`
             : ""}
       </p>
       {list.length === 0 ? (
         <div className="mt-4">
           <Empty
-            title="Nada con esos filtros"
-            hint="Prueba otra categoría o quita el municipio. Ver ofertas lejanas siempre está permitido."
+            title={t.explore.empty}
+            hint={t.explore.emptyHint}
           />
         </div>
       ) : (
