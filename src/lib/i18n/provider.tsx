@@ -23,13 +23,15 @@ function readCookie(): Locale | null {
 }
 
 function readStored(): Locale {
+  const fromCookie = readCookie();
+  if (fromCookie) return fromCookie;
   try {
     const fromLs = localStorage.getItem(LOCALE_COOKIE);
     if (fromLs === "en" || fromLs === "es") return fromLs;
   } catch {
     /* private mode */
   }
-  return readCookie() ?? DEFAULT_LOCALE;
+  return DEFAULT_LOCALE;
 }
 
 function applyLocale(locale: Locale) {
@@ -56,13 +58,7 @@ function subscribe(listener: () => void) {
 }
 
 function getSnapshot(): Locale {
-  const lang = document.documentElement.lang;
-  if (lang === "es" || lang === "en") return lang;
   return readStored();
-}
-
-function getServerSnapshot(): Locale {
-  return DEFAULT_LOCALE;
 }
 
 type I18nValue = {
@@ -74,7 +70,14 @@ type I18nValue = {
 
 const Ctx = createContext<I18nValue | null>(null);
 
-export function I18nProvider({ children }: { children: React.ReactNode }) {
+export function I18nProvider({
+  children,
+  initialLocale = DEFAULT_LOCALE,
+}: {
+  children: React.ReactNode;
+  initialLocale?: Locale;
+}) {
+  const getServerSnapshot = useCallback(() => initialLocale, [initialLocale]);
   const locale = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const t = useMemo(() => getMessages(locale), [locale]);
 

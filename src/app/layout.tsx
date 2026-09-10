@@ -1,10 +1,12 @@
 import type { Metadata, Viewport } from "next";
+import { cookies } from "next/headers";
 import { Outfit, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { AppShell } from "@/components/AppShell";
 import { themeInitScript } from "@/lib/theme-script";
 import { localeInitScript } from "@/lib/i18n/script";
+import { DEFAULT_LOCALE, LOCALE_COOKIE, type Locale } from "@/lib/i18n/types";
 
 const sans = Source_Sans_3({
   variable: "--font-body",
@@ -37,10 +39,17 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+function localeFromCookie(value: string | undefined): Locale {
+  return value === "es" || value === "en" ? value : DEFAULT_LOCALE;
+}
+
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const cookieStore = await cookies();
+  const locale = localeFromCookie(cookieStore.get(LOCALE_COOKIE)?.value);
+
   return (
     <html
-      lang="en"
+      lang={locale}
       className={`${sans.variable} ${display.variable} h-full antialiased`}
       suppressHydrationWarning
     >
@@ -49,7 +58,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: localeInitScript }} />
       </head>
       <body className="flex min-h-full flex-col font-sans text-ink">
-        <Providers>
+        <Providers initialLocale={locale}>
           <AppShell>{children}</AppShell>
         </Providers>
       </body>
