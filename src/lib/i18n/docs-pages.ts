@@ -17,6 +17,15 @@ const en = {
           { n: "05", title: "You rate", text: "Reputation stays. The graph does not." },
         ],
       },
+      { type: "h2", text: "Why it is called MeCuadra" },
+      {
+        type: "p",
+        text: "In Cuba and across the Caribbean, **me cuadra** is everyday speech: something suits you, you like it, you are in. **Eso me cuadra** means the deal works for you — not that you are paying.",
+      },
+      {
+        type: "p",
+        text: "The product is named after that nod. When someone taps the handshake they are saying the swap **cuadra**: they want it. One verb for interest, fit, and yes. That is why the button is not Buy, Bid, or Pay.",
+      },
       { type: "h2", text: "Who this notebook is for" },
       {
         type: "p",
@@ -177,7 +186,7 @@ const en = {
           },
           {
             title: "You tap MeCuadra",
-            text: "Mark your items or write something that is not listed.",
+            text: "In Cuban and Caribbean Spanish, **me cuadra** means it suits you — you like it, you are interested. The tap is that yes: mark your items or write something that is not listed.",
           },
           {
             title: "The owner decides",
@@ -395,6 +404,15 @@ const es: typeof en = {
           { n: "05", title: "Se valoran", text: "La reputación queda. El grafo, no." },
         ],
       },
+      { type: "h2", text: "Por qué se llama MeCuadra" },
+      {
+        type: "p",
+        text: "En Cuba y en el Caribe, **me cuadra** es habla de todos los días: algo te sirve, te gusta, te interesa. **Eso me cuadra** quiere decir que el trato te encaja — no que estás pagando.",
+      },
+      {
+        type: "p",
+        text: "El producto toma el nombre de ese gesto. Cuando alguien toca el apretón de manos está diciendo que el trueque **cuadra**: lo quiere. Un solo verbo para interés, encaje y sí. Por eso el botón no es Comprar, Pujar ni Pagar.",
+      },
       { type: "h2", text: "Para quién es este cuaderno" },
       {
         type: "p",
@@ -555,7 +573,7 @@ const es: typeof en = {
           },
           {
             title: "Tocas MeCuadra",
-            text: "Marcas tus artículos o escribes algo que no está publicado.",
+            text: "En Cuba y el Caribe, **me cuadra** quiere decir que te sirve, te gusta o te interesa. El toque es ese sí: marcas tus artículos o escribes algo que no está publicado.",
           },
           {
             title: "El dueño decide",

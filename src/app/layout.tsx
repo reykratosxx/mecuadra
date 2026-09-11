@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
-import { Outfit, Source_Sans_3 } from "next/font/google";
+import { Outfit, Source_Sans_3, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { AppShell } from "@/components/AppShell";
@@ -17,6 +17,13 @@ const sans = Source_Sans_3({
 const display = Outfit({
   variable: "--font-head",
   subsets: ["latin"],
+  display: "swap",
+});
+
+const serif = Source_Serif_4({
+  variable: "--font-accent",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -50,7 +57,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang={locale}
-      className={`${sans.variable} ${display.variable} h-full antialiased`}
+      className={`${sans.variable} ${display.variable} ${serif.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>

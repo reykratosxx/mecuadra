@@ -15,6 +15,14 @@ export function AppShell({
 }) {
   const path = usePathname();
   if (bare || path.startsWith("/docs")) return <>{children}</>;
+  if (path === "/") {
+    return (
+      <>
+        {children}
+        <SupportMenu />
+      </>
+    );
+  }
   return (
     <>
       <Header />

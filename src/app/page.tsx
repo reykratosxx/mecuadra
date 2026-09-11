@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import { OfferCard } from "@/components/OfferCard";
+import { HomeHero } from "@/components/HomeHero";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import {
   IconArrows,
   IconCheck,
@@ -12,8 +15,6 @@ import {
   IconUser,
 } from "@/components/icons";
 import { useStore } from "@/lib/store";
-import { Logo } from "@/components/Logo";
-import { MeCuadraLabel } from "@/components/MeCuadraMark";
 import { useI18n } from "@/lib/i18n/provider";
 
 function formatCount(n: number, locale: string) {
@@ -60,59 +61,9 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="-mx-4">
-      <section className="relative overflow-hidden px-4 pb-12 pt-8 md:pb-16 md:pt-16">
-        <div className="mx-auto grid max-w-6xl items-center gap-10 md:grid-cols-2">
-          <div>
-            <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs font-semibold text-brand">
-              {t.home.kicker}
-            </p>
-            <h1 className="font-display text-3xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-4xl md:text-6xl">
-              {t.home.title}
-            </h1>
-            <p className="mt-4 max-w-lg text-base leading-7 text-mute sm:mt-5 sm:text-lg">{t.home.lead}</p>
-            <div className="mt-6 flex flex-wrap gap-3 sm:mt-7">
-              <Link href="/explorar" className="btn-primary">
-                {t.home.ctaExplore}
-              </Link>
-              <Link href="/login" className="btn-ghost">
-                {t.home.ctaLogin}
-              </Link>
-            </div>
-            <p className="mt-4 max-w-lg text-sm leading-6 text-mute">{t.home.privacyBody}</p>
-          </div>
-          <div className="relative">
-            <div className="absolute -inset-6 rounded-[2.5rem] bg-[image:var(--grad)] opacity-20 blur-2xl" />
-            <div className="card relative min-w-0 p-5 shadow-xl shadow-brand/10">
-              <div className="mb-4 flex items-center justify-between gap-2">
-                <Logo withWord size={48} />
-                <span className="shrink-0 text-xs text-mute">{t.home.demoOpen}</span>
-              </div>
-              <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-2xl bg-surface-2 p-4">
-                <div className="min-w-0">
-                  <p className="text-[10px] font-semibold uppercase text-mute">{t.home.demoOffers}</p>
-                  <p className="font-medium">{t.home.demoItem}</p>
-                  <p className="text-xs text-mute">{t.home.demoPlace}</p>
-                </div>
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[image:var(--grad)] text-white">
-                  <IconArrows className="h-5 w-5" />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-[10px] font-semibold uppercase text-mute">{t.home.demoNeeds}</p>
-                  <p className="font-medium">{t.home.demoWant}</p>
-                  <p className="text-xs text-mute">{t.home.demoTravel}</p>
-                </div>
-              </div>
-              <div className="mt-4 flex w-full flex-col items-center">
-                <button type="button" className="btn-primary pointer-events-none">
-                  <MeCuadraLabel />
-                </button>
-                <p className="mt-3 text-center text-xs text-mute">{t.home.demoTap}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+    <div>
+      <HomeHero />
+      <Header />
 
       <section className="border-y border-line bg-surface px-4 py-10">
         <div className="mx-auto max-w-6xl">
@@ -212,6 +163,7 @@ export default function HomePage() {
           {t.home.geoHint}
         </p>
       </section>
+      <Footer />
     </div>
   );
 }

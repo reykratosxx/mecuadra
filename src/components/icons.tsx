@@ -190,3 +190,46 @@ export function IconLock({ className }: IconProps) {
     </svg>
   );
 }
+
+export function IconMenu({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function IconArrowRight({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function IconSparkles({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M12 3.2 13.4 8 18 9.4 13.4 10.8 12 15.6 10.6 10.8 6 9.4 10.6 8 12 3.2Z" strokeLinejoin="round" />
+      <path d="M18.5 14.2 19.2 16.4 21.4 17.1 19.2 17.8 18.5 20 17.8 17.8 15.6 17.1 17.8 16.4 18.5 14.2Z" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function IconBook({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M5 5.5A3.5 3.5 0 0 1 8.5 4H20v14.5H8.5A3.5 3.5 0 0 0 5 22V5.5Z" strokeLinejoin="round" />
+      <path d="M5 19.2A3.5 3.5 0 0 1 8.5 16H20" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function IconWand({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="m15 4 1.2 2.8L19 8l-2.8 1.2L15 12l-1.2-2.8L11 8l2.8-1.2L15 4Z" strokeLinejoin="round" />
+      <path d="m4 20 9.2-9.2" strokeLinecap="round" />
+    </svg>
+  );
+}
