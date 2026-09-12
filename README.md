@@ -11,11 +11,11 @@
 </p>
 
 <p align="center">
-  <a href="https://mecuadra-14n4uwt8d-reykratosxx-7776s-projects.vercel.app">Live demo</a>
+  <a href="https://mecuadra-git-hackathon-boss-battle-reykratosxx-7776s-projects.vercel.app">Live demo</a>
   ·
-  <a href="https://mecuadra-14n4uwt8d-reykratosxx-7776s-projects.vercel.app/docs">Docs</a>
+  <a href="https://mecuadra-git-hackathon-boss-battle-reykratosxx-7776s-projects.vercel.app/docs">Docs</a>
   ·
-  <a href="https://mecuadra-14n4uwt8d-reykratosxx-7776s-projects.vercel.app/docs/zk">ZK verifier</a>
+  <a href="https://mecuadra-git-hackathon-boss-battle-reykratosxx-7776s-projects.vercel.app/docs/zk">ZK verifier</a>
   ·
   <a href="https://devfolio.co/projects/mecuadra-8c8f">Devfolio</a>
 </p>
