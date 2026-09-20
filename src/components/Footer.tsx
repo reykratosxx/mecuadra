@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { Logo } from "./Logo";
-import { COMMUNITY_TELEGRAM, SUPPORT_TELEGRAM } from "@/lib/support";
+import { SocialLinks } from "./SocialLinks";
+import { COMMUNITY_TELEGRAM, SOCIAL_FACEBOOK, SOCIAL_X, SUPPORT_TELEGRAM } from "@/lib/support";
 import { useT } from "@/lib/i18n/provider";
 
 export function Footer() {
@@ -13,6 +14,8 @@ export function Footer() {
         <div className="sm:col-span-2">
           <Logo withWord />
           <p className="mt-3 max-w-sm text-sm leading-6 text-mute">{t.footer.blurb}</p>
+          <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-mute">{t.footer.socials}</p>
+          <SocialLinks className="mt-2" />
         </div>
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-mute">{t.footer.product}</p>
@@ -49,7 +52,17 @@ export function Footer() {
             </li>
             <li>
               <a href={COMMUNITY_TELEGRAM} target="_blank" rel="noopener noreferrer" className="hover:text-brand">
-                {t.footer.community}
+                Telegram
+              </a>
+            </li>
+            <li>
+              <a href={SOCIAL_X} target="_blank" rel="noopener noreferrer" className="hover:text-brand">
+                X
+              </a>
+            </li>
+            <li>
+              <a href={SOCIAL_FACEBOOK} target="_blank" rel="noopener noreferrer" className="hover:text-brand">
+                Facebook
               </a>
             </li>
             <li className="text-mute">{t.footer.hints}</li>

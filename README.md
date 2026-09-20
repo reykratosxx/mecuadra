@@ -20,6 +20,12 @@
   <a href="https://youtu.be/iYP6DPwXQds">Demo video</a>
   ·
   <a href="https://devfolio.co/projects/mecuadra-8c8f">Devfolio</a>
+  ·
+  <a href="https://t.me/mecuadrachat">Telegram</a>
+  ·
+  <a href="https://x.com/mecuadraoficial">X</a>
+  ·
+  <a href="https://www.facebook.com/groups/887861347516457/">Facebook</a>
 </p>
 
 <p align="center">

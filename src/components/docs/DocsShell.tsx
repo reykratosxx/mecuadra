@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/Logo";
 import { IconSearch } from "@/components/icons";
+import { SocialLinks } from "@/components/SocialLinks";
 import { getDocGroups } from "@/lib/docs";
 import { cn } from "@/lib/utils";
 import { DocsSearch } from "./DocsSearch";
@@ -93,6 +94,12 @@ export function DocsShell({ children }: { children: React.ReactNode }) {
       </div>
       {open ? <DocsSearch onClose={() => setOpen(false)} /> : null}
       <DocsHotkeys />
+      <div className="border-t border-line/80 px-4 py-6">
+        <div className="mx-auto flex max-w-[1400px] flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-mute">{t.footer.copy}</p>
+          <SocialLinks compact />
+        </div>
+      </div>
     </div>
   );
 }

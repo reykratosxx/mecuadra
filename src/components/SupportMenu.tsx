@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { COMMUNITY_TELEGRAM, SUPPORT_TELEGRAM } from "@/lib/support";
+import { COMMUNITY_TELEGRAM, SOCIAL_FACEBOOK, SOCIAL_X, SUPPORT_TELEGRAM } from "@/lib/support";
+import { IconTelegram } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { useT } from "@/lib/i18n/provider";
 
@@ -56,6 +57,26 @@ export function SupportMenu() {
             {t.footer.helpCommunity}
             <span className="mt-0.5 block text-xs font-normal text-mute">t.me/mecuadrachat</span>
           </a>
+          <a
+            href={SOCIAL_X}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block border-t border-line px-3 py-2.5 text-sm font-medium text-ink hover:bg-hover"
+            onClick={() => setOpen(false)}
+          >
+            {t.footer.helpX}
+            <span className="mt-0.5 block text-xs font-normal text-mute">@mecuadraoficial</span>
+          </a>
+          <a
+            href={SOCIAL_FACEBOOK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block border-t border-line px-3 py-2.5 text-sm font-medium text-ink hover:bg-hover"
+            onClick={() => setOpen(false)}
+          >
+            {t.footer.helpFacebook}
+            <span className="mt-0.5 block text-xs font-normal text-mute">facebook.com/groups</span>
+          </a>
         </div>
       ) : null}
 
@@ -69,17 +90,9 @@ export function SupportMenu() {
         aria-expanded={open}
         aria-label={open ? t.footer.helpClose : t.footer.helpOpen}
       >
-        <TelegramGlyph className="h-4 w-4" />
+        <IconTelegram className="h-4 w-4" />
         {t.footer.help}
       </button>
     </div>
-  );
-}
-
-function TelegramGlyph({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden>
-      <path d="M21.5 4.4 3.7 11.2c-1.2.5-1.2 1.2-.2 1.5l4.6 1.4 10.6-6.7c.5-.3 1-.1.6.2l-8.6 7.8-.3 4.6c.5 0 .7-.2 1-.5l2.3-2.2 4.8 3.5c.9.5 1.5.2 1.7-.8l3.1-14.6c.3-1.2-.5-1.8-1.4-1.4Z" />
-    </svg>
   );
 }

@@ -35,6 +35,9 @@ const en = {
     helpClose: "Close help menu",
     helpSupport: "Support on Telegram",
     helpCommunity: "Community group",
+    socials: "Social",
+    helpX: "X / Twitter",
+    helpFacebook: "Facebook group",
   },
   home: {
     kicker: "P2P goods market · worldwide",
@@ -532,6 +535,9 @@ const es = {
     helpClose: "Cerrar menú de ayuda",
     helpSupport: "Soporte en Telegram",
     helpCommunity: "Grupo de la comunidad",
+    socials: "Redes",
+    helpX: "X / Twitter",
+    helpFacebook: "Grupo de Facebook",
   },
   home: {
     kicker: "Mercado P2P de bienes · mundial",
