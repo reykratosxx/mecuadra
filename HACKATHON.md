@@ -72,6 +72,8 @@ Nostr identity + encrypted offers/DMs + Cashu, without Telegram/Google as a requ
 
 ## Demo script (2–3 min, English)
 
+Watch: [https://youtu.be/iYP6DPwXQds](https://youtu.be/iYP6DPwXQds)
+
 1. Globe icon → English.
 2. Sign in: generate nsec (show backup) or NIP-07.
 3. Profile: npub + Silent Payment code.
@@ -82,17 +84,14 @@ Nostr identity + encrypted offers/DMs + Cashu, without Telegram/Google as a requ
 
 ## Devfolio
 
-The project is still a **draft**, so `https://devfolio.co/projects/mecuadra-8c8f` **404s**. Devfolio only lists published projects ([submission guide](https://guide.devfolio.co/docs/guide/participating-in-hackathons/project-submission)). The public gallery is empty until you publish: [boss-battle.devfolio.co/projects](https://boss-battle.devfolio.co/projects).
+Published:
 
-Open the draft while logged in as [manudev97](https://devfolio.co/@manudev97):
+- [boss-battle.devfolio.co/projects/mecuadra-8c8f](https://boss-battle.devfolio.co/projects/mecuadra-8c8f)
+- [devfolio.co/projects/mecuadra-8c8f](https://devfolio.co/projects/mecuadra-8c8f)
 
-1. [BOSS Battle](https://boss-battle.devfolio.co) → Dashboard → **Edit project** (slug `mecuadra-8c8f`).
-2. Tracks already applied: **Cypherpunk** + **Freedom Stack**.
+Demo video: [youtu.be/iYP6DPwXQds](https://youtu.be/iYP6DPwXQds)
 
-Do **not** publish until you upload a real screenshot (1–6) and, ideally, a demo video. Do not generate fake screenshots. After publish, the public URL will be:
-
-- `https://boss-battle.devfolio.co/projects/mecuadra-8c8f`
-- `https://devfolio.co/projects/mecuadra-8c8f`
+Tracks: **Cypherpunk** + **Freedom Stack**. Live demo stays on the `hackathon/boss-battle` Vercel alias — do not `--prod` onto Cuba `main`.
 
 ## Contacts
 

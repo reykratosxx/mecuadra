@@ -70,12 +70,18 @@ export async function establishNostrSession(pubkeyHex: string, silentPayment?: s
     }
   }
 
+  const isNew = Boolean(created?.user?.id);
   const patch: Record<string, unknown> = {
     npub,
     pubkey_hex: pubkeyHex,
     verified: true,
   };
   if (silentPayment) patch.silent_payment_code = silentPayment;
+  if (isNew) {
+    patch.province = "Portugal";
+    patch.municipality = "Lisbon";
+    patch.neighborhood = "";
+  }
 
   const { error: updateErr } = await admin.from("profiles").update(patch).eq("id", userId);
   if (updateErr) {
@@ -91,8 +97,8 @@ export async function establishNostrSession(pubkeyHex: string, silentPayment?: s
       npub,
       pubkey_hex: pubkeyHex,
       silent_payment_code: silentPayment ?? null,
-      province: "",
-      municipality: "",
+      province: "Portugal",
+      municipality: "Lisbon",
       verified: true,
     });
     if (insertErr) {

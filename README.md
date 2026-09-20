@@ -17,6 +17,8 @@
   ·
   <a href="https://mecuadra-git-hackathon-boss-battle-reykratosxx-7776s-projects.vercel.app/docs/zk">ZK verifier</a>
   ·
+  <a href="https://youtu.be/iYP6DPwXQds">Demo video</a>
+  ·
   <a href="https://devfolio.co/projects/mecuadra-8c8f">Devfolio</a>
 </p>
 

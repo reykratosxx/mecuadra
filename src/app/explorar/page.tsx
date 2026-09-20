@@ -10,6 +10,7 @@ import {
   type CategoryGroupId,
 } from "@/lib/categories";
 import { useStore } from "@/lib/store";
+import { isLegacyCubaPlace } from "@/lib/geo";
 import { Empty } from "@/components/ui";
 import { useI18n } from "@/lib/i18n/provider";
 
@@ -58,6 +59,9 @@ export default function ExplorarPage() {
     if (filters.municipality && o.municipality !== filters.municipality) return false;
     if (filters.transport && o.transport !== filters.transport) return false;
     if (filters.openToProposals && !o.openToProposals) return false;
+    const wantsCuba =
+      filters.province === "Cuba" || isLegacyCubaPlace(filters.province, filters.municipality);
+    if (!wantsCuba && isLegacyCubaPlace(o.province, o.municipality)) return false;
     return true;
   });
 

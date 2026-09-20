@@ -390,9 +390,10 @@ function Form() {
           </p>
         ) : null}
 
-        <button type="submit" className="btn-primary w-full" disabled={publishing}>
+        <button type="submit" className="btn-primary w-full" disabled={publishing || !cashuOk}>
           {publishing ? t.publish.publishing : t.publish.submit}
         </button>
+        {!cashuOk ? <p className="text-center text-xs text-mute">{t.publish.cashuNeed}</p> : null}
       </form>
     </div>
   );

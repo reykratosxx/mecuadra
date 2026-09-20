@@ -15,6 +15,7 @@ import {
   IconUser,
 } from "@/components/icons";
 import { useStore } from "@/lib/store";
+import { isLegacyCubaPlace } from "@/lib/geo";
 import { useI18n } from "@/lib/i18n/provider";
 
 function formatCount(n: number, locale: string) {
@@ -24,7 +25,9 @@ function formatCount(n: number, locale: string) {
 export default function HomePage() {
   const { offers, users, ready } = useStore();
   const { t, locale } = useI18n();
-  const featured = offers.filter((o) => o.status === "abierta").slice(0, 6);
+  const featured = offers
+    .filter((o) => o.status === "abierta" && !isLegacyCubaPlace(o.province, o.municipality))
+    .slice(0, 6);
   const openOffers = offers.filter((o) => o.status === "abierta").length;
   const registered = users.length;
   const withTransport = users.filter((u) => u.transport === "tengo").length;
@@ -125,11 +128,20 @@ export default function HomePage() {
               {t.home.seeAll}
             </Link>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
-            {featured.map((o) => (
-              <OfferCard key={o.id} offer={o} />
-            ))}
-          </div>
+          {featured.length ? (
+            <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+              {featured.map((o) => (
+                <OfferCard key={o.id} offer={o} />
+              ))}
+            </div>
+          ) : (
+            <p className="rounded-3xl border border-dashed border-line bg-surface px-5 py-8 text-sm text-mute">
+              {t.home.marketEmpty}{" "}
+              <Link href="/publicar" className="font-semibold text-brand">
+                {t.home.ctaPublish}
+              </Link>
+            </p>
+          )}
         </div>
       </section>
 

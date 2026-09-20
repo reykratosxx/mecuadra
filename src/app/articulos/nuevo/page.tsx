@@ -12,12 +12,12 @@ import { CategorySelect } from "@/components/CategorySelect";
 import { useT } from "@/lib/i18n/provider";
 
 const SAMPLES = [
-  "https://images.unsplash.com/photo-1563453392212-326f5e854473?auto=format&fit=crop&w=800&q=70",
-  "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=800&q=70",
-  "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=70",
-  "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?auto=format&fit=crop&w=800&q=70",
-  "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=70",
-  "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=800&q=70",
+  "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=800&q=70",
+  "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=800&q=70",
+  "https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=800&q=70",
+  "https://images.unsplash.com/photo-1510915228340-29c29a4aa08c?auto=format&fit=crop&w=800&q=70",
+  "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=800&q=70",
+  "https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=800&q=70",
 ];
 
 export default function NuevoArticuloPage() {
@@ -95,12 +95,23 @@ function Form() {
           </div>
         </div>
         <div>
-          <label className="label">{t.items.fieldTitle}</label>
-          <input className="input" required value={title} onChange={(e) => setTitle(e.target.value)} />
+          <label className="label" htmlFor="item-title">
+            {t.items.fieldTitle}
+          </label>
+          <input
+            id="item-title"
+            className="input"
+            required
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
         </div>
         <div>
-          <label className="label">{t.items.description}</label>
+          <label className="label" htmlFor="item-description">
+            {t.items.description}
+          </label>
           <textarea
+            id="item-description"
             className="input min-h-24"
             required
             value={description}

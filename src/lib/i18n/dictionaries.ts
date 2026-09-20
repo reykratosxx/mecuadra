@@ -77,6 +77,7 @@ const en = {
       "You publish. Someone taps MeCuadra and proposes what they give. You coordinate in chat, confirm delivery, and rate. Reputation stays on the profile.",
     marketTitle: "P2P market",
     marketLead: "Open offers · what you have / what you need / city",
+    marketEmpty: "No open offers in the global market yet. Publish a swap — a bike for a camera, no price.",
     trustTitle: "Trust, not a money escrow",
     trustBody:
       "A ZK badge this browser can re-check — not a public list of who rated you. Reputation without a guest list.",
@@ -133,7 +134,7 @@ const en = {
     clear: "Clear",
     results: "See results",
     empty: "No offers match those filters.",
-    emptyHint: "Try another city or clear the filters.",
+    emptyHint: "Try another city, or publish the first Lisbon-style swap (bike for a camera, no price).",
     all: "All",
   },
   auth: {
@@ -154,7 +155,7 @@ const en = {
     signing: "Opening session…",
     error: "Could not sign in.",
     noExt: "No Nostr extension found. Generate a key or install Alby / nos2x.",
-    telegramOpt: "Optional: Telegram (legacy Cuba login)",
+    telegramOpt: "Optional: Telegram",
     telegramLead: "Not required. The cypherpunk path is a Bitcoin key.",
     exploreAnon: "Browse the market without signing in",
     bullets1: "Explore offers: free, no account.",
@@ -573,6 +574,8 @@ const es = {
       "Publicas. Alguien toca MeCuadra y propone qué da a cambio. Coordinan en el chat, confirman la entrega y se valoran. La reputación queda en el perfil.",
     marketTitle: "Mercado P2P",
     marketLead: "Ofertas abiertas · lo que tienes / lo que necesitas / ciudad",
+    marketEmpty:
+      "Aún no hay ofertas abiertas en el mercado global. Publica un trueque — bici por cámara, sin precio.",
     trustTitle: "Confianza, no escrow de dinero",
     trustBody:
       "Un badge ZK que este navegador puede volver a comprobar — no una lista pública de quién te valoró. Reputación sin lista de invitados.",
@@ -629,7 +632,7 @@ const es = {
     clear: "Limpiar",
     results: "Ver resultados",
     empty: "Ninguna oferta encaja con esos filtros.",
-    emptyHint: "Prueba otra ciudad o limpia los filtros.",
+    emptyHint: "Prueba otra ciudad, o publica el primer trueque estilo Lisboa (bici por cámara, sin precio).",
     all: "Todas",
   },
   auth: {
@@ -650,7 +653,7 @@ const es = {
     signing: "Abriendo sesión…",
     error: "No se pudo iniciar sesión.",
     noExt: "No hay extensión Nostr. Genera una clave o instala Alby / nos2x.",
-    telegramOpt: "Opcional: Telegram (login legado Cuba)",
+    telegramOpt: "Opcional: Telegram",
     telegramLead: "No es obligatorio. El camino cypherpunk es una clave Bitcoin.",
     exploreAnon: "Ver el mercado sin entrar",
     bullets1: "Explorar ofertas: libre, sin registro.",
