@@ -134,7 +134,7 @@ const en = {
     clear: "Clear",
     results: "See results",
     empty: "No offers match those filters.",
-    emptyHint: "Try another city, or publish the first Lisbon-style swap (bike for a camera, no price).",
+    emptyHint: "Try another city or clear the filters.",
     all: "All",
   },
   auth: {
@@ -632,7 +632,7 @@ const es = {
     clear: "Limpiar",
     results: "Ver resultados",
     empty: "Ninguna oferta encaja con esos filtros.",
-    emptyHint: "Prueba otra ciudad, o publica el primer trueque estilo Lisboa (bici por cámara, sin precio).",
+    emptyHint: "Prueba otra ciudad o limpia los filtros.",
     all: "Todas",
   },
   auth: {

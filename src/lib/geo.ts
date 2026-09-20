@@ -61,14 +61,3 @@ export function municipalitiesOf(country: string) {
 export function isKnownCountry(name: string) {
   return Boolean(COUNTRIES[name]);
 }
-
-const CUBA_CITIES = new Set((COUNTRIES.Cuba ?? []).map((c) => c.toLowerCase()));
-
-/** Shared Cuba production rows still live in the same DB. Hide them unless the judge filters there. */
-export function isLegacyCubaPlace(province: string, municipality = "") {
-  const country = province.trim().toLowerCase();
-  const city = municipality.trim().toLowerCase();
-  if (country === "cuba") return true;
-  if (CUBA_CITIES.has(country) || CUBA_CITIES.has(city)) return true;
-  return country.includes("habana") || city.includes("habana");
-}
